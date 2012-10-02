@@ -16,6 +16,9 @@ utt_wubi_new ()
   wubi_class_init (&utt->wubi);
   utt->previous_class_id = utt->class_id = CLASS_TYPE_NONE;
   utt->subclass_id = SUBCLASS_TYPE_NONE;
+
+  utt->table = wubi_table_new ();
+  wubi_table_parse_file (utt->table, "./Wubi.txt");
   return utt;
 }
 
@@ -48,6 +51,7 @@ utt_wubi_destroy (struct utt_wubi *utt)
   free_keyboard (&utt->kb_layout);
   wubi_class_free (&utt->wubi);
   g_object_unref (utt->record);
+  wubi_table_destroy (utt->table);
   g_free (utt);
 }
 

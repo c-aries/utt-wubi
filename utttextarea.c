@@ -720,3 +720,11 @@ utt_text_area_reset (UttTextArea *area)
   priv->mark_x = priv->mark_y = 0;
   utt_class_record_set_mode (priv->record, CLASS_ADVANCE_WITHOUT_CHECK);
 }
+
+gchar *
+utt_text_area_get_compare_text (UttTextArea *area)
+{
+  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+
+  return priv->text_cmp;
+}

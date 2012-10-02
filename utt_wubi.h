@@ -5,6 +5,7 @@
 #include "wubi_class.h"
 #include "uttclassrecord.h"
 #include "keyboard.h"
+#include "wubi_table.h"
 
 /* predefines */
 #define DISPLAY_CHAR_NUM 6
@@ -30,6 +31,7 @@ struct utt_wubi {
   struct ui ui;
   UttClassRecord *record;		 /* class statistics object */
   struct keyboard_layout kb_layout; /* keyboard object */
+  struct wubi_table *table;
   /* variables */
   enum class_type class_id, previous_class_id;
   int subclass_id;

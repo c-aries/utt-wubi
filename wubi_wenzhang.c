@@ -98,6 +98,49 @@ on_end_of_class (UttTextArea *area, struct utt_wubi *utt)
   }
 }
 
+static gboolean
+on_key_press (GtkWidget *widget, GdkEventKey *event, struct utt_wubi *utt)
+{
+  struct query_record *record;
+  gchar *name, *cmp_text, *code;
+  gchar **code_array;
+  gint i;
+
+  /* @0 if class not begin,
+     return, stop propagate the event further.
+     if the current page isn't related to the chosen class,
+     return, stop propagate the event further*/
+  if (!utt_class_record_has_begin (utt->record) ||
+      !utt_current_page_is_chosen_class (utt)) {
+    return TRUE;
+  }
+
+  /* @1 handle unprintable keys */
+  if (event->keyval == GDK_F2) {			/* help button */
+    if (priv->gen_chars) {
+      cmp_text = utt_text_area_get_compare_text (UTT_TEXT_AREA (priv->area));
+      record = wubi_article_query (utt->table, cmp_text);
+      if (record->num && record->code) {
+	name = (gchar *)g_malloc (3 * record->num + 1);
+	g_utf8_strncpy (name, cmp_text, record->num);
+
+	code_array = g_new0 (gchar *, record->code->len + 1);
+	for (i = 0; i < record->code->len; i++) {
+	  code_array[i] = g_ptr_array_index (record->code, i);
+	}
+	code = g_strjoinv (",", code_array);
+	g_free (code_array);
+
+	utt_info (utt, "%s: %s", name, code);
+	g_free (code);
+	g_free (name);
+      }
+      g_free (record);
+    }
+  }
+  return FALSE;
+}
+
 void
 wubi_wenzhang (struct utt_wubi *utt, GtkWidget *vbox)
 {
@@ -127,6 +170,7 @@ wubi_wenzhang (struct utt_wubi *utt, GtkWidget *vbox)
   gtk_box_pack_start (GTK_BOX (hbox), priv->area, TRUE, TRUE, 0);
   gtk_container_add (GTK_CONTAINER (frame), hbox);
   g_signal_connect (priv->area, "button-press-event", G_CALLBACK (on_button_press), menu);
+  g_signal_connect (priv->area, "key-press-event", G_CALLBACK (on_key_press), utt);
 
   priv->dash = utt_dashboard_new (priv->utt);
   gtk_box_pack_start (GTK_BOX (vbox), priv->dash->align, FALSE, FALSE, 0);

@@ -37,6 +37,7 @@ void utt_text_area_underscore_start_timeout (UttTextArea *area);
 void utt_text_area_underscore_restart_timeout (UttTextArea *area);
 void utt_text_area_class_begin (UttTextArea *area);
 void utt_text_area_class_end (UttTextArea *area);
+gchar *utt_text_area_get_compare_text (UttTextArea *area);
 
 G_END_DECLS
 
