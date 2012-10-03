@@ -84,6 +84,7 @@ on_end_of_class (UttTextArea *area, struct utt_wubi *utt)
 {
   gint ret;
 
+  g_print ("headache\n");
   gtk_widget_queue_draw (utt->ui.main_window);
   ret = utt_continue_dialog_run (utt);
   if (ret == GTK_RESPONSE_YES) {

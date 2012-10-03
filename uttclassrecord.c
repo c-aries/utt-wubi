@@ -267,10 +267,11 @@ utt_class_record_can_end (UttClassRecord *record)
 	     priv->stat.correct <= priv->stat.total) ||
 	    (priv->mode == CLASS_ADVANCE_WITHOUT_CHECK &&
 	     priv->stat.typed <= priv->stat.total));
-  if ((priv->mode == CLASS_ADVANCE_NEED_CORRECT &&
+  if (utt_class_record_has_begin (record) &&
+      ((priv->mode == CLASS_ADVANCE_NEED_CORRECT &&
        priv->stat.correct == priv->stat.total) ||
       (priv->mode == CLASS_ADVANCE_WITHOUT_CHECK &&
-       priv->stat.typed == priv->stat.total)) {
+       priv->stat.typed == priv->stat.total))) {
     return TRUE;
   }
   return FALSE;

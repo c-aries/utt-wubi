@@ -24,6 +24,7 @@ static gchar *jianma_subclass_name[] = {
 };
 static gchar *wenzhang_subclass_name[] = {
   "石苍舒醉墨堂",
+  "测试",
 };
 
 static gchar *yiji[] = {
