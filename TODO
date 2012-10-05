@@ -1,1 +1,8 @@
-utttextarea.c compare advance event.
+utttextarea.c "compare-advance" event.
+设计LOGO，美化UI
+帮助文档
+ibus, scim, fcitx的支持
+用户可配置的能力
+让文章键码帮助功能更适合初级用户
+除BUG
+用autotools, gettext规范化
