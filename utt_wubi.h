@@ -52,9 +52,14 @@ void utt_reset_class_clean_func (struct utt_wubi *utt, GFunc clean_func);
 /* common functions */
 gboolean utt_continue_dialog_run ();
 void utt_config_dialog_run (struct utt_wubi *utt, GtkWidget *box);
-/* subclass */
-void wubi_jianma (struct utt_wubi *utt, GtkWidget *vbox);
-void wubi_zigen (struct utt_wubi *utt, GtkWidget *vbox);
-void wubi_wenzhang (struct utt_wubi *utt, GtkWidget *vbox);
+
+#define load_plugin(name) \
+  extern struct utt_plugin name##_plugin; \
+  utt_register_plugin (utt->plugin, &name##_plugin)
+
+static inline gint utt_current_page (struct utt_wubi *utt)
+{
+  return gtk_notebook_get_current_page (GTK_NOTEBOOK (utt->ui.notebook));
+}
 
 #endif

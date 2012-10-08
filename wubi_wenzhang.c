@@ -15,10 +15,12 @@ static struct priv {
 static struct priv *priv = &_priv;
 
 static void on_config_click (GtkToolButton *button, gpointer user_data);
+static GtkWidget *main_page (gpointer user_data);
 
 struct utt_plugin wubi_wenzhang_plugin = {
   .plugin_name = "wubi::wenzhang",
   .locale_name = "文章",
+  .create_main_page = main_page,
   .config_button_click = on_config_click,
 };
 
@@ -163,15 +165,17 @@ on_config_click (GtkToolButton *button, gpointer user_data)
   utt_config_dialog_run (utt, vbox);
 }
 
-void
-wubi_wenzhang (struct utt_wubi *utt, GtkWidget *vbox)
+static GtkWidget *
+main_page (gpointer user_data)
 {
+  GtkWidget *vbox;
+  struct utt_wubi *utt = user_data;
   GtkWidget *frame, *hbox;
   GtkWidget *menu, *class_item;
   gint i;
 
+  vbox = gtk_vbox_new (FALSE, 0);
   priv->utt = utt;
-  utt_register_plugin (utt->plugin, &wubi_wenzhang_plugin);
 
   menu = gtk_menu_new ();	/* take care of memory leak */
   for (i = 0; i < wubi_class_get_subclass_num (&utt->wubi, CLASS_TYPE_WENZHANG); i++) {
@@ -197,4 +201,5 @@ wubi_wenzhang (struct utt_wubi *utt, GtkWidget *vbox)
 
   priv->dash = utt_dashboard_new (priv->utt);
   gtk_box_pack_start (GTK_BOX (vbox), priv->dash->align, FALSE, FALSE, 0);
+  return vbox;
 }

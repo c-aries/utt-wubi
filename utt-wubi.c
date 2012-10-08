@@ -256,10 +256,8 @@ static void
 on_preferences_click (GtkToolButton *button, struct utt_wubi *utt)
 {
   struct utt_plugin *plugin;
-  gint page;
 
-  page = gtk_notebook_get_current_page (GTK_NOTEBOOK (utt->ui.notebook));
-  plugin = utt_nth_plugin (utt->plugin, page);
+  plugin = utt_nth_plugin (utt->plugin, utt_current_page (utt));
   plugin->config_button_click (button, utt);
 }
 
@@ -288,6 +286,7 @@ int main (int argc, char *argv[])
   struct utt_wubi *utt;
   struct ui *ui;
   struct wubi_class *wubi;
+  struct utt_plugin *plugin;
   GtkWidget *window;
   GtkWidget *vbox, *vbox2, *label;
   GtkWidget *toolbar;
@@ -300,7 +299,11 @@ int main (int argc, char *argv[])
   utt = utt_wubi_new ();
   ui = &utt->ui;
   wubi = &utt->wubi;
+
   utt->plugin = utt_plugin_table_new ();
+  load_plugin (wubi_zigen);
+  load_plugin (wubi_jianma);
+  load_plugin (wubi_wenzhang);
 
   utt_class_record_set_total (utt->record, 5 * TEXT_MOD);
   utt_class_record_set_timer_func (utt->record, (GFunc)class_record_timer_func, &utt->ui);
@@ -334,19 +337,13 @@ int main (int argc, char *argv[])
 
   ui->notebook = gtk_notebook_new ();
   gtk_box_pack_start (GTK_BOX (vbox), ui->notebook, TRUE, TRUE, 0);
-  for (i = 0; i < wubi_class_get_class_num (wubi); i++) {
-    label = gtk_label_new (wubi_class_get_class_name (wubi, i));
+  for (i = 0; i < utt_get_plugin_num (utt->plugin); i++) {
+    plugin = utt_nth_plugin (utt->plugin, i);
+    label = gtk_label_new (plugin->locale_name);
     vbox2 = gtk_vbox_new (FALSE, 0);
-    gtk_notebook_append_page (GTK_NOTEBOOK (ui->notebook), vbox2, label);
-    if (i == CLASS_TYPE_ZIGEN) {
-      wubi_zigen (utt, vbox2);
-    }
-    else if (i == CLASS_TYPE_JIANMA) {
-      wubi_jianma (utt, vbox2);
-    }
-    else if (i == CLASS_TYPE_WENZHANG) {
-      wubi_wenzhang (utt, vbox2);
-    }
+    gtk_notebook_append_page (GTK_NOTEBOOK (ui->notebook),
+			      plugin->create_main_page (utt),
+			      label);
   }
   g_signal_connect (ui->notebook, "switch-page", G_CALLBACK (on_notebook_switch), utt);
 

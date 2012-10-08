@@ -44,3 +44,9 @@ utt_nth_plugin (struct utt_plugin_table *table, int n)
 {
   return g_list_nth_data (table->list, n);
 }
+
+gint
+utt_get_plugin_num (struct utt_plugin_table *table)
+{
+  return table->num;
+}

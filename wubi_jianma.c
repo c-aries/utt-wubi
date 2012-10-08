@@ -16,10 +16,12 @@ static struct priv {
 static struct priv *priv = &_priv;
 
 static void on_config_click (GtkToolButton *button, gpointer user_data);
+static GtkWidget *main_page (gpointer user_data);
 
 struct utt_plugin wubi_jianma_plugin = {
   .plugin_name = "wubi::jianma",
   .locale_name = "简码",
+  .create_main_page = main_page,
   .config_button_click = on_config_click,
 };
 
@@ -276,26 +278,31 @@ on_key_press (GtkWidget *widget, GdkEventKey *event, struct utt_wubi *utt)
 static void
 on_config_click (GtkToolButton *button, gpointer user_data)
 {
-  GtkWidget *vbox;
-  GtkWidget *label;
   struct utt_wubi *utt = user_data;
+  GtkWidget *vbox, *hbox, *label, *spin;
 
   vbox = gtk_vbox_new (FALSE, 0);
-  label = gtk_label_new ("训练的简码数目:");
-  gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 6);
+  hbox = gtk_hbox_new (TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
+  label = gtk_label_new ("训练的简码数目:");
+  gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, TRUE, 0);
+  spin = gtk_spin_button_new_with_range (36, 360, 6);
+  gtk_box_pack_end (GTK_BOX (hbox), spin, FALSE, TRUE, 0);
   utt_config_dialog_run (utt, vbox);
 }
 
-void
-wubi_jianma (struct utt_wubi *utt, GtkWidget *vbox)
+static GtkWidget *
+main_page (gpointer user_data)
 {
+  GtkWidget *vbox;
+  struct utt_wubi *utt = user_data;
   GtkWidget *frame, *hbox, *hbox2, *align;
   GtkWidget *menu, *class_item;
   gint i;
 
+  vbox = gtk_vbox_new (FALSE, 0);
   priv->utt = utt;
-  utt_register_plugin (utt->plugin, &wubi_jianma_plugin);
 
   menu = gtk_menu_new ();	/* take care of memory leak */
   for (i = 0; i < wubi_class_get_subclass_num (&utt->wubi, CLASS_TYPE_JIANMA); i++) {
@@ -353,4 +360,5 @@ wubi_jianma (struct utt_wubi *utt, GtkWidget *vbox)
 
   priv->dash = utt_dashboard_new (priv->utt);
   gtk_box_pack_start (GTK_BOX (vbox), priv->dash->align, FALSE, FALSE, 0);
+  return vbox;
 }
