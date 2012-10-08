@@ -159,9 +159,11 @@ on_config_click (GtkToolButton *button, gpointer user_data)
   struct utt_wubi *utt = user_data;
 
   vbox = gtk_vbox_new (FALSE, 0);
-  label = gtk_label_new ("文章训练配置:");
-  gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 6);
+  label = gtk_label_new ("添加文章");
+  gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
+  label = gtk_label_new ("考试模式/训练模式");
+  gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
   utt_config_dialog_run (utt, vbox);
 }
 
