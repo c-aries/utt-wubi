@@ -12,6 +12,8 @@
 #define DISPLAY_CHAR_NUM 6
 #define TEXT_MOD DISPLAY_CHAR_NUM
 #define TEXT_TOTAL (6 * TEXT_MOD)
+#define MAX_KEYTEXT (60 * TEXT_MOD)
+#define MIN_KEYTEXT (6 * TEXT_MOD)
 
 struct utt_ui {
   GtkWidget *ch_draw[DISPLAY_CHAR_NUM];

@@ -1,5 +1,6 @@
 #include <glib/gprintf.h>
 #include <gdk/gdkkeysyms.h>
+#include <gconf/gconf-client.h>
 #include <ctype.h>
 #include <string.h>
 #include "utt_wubi.h"
@@ -76,6 +77,36 @@ wubi_jianma_genchars_with_check ()
   return FALSE;
 }
 
+static gint
+get_text_num ()
+{
+  GConfClient *config;
+  GConfValue *value;
+  gint default_num = MIN_KEYTEXT;
+
+  config = gconf_client_get_default ();
+  value = gconf_client_get (config, "/apps/utt/wubi/jianma_num", NULL);
+  if (value && value->type == GCONF_VALUE_INT) {
+    default_num = gconf_value_get_int (value);
+  }
+  g_object_unref (config);
+  return default_num;
+}
+
+static gboolean
+set_text_num (gint num)
+{
+  GConfClient *config;
+
+  if (num >= MIN_KEYTEXT && num <= MAX_KEYTEXT && num % TEXT_MOD == 0) {
+    config = gconf_client_get_default ();
+    gconf_client_set_int (config, "/apps/utt/wubi/jianma_num", num, NULL);
+    g_object_unref (config);
+    return TRUE;
+  }
+  return FALSE;
+}
+
 static void
 on_class_item_activate (GtkMenuItem *item, int subclass_id)
 {
@@ -89,7 +120,7 @@ on_class_item_activate (GtkMenuItem *item, int subclass_id)
   /* @1 initialize the current class(init = clean + set),
      set pause button inactive and sensitive, then update the notify content */
   wubi_jianma_clean ();
-  utt_class_record_set_total (priv->utt->record, 5 * TEXT_MOD);
+  utt_class_record_set_total (priv->utt->record, get_text_num ());
   utt_class_record_set_mode (priv->utt->record, CLASS_ADVANCE_NEED_CORRECT);
   wubi_jianma_genchars ();
   gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON (priv->utt->ui.pause_button), FALSE);
@@ -276,6 +307,12 @@ on_key_press (GtkWidget *widget, GdkEventKey *event, struct utt_wubi *utt)
 }
 
 static void
+on_spin_change (GtkSpinButton *button, gpointer user_data)
+{
+  set_text_num (gtk_spin_button_get_value (button));
+}
+
+static void
 on_config_click (GtkToolButton *button, gpointer user_data)
 {
   struct utt_wubi *utt = user_data;
@@ -283,11 +320,13 @@ on_config_click (GtkToolButton *button, gpointer user_data)
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 6);
-  hbox = gtk_hbox_new (TRUE, 0);
+  hbox = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
-  label = gtk_label_new ("训练的简码数目:");
+  label = gtk_label_new ("简码数目(下次训练时生效):");
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, TRUE, 0);
-  spin = gtk_spin_button_new_with_range (36, 360, 6);
+  spin = gtk_spin_button_new_with_range (MIN_KEYTEXT, MAX_KEYTEXT, TEXT_MOD);
+  g_signal_connect (spin, "value-changed", G_CALLBACK (on_spin_change), NULL);
+  gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin), get_text_num ());
   gtk_box_pack_end (GTK_BOX (hbox), spin, FALSE, TRUE, 0);
   utt_config_dialog_run (utt, vbox);
 }

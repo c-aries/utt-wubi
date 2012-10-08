@@ -1,5 +1,5 @@
-CFLAGS:=$(shell pkg-config --cflags gtk+-2.0) -Werror -Wall -g
-LDFLAGS:=$(shell pkg-config --libs gtk+-2.0)
+CFLAGS:=$(shell pkg-config --cflags gtk+-2.0 gconf-2.0) -Werror -Wall -g
+LDFLAGS:=$(shell pkg-config --libs gtk+-2.0 gconf-2.0)
 TARGET:= utt-wubi
 
 all: $(TARGET)
