@@ -7,7 +7,8 @@ all: $(TARGET)
 utt-wubi: utt_wubi.h \
 	keyboard.o wubi_class.o wubi_article.o zigen_images.o wubi_table.o \
 	wubi_zigen.o wubi_jianma.o wubi_wenzhang.o \
-	utttextarea.o utt_dashboard.o uttclassrecord.o
+	utttextarea.o utt_dashboard.o uttclassrecord.o \
+	utt_plugin.o
 
 utt_class.o: utt_class.c utt_class.h
 wubi_zigen.o: wubi_zigen.c
@@ -19,6 +20,7 @@ wubi_class.o: wubi_class.c wubi_class.h
 keyboard.o: keyboard.c keyboard.h
 uttclassrecord.o: uttclassrecord.c uttclassrecord.h
 wubi_table.o: wubi_table.c wubi_table.h
+utt_plugin.o: utt_plugin.c utt_plugin.h
 
 debug: test.o utttextarea.o class.o
 	gcc -DDEBUG_MAIN $(CFLAGS) $(LDFLAGS) $^

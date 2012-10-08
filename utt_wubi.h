@@ -6,6 +6,7 @@
 #include "uttclassrecord.h"
 #include "keyboard.h"
 #include "wubi_table.h"
+#include "utt_plugin.h"
 
 /* predefines */
 #define DISPLAY_CHAR_NUM 6
@@ -25,6 +26,7 @@ struct ui {
   GtkWidget *info;
   guint info_id;
   GtkToolItem *pause_button;
+  GtkToolItem *config_button;
 };
 struct utt_wubi {
   struct wubi_class wubi;
@@ -32,6 +34,7 @@ struct utt_wubi {
   UttClassRecord *record;		 /* class statistics object */
   struct keyboard_layout kb_layout; /* keyboard object */
   struct wubi_table *table;
+  struct utt_plugin_table *plugin;
   /* variables */
   enum class_type class_id, previous_class_id;
   int subclass_id;
@@ -48,6 +51,7 @@ void utt_set_class_clean_func (struct utt_wubi *utt, GFunc clean_func);
 void utt_reset_class_clean_func (struct utt_wubi *utt, GFunc clean_func);
 /* common functions */
 gboolean utt_continue_dialog_run ();
+void utt_config_dialog_run (struct utt_wubi *utt, GtkWidget *box);
 /* subclass */
 void wubi_jianma (struct utt_wubi *utt, GtkWidget *vbox);
 void wubi_zigen (struct utt_wubi *utt, GtkWidget *vbox);

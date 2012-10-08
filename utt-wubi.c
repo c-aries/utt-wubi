@@ -215,11 +215,12 @@ static gboolean
 on_delete (GtkWidget *window, GdkEvent *event, struct utt_wubi *utt)
 {
   utt_wubi_destroy (utt);
+  utt_plugin_table_destroy (utt->plugin);
   return FALSE;
 }
 
-static void
-utt_config_dialog_run (struct utt_wubi *utt)
+void
+utt_config_dialog_run (struct utt_wubi *utt, GtkWidget *box)
 {
   GtkWidget *dialog, *content, *notebook;
   GtkWidget *vbox, *label;
@@ -232,15 +233,15 @@ utt_config_dialog_run (struct utt_wubi *utt)
 					GTK_STOCK_CLOSE,
 					GTK_RESPONSE_CLOSE,
 					NULL);
+  gtk_widget_set_size_request (dialog, 320, 240);
   content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   notebook = gtk_notebook_new ();
   gtk_container_add (GTK_CONTAINER (content), notebook);
 
-  vbox = gtk_vbox_new (FALSE, 0);
   page = gtk_notebook_get_current_page (GTK_NOTEBOOK (utt->ui.notebook));
   name = wubi_class_get_class_name (&utt->wubi, page);
   label = gtk_label_new (name);
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), box, label);
 
   vbox = gtk_vbox_new (FALSE, 0);
   label = gtk_label_new ("全局");
@@ -254,7 +255,12 @@ utt_config_dialog_run (struct utt_wubi *utt)
 static void
 on_preferences_click (GtkToolButton *button, struct utt_wubi *utt)
 {
-  utt_config_dialog_run (utt);
+  struct utt_plugin *plugin;
+  gint page;
+
+  page = gtk_notebook_get_current_page (GTK_NOTEBOOK (utt->ui.notebook));
+  plugin = utt_nth_plugin (utt->plugin, page);
+  plugin->config_button_click (button, utt);
 }
 
 static void
@@ -294,6 +300,7 @@ int main (int argc, char *argv[])
   utt = utt_wubi_new ();
   ui = &utt->ui;
   wubi = &utt->wubi;
+  utt->plugin = utt_plugin_table_new ();
 
   utt_class_record_set_total (utt->record, 5 * TEXT_MOD);
   utt_class_record_set_timer_func (utt->record, (GFunc)class_record_timer_func, &utt->ui);
@@ -319,9 +326,9 @@ int main (int argc, char *argv[])
   gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (item), -1);
   item = gtk_tool_button_new_from_stock (GTK_STOCK_DIALOG_INFO);
   gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (item), -1);
-  item = gtk_tool_button_new_from_stock (GTK_STOCK_PREFERENCES);
-  gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (item), -1);
-  g_signal_connect (item, "clicked", G_CALLBACK (on_preferences_click), utt);
+  ui->config_button = gtk_tool_button_new_from_stock (GTK_STOCK_PREFERENCES);
+  g_signal_connect (ui->config_button, "clicked", G_CALLBACK (on_preferences_click), utt);
+  gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (ui->config_button), -1);
   item = gtk_tool_button_new_from_stock (GTK_STOCK_HELP);
   gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (item), -1);
 
