@@ -257,6 +257,26 @@ on_preferences_click (GtkToolButton *button, struct utt_wubi *utt)
   utt_config_dialog_run (utt);
 }
 
+static void
+logo_setup ()
+{
+  GdkPixbuf *pixbuf = NULL;
+  GError *error = NULL;
+  GList *list = NULL;
+
+  pixbuf = gdk_pixbuf_new_from_file ("./logo.png", &error);
+  if (error) {
+    g_error_free (error);
+    return;
+  }
+  if (pixbuf) {
+    list = g_list_append (list, pixbuf);
+    gtk_window_set_default_icon_list (list);
+    g_list_free (list);
+    g_object_unref (pixbuf);
+  }
+}
+
 int main (int argc, char *argv[])
 {
   struct utt_wubi *utt;
@@ -270,6 +290,7 @@ int main (int argc, char *argv[])
 
   gtk_init (&argc, &argv);
 
+  logo_setup ();
   utt = utt_wubi_new ();
   ui = &utt->ui;
   wubi = &utt->wubi;
