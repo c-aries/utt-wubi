@@ -1,9 +1,16 @@
 #include <string.h>
 #include <glib/gprintf.h>
 #include <gdk/gdkkeysyms.h>
+#include <gconf/gconf-client.h>
 #include "utt_wubi.h"
 #include "utttextarea.h"
 #include "utt_dashboard.h"
+
+enum mode {
+  TEST_MODE,
+  EXAM_MODE,
+  N_MODE,
+};
 
 static struct priv {
   struct utt_wubi *utt;
@@ -151,19 +158,68 @@ on_key_press (GtkWidget *widget, GdkEventKey *event, struct utt_wubi *utt)
   return FALSE;
 }
 
+static enum mode
+get_mode ()
+{
+  GConfClient *config;
+  GConfValue *value;
+  gint default_mode = TEST_MODE;
+
+  config = gconf_client_get_default ();
+  value = gconf_client_get (config, "/apps/utt/wubi/wenzhang_mode", NULL);
+  if (value && value->type == GCONF_VALUE_INT) {
+    default_mode = gconf_value_get_int (value);
+  }
+  g_object_unref (config);
+  return default_mode;
+}
+
+static gboolean
+set_mode (enum mode mode)
+{
+  GConfClient *config;
+
+  if (mode >= TEST_MODE && mode <= EXAM_MODE) {
+    config = gconf_client_get_default ();
+    gconf_client_set_int (config, "/apps/utt/wubi/wenzhang_mode", mode, NULL);
+    g_object_unref (config);
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static void
+on_radio_toggle (GtkToggleButton *button, enum mode mode)
+{
+  if (gtk_toggle_button_get_active (button)) {
+    set_mode (mode);
+  }
+}
+
 static void
 on_config_click (GtkToolButton *button, gpointer user_data)
 {
-  GtkWidget *vbox;
-  GtkWidget *label;
+  GtkWidget *vbox, *hbox, *label;
+  GtkWidget *radio[N_MODE];
   struct utt_wubi *utt = user_data;
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 6);
+  hbox = gtk_hbox_new (FALSE, 0);
   label = gtk_label_new ("添加文章");
   gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
-  label = gtk_label_new ("考试模式/训练模式");
-  gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
+  label = gtk_label_new ("模式(下次训练时生效):");
+  gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, TRUE, 0);
+
+  radio[EXAM_MODE] = gtk_radio_button_new_with_label (NULL, "考试");
+  g_signal_connect (radio[EXAM_MODE], "toggled", G_CALLBACK (on_radio_toggle), GINT_TO_POINTER (EXAM_MODE));
+  gtk_box_pack_end (GTK_BOX (hbox), radio[EXAM_MODE], FALSE, TRUE, 0);
+  radio[TEST_MODE] = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio[EXAM_MODE]), "训练");
+  g_signal_connect (radio[TEST_MODE], "toggled", G_CALLBACK (on_radio_toggle), GINT_TO_POINTER (TEST_MODE));
+  gtk_box_pack_end (GTK_BOX (hbox), radio[TEST_MODE], FALSE, TRUE, 0);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio[get_mode ()]), TRUE);
+
   utt_config_dialog_run (utt, vbox);
 }
 
