@@ -12,6 +12,7 @@ struct utt_plugin {
   gchar *plugin_name;
   gchar *locale_name;
   GtkWidget *(*create_main_page) (gpointer user_data);
+  void (*class_clean) (void);
   void (*config_button_click) (GtkToolButton *button, gpointer user_data);
 };
 

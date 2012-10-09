@@ -24,13 +24,6 @@ static struct priv *priv = &_priv;
 static void on_config_click (GtkToolButton *button, gpointer user_data);
 static GtkWidget *main_page (gpointer user_data);
 
-struct utt_plugin wubi_wenzhang_plugin = {
-  .plugin_name = "wubi::wenzhang",
-  .locale_name = "文章",
-  .create_main_page = main_page,
-  .config_button_click = on_config_click,
-};
-
 static void
 wubi_wenzhang_clean ()
 {
@@ -261,3 +254,25 @@ main_page (gpointer user_data)
   gtk_box_pack_start (GTK_BOX (vbox), priv->dash->align, FALSE, FALSE, 0);
   return vbox;
 }
+
+static void
+class_clean ()
+{
+  utt_text_area_class_end (UTT_TEXT_AREA (priv->area));
+  if (priv->gen_chars) {
+    g_free (priv->gen_chars);
+    priv->gen_chars = NULL;
+  }
+  if (gtk_main_level () != 0) {
+    gtk_progress_bar_set_text (GTK_PROGRESS_BAR (priv->dash->progress), "0%");
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->dash->progress), 0);
+  }
+}
+
+struct utt_plugin wubi_wenzhang_plugin = {
+  .plugin_name = "wubi::wenzhang",
+  .locale_name = "文章",
+  .create_main_page = main_page,
+  .class_clean = class_clean,
+  .config_button_click = on_config_click,
+};

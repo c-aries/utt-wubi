@@ -375,9 +375,26 @@ main_page (gpointer user_data)
   return vbox;
 }
 
+static void
+class_clean ()
+{
+  utt_class_record_end (priv->utt->record);
+  if (priv->gen_chars) {
+    free_zigen_chars (priv->gen_chars);
+    priv->gen_chars = NULL;
+  }
+  priv->key_press = NULL;
+  priv->match = FALSE;
+  if (gtk_main_level () != 0) {
+    gtk_progress_bar_set_text (GTK_PROGRESS_BAR (priv->dash->progress), "0%");
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->dash->progress), 0);
+  }
+}
+
 struct utt_plugin wubi_zigen_plugin = {
   .plugin_name = "wubi::zigen",
   .locale_name = "字根",
+  .class_clean = class_clean,
   .create_main_page = main_page,
   .config_button_click = on_config_click,
 };

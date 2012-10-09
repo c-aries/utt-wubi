@@ -16,16 +16,6 @@ static struct priv {
 } _priv;			/* _ means instance */
 static struct priv *priv = &_priv;
 
-static void on_config_click (GtkToolButton *button, gpointer user_data);
-static GtkWidget *main_page (gpointer user_data);
-
-struct utt_plugin wubi_jianma_plugin = {
-  .plugin_name = "wubi::jianma",
-  .locale_name = "简码",
-  .create_main_page = main_page,
-  .config_button_click = on_config_click,
-};
-
 static void
 wubi_jianma_clean ()
 {
@@ -401,3 +391,27 @@ main_page (gpointer user_data)
   gtk_box_pack_start (GTK_BOX (vbox), priv->dash->align, FALSE, FALSE, 0);
   return vbox;
 }
+
+static void
+class_clean ()
+{
+  utt_class_record_end (priv->utt->record);
+  if (priv->gen_chars) {
+    g_free (priv->gen_chars);
+    priv->gen_chars = NULL;
+  }
+  priv->key_press = NULL;
+  priv->match = FALSE;
+  if (gtk_main_level () != 0) {
+    gtk_progress_bar_set_text (GTK_PROGRESS_BAR (priv->dash->progress), "0%");
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->dash->progress), 0);
+  }
+}
+
+struct utt_plugin wubi_jianma_plugin = {
+  .plugin_name = "wubi::jianma",
+  .locale_name = "简码",
+  .create_main_page = main_page,
+  .class_clean = class_clean,
+  .config_button_click = on_config_click,
+};
