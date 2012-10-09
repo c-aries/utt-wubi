@@ -408,9 +408,20 @@ class_clean ()
   }
 }
 
+static gchar *
+nth_class_name (gint n)
+{
+  static gchar *name[] = {
+    "一级简码",
+  };
+  return name[n];
+}
+
 struct utt_plugin wubi_jianma_plugin = {
   .plugin_name = "wubi::jianma",
   .locale_name = "简码",
+  .class_num = 1,
+  .nth_class_name = nth_class_name,
   .create_main_page = main_page,
   .class_clean = class_clean,
   .config_button_click = on_config_click,

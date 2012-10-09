@@ -281,6 +281,67 @@ logo_setup ()
   }
 }
 
+static GtkWidget *
+fill_content_area (GtkWidget *content_area, struct utt_plugin *plugin)
+{
+  GtkWidget *view;
+  GtkCellRenderer *renderer;
+  GtkTreeViewColumn *column;
+  GtkTreeIter iter;
+  GtkListStore *store;
+  gint i;
+
+  store = gtk_list_store_new (1, G_TYPE_STRING);
+  for (i = 0; i < plugin->class_num; i++) {
+    gtk_list_store_append (store, &iter);
+    gtk_list_store_set (store, &iter,
+			0, plugin->nth_class_name (i),
+			-1);
+  }
+
+  view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (store));
+  gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), FALSE);
+  renderer = gtk_cell_renderer_text_new (); /* FIXME: memory leak? */
+  column = gtk_tree_view_column_new_with_attributes ("", renderer,
+						     "text", 0,
+						     NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (view), column);
+  gtk_container_add (GTK_CONTAINER (content_area), view);
+  return view;
+}
+
+static void
+on_index_click (GtkToolButton *button, struct utt_wubi *utt)
+{
+  GtkWidget *dialog, *content_area, *view;
+  GtkTreeSelection *sel;
+  GtkTreePath *path;
+  GtkTreeIter iter;
+  gint ret, id;
+  struct utt_plugin *plugin;
+
+  plugin = utt_nth_plugin (utt->plugin, utt_current_page (utt));
+
+  dialog = gtk_dialog_new_with_buttons ("请选择课程内容",
+					GTK_WINDOW (utt->ui.main_window),
+					GTK_DIALOG_DESTROY_WITH_PARENT,
+					GTK_STOCK_OK, GTK_RESPONSE_OK,
+					GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+					NULL);
+  content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  view = fill_content_area (content_area, plugin);
+  gtk_widget_show_all (dialog);
+  ret = gtk_dialog_run (GTK_DIALOG (dialog));
+  if (ret == GTK_RESPONSE_OK) {
+    sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (view));
+    gtk_tree_selection_get_selected (sel, NULL, &iter);
+    path = gtk_tree_model_get_path (gtk_tree_view_get_model (GTK_TREE_VIEW (view)),
+				    &iter);
+    id = gtk_tree_path_get_indices (path)[0];
+  }
+  gtk_widget_destroy (dialog);
+}
+
 int main (int argc, char *argv[])
 {
   struct utt_wubi *utt;
@@ -321,6 +382,7 @@ int main (int argc, char *argv[])
   gtk_box_pack_start (GTK_BOX (vbox), toolbar, FALSE, FALSE, 0);
   item = gtk_tool_button_new_from_stock (GTK_STOCK_INDEX);
   gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (item), -1);
+  g_signal_connect (item, "clicked", G_CALLBACK (on_index_click), utt);
   ui->pause_button = gtk_toggle_tool_button_new_from_stock (GTK_STOCK_MEDIA_PAUSE);
   gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (ui->pause_button), -1);
   g_signal_connect (ui->pause_button, "toggled", G_CALLBACK (on_pause_button_toggled), utt);

@@ -391,9 +391,25 @@ class_clean ()
   }
 }
 
+static gchar *
+nth_class_name (gint n)
+{
+  static gchar *name[] = {
+    "横区(ASDFG)",
+    "竖区(HJKLM)",
+    "撇区(QWERT)",
+    "捺区(YUIOP)",
+    "折区(XCVBN)",
+    "综合",
+  };
+  return name[n];
+}
+
 struct utt_plugin wubi_zigen_plugin = {
   .plugin_name = "wubi::zigen",
   .locale_name = "字根",
+  .class_num = 6,
+  .nth_class_name = nth_class_name,
   .class_clean = class_clean,
   .create_main_page = main_page,
   .config_button_click = on_config_click,

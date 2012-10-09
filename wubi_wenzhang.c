@@ -269,9 +269,21 @@ class_clean ()
   }
 }
 
+static gchar *
+nth_class_name (gint n)
+{
+  static gchar *name[] = {
+    "石苍舒醉墨堂",
+    "测试",
+  };
+  return name[n];
+}
+
 struct utt_plugin wubi_wenzhang_plugin = {
   .plugin_name = "wubi::wenzhang",
   .locale_name = "文章",
+  .class_num = 2,
+  .nth_class_name = nth_class_name,
   .create_main_page = main_page,
   .class_clean = class_clean,
   .config_button_click = on_config_click,
