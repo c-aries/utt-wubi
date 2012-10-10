@@ -3,6 +3,8 @@ GitHub SSH
 
 Take utt.git as an example
 * initialization
+$ git config --global user.name "c-aries"
+$ git config --global user.email "babyaries2@gmail.com"
 $ ssh-keygen -C 'babyaries2@gmail.com' -t rsa
 $ cat ~/.ssh/id_rsa.pub
 $ ssh-agent
@@ -29,4 +31,12 @@ $ git remote add upstream https://github.com/c-aries/utt-wubi.git
 $ git remote
 $ git fetch upstream
 $ git merge upstream/master
+or use github "pull request" button
+$ git push
+Username: 
+Password: 
+= =b> This is your github account password
+= =b> If you don't use github, you can use email, send him patch, ask the upstreamer to "remote add", "fetch", "merge"
+  If you have the upsterm account, you can push yourself
 $ git push upstream
+>> https://help.github.com/articles/using-pull-requests
