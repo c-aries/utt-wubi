@@ -159,7 +159,7 @@ get_mode ()
   gint default_mode = TEST_MODE;
 
   config = gconf_client_get_default ();
-  value = gconf_client_get (config, "/apps/utt/wubi/wenzhang_mode", NULL);
+  value = gconf_client_get (config, "/apps/utt/wubi/wenzhang/mode", NULL);
   if (value && value->type == GCONF_VALUE_INT) {
     default_mode = gconf_value_get_int (value);
   }
@@ -174,7 +174,7 @@ set_mode (enum mode mode)
 
   if (mode >= TEST_MODE && mode <= EXAM_MODE) {
     config = gconf_client_get_default ();
-    gconf_client_set_int (config, "/apps/utt/wubi/wenzhang_mode", mode, NULL);
+    gconf_client_set_int (config, "/apps/utt/wubi/wenzhang/mode", mode, NULL);
     g_object_unref (config);
     return TRUE;
   }

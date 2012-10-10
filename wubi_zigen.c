@@ -78,7 +78,7 @@ get_text_num ()
   gint default_num = MIN_KEYTEXT;
 
   config = gconf_client_get_default ();
-  value = gconf_client_get (config, "/apps/utt/wubi/zigen_num", NULL);
+  value = gconf_client_get (config, "/apps/utt/wubi/zigen/text_num", NULL);
   if (value && value->type == GCONF_VALUE_INT) {
     default_num = gconf_value_get_int (value);
   }
@@ -93,7 +93,7 @@ set_text_num (gint num)
 
   if (num >= MIN_KEYTEXT && num <= MAX_KEYTEXT && num % TEXT_MOD == 0) {
     config = gconf_client_get_default ();
-    gconf_client_set_int (config, "/apps/utt/wubi/zigen_num", num, NULL);
+    gconf_client_set_int (config, "/apps/utt/wubi/zigen/text_num", num, NULL);
     g_object_unref (config);
     return TRUE;
   }
