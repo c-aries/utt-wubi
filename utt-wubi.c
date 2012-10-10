@@ -318,6 +318,15 @@ fill_content_area (GtkWidget *content_area, struct utt_plugin *plugin)
   return view;
 }
 
+static gboolean
+on_index_key_press (GtkWidget *widget, GdkEventKey *event, GtkDialog *dialog)
+{
+  if (event->keyval == GDK_Return) {
+    gtk_dialog_response (dialog, GTK_RESPONSE_OK);
+  }
+  return FALSE;
+}
+
 static void
 on_index_click (GtkToolButton *button, struct utt_wubi *utt)
 {
@@ -338,6 +347,7 @@ on_index_click (GtkToolButton *button, struct utt_wubi *utt)
 					NULL);
   content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   view = fill_content_area (content_area, plugin);
+  g_signal_connect (view, "key-press-event", G_CALLBACK (on_index_key_press), dialog);
   gtk_widget_show_all (dialog);
   ret = gtk_dialog_run (GTK_DIALOG (dialog));
   if (ret == GTK_RESPONSE_OK) {
@@ -431,7 +441,7 @@ int main (int argc, char *argv[])
   gtk_box_pack_start (GTK_BOX (vbox), ui->info, FALSE, FALSE, 0);
   gtk_statusbar_push (GTK_STATUSBAR (ui->info),
 		      ui->info_id,
-		      "右键点击\"键盘/比对输入\"选择开始训练的项目,按F2可获得当前字词输入方法的提示.");
+		      "回车选择开始训练的项目,按F2可获得当前字词输入方法的提示.");
 
   g_signal_connect (window, "focus-out-event", G_CALLBACK (on_focus_out), utt);
 
