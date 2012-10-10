@@ -22,3 +22,10 @@ $ git push -u wubi wubi
 $ git checkout wubi
 $ git pull
 $ git fetch origin wubi:wubi
+* upstream
+Assume your name is babyaries, fork from c-aries at github, then
+$ git clone https://github.com/babyaries/utt-wubi.git
+$ git remote add upstream https://github.com/c-aries/utt-wubi.git
+$ git remote
+$ git fetch upstream
+$ git merge upstream/master
