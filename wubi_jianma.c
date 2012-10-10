@@ -6,6 +6,10 @@
 #include "utt_wubi.h"
 #include "utt_dashboard.h"
 
+#define TEXT_NUM_CONF "/apps/utt/wubi/jianma/text_num"
+#define CLASS_INDEX_CONF "/apps/utt/wubi/jianma/class_index"
+#define CLASS_NUM 1
+
 static struct priv {
   struct utt_wubi *utt;
   struct utt_ui ui;
@@ -75,7 +79,7 @@ get_text_num ()
   gint default_num = MIN_KEYTEXT;
 
   config = gconf_client_get_default ();
-  value = gconf_client_get (config, "/apps/utt/wubi/jianma/text_num", NULL);
+  value = gconf_client_get (config, TEXT_NUM_CONF, NULL);
   if (value && value->type == GCONF_VALUE_INT) {
     default_num = gconf_value_get_int (value);
   }
@@ -90,7 +94,37 @@ set_text_num (gint num)
 
   if (num >= MIN_KEYTEXT && num <= MAX_KEYTEXT && num % TEXT_MOD == 0) {
     config = gconf_client_get_default ();
-    gconf_client_set_int (config, "/apps/utt/wubi/jianma/text_num", num, NULL);
+    gconf_client_set_int (config, TEXT_NUM_CONF, num, NULL);
+    g_object_unref (config);
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static gint
+get_class_index ()
+{
+  GConfClient *config;
+  GConfValue *value;
+  gint default_index = 0;
+
+  config = gconf_client_get_default ();
+  value = gconf_client_get (config, CLASS_INDEX_CONF, NULL);
+  if (value && value->type == GCONF_VALUE_INT) {
+    default_index = gconf_value_get_int (value);
+  }
+  g_object_unref (config);
+  return default_index;
+}
+
+static gboolean
+set_class_index (gint index)
+{
+  GConfClient *config;
+
+  if (index >= 0 && index < CLASS_NUM) {
+    config = gconf_client_get_default ();
+    gconf_client_set_int (config, CLASS_INDEX_CONF, index, NULL);
     g_object_unref (config);
     return TRUE;
   }
@@ -393,6 +427,25 @@ main_page (gpointer user_data)
 }
 
 static void
+class_begin ()
+{
+  /* @1 initialize the current class(init = clean + set),
+     set pause button inactive and sensitive, then update the notify content */
+  wubi_jianma_clean ();
+  utt_class_record_set_total (priv->utt->record, get_text_num ());
+  utt_class_record_set_mode (priv->utt->record, CLASS_ADVANCE_NEED_CORRECT);
+  wubi_jianma_genchars ();
+  gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON (priv->utt->ui.pause_button), FALSE);
+  gtk_widget_set_sensitive (GTK_WIDGET (priv->utt->ui.pause_button), TRUE);
+  utt_info (priv->utt, "");
+
+  /* @2 class begin, grab keyboard focus, and update all ui */
+  utt_class_record_begin (priv->utt->record);
+  gtk_widget_grab_focus (priv->ui.kb_draw);
+  gtk_widget_queue_draw (priv->utt->ui.main_window);
+}
+
+static void
 class_clean ()
 {
   utt_class_record_end (priv->utt->record);
@@ -420,9 +473,12 @@ nth_class_name (gint n)
 struct utt_plugin wubi_jianma_plugin = {
   .plugin_name = "wubi::jianma",
   .locale_name = "简码",
-  .class_num = 1,
+  .class_num = CLASS_NUM,
   .nth_class_name = nth_class_name,
+  .get_class_index = get_class_index,
+  .set_class_index = set_class_index,
   .create_main_page = main_page,
+  .class_begin = class_begin,
   .class_clean = class_clean,
   .config_button_click = on_config_click,
 };

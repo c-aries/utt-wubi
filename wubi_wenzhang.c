@@ -12,6 +12,10 @@ enum mode {
   N_MODE,
 };
 
+#define MODE_CONF "/apps/utt/wubi/jianma/mode"
+#define CLASS_INDEX_CONF "/apps/utt/wubi/wenzhang/class_index"
+#define CLASS_NUM 2
+
 static struct priv {
   struct utt_wubi *utt;
   struct utt_ui ui;
@@ -159,7 +163,7 @@ get_mode ()
   gint default_mode = TEST_MODE;
 
   config = gconf_client_get_default ();
-  value = gconf_client_get (config, "/apps/utt/wubi/wenzhang/mode", NULL);
+  value = gconf_client_get (config, MODE_CONF, NULL);
   if (value && value->type == GCONF_VALUE_INT) {
     default_mode = gconf_value_get_int (value);
   }
@@ -174,7 +178,38 @@ set_mode (enum mode mode)
 
   if (mode >= TEST_MODE && mode <= EXAM_MODE) {
     config = gconf_client_get_default ();
-    gconf_client_set_int (config, "/apps/utt/wubi/wenzhang/mode", mode, NULL);
+    gconf_client_set_int (config, MODE_CONF, mode, NULL);
+    g_object_unref (config);
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/* FIXME: common function */
+static gint
+get_class_index ()
+{
+  GConfClient *config;
+  GConfValue *value;
+  gint default_index = 0;
+
+  config = gconf_client_get_default ();
+  value = gconf_client_get (config, CLASS_INDEX_CONF, NULL);
+  if (value && value->type == GCONF_VALUE_INT) {
+    default_index = gconf_value_get_int (value);
+  }
+  g_object_unref (config);
+  return default_index;
+}
+
+static gboolean
+set_class_index (gint index)
+{
+  GConfClient *config;
+
+  if (index >= 0 && index < CLASS_NUM) {
+    config = gconf_client_get_default ();
+    gconf_client_set_int (config, CLASS_INDEX_CONF, index, NULL);
     g_object_unref (config);
     return TRUE;
   }
@@ -256,6 +291,23 @@ main_page (gpointer user_data)
 }
 
 static void
+class_begin ()
+{
+  struct ui *ui = &priv->utt->ui;
+
+  wubi_wenzhang_clean ();
+  wubi_wenzhang_genchars ();
+  utt_text_area_set_text (UTT_TEXT_AREA (priv->area), priv->gen_chars);
+  gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON (ui->pause_button), FALSE);
+  gtk_widget_set_sensitive (GTK_WIDGET (ui->pause_button), TRUE);
+  utt_info (priv->utt, "");
+
+  gtk_widget_grab_focus (priv->area);
+  utt_text_area_class_begin (UTT_TEXT_AREA (priv->area));
+  gtk_widget_queue_draw (priv->utt->ui.main_window);
+}
+
+static void
 class_clean ()
 {
   utt_text_area_class_end (UTT_TEXT_AREA (priv->area));
@@ -282,9 +334,12 @@ nth_class_name (gint n)
 struct utt_plugin wubi_wenzhang_plugin = {
   .plugin_name = "wubi::wenzhang",
   .locale_name = "文章",
-  .class_num = 2,
+  .class_num = CLASS_NUM,
   .nth_class_name = nth_class_name,
+  .get_class_index = get_class_index,
+  .set_class_index = set_class_index,
   .create_main_page = main_page,
+  .class_begin = class_begin,
   .class_clean = class_clean,
   .config_button_click = on_config_click,
 };

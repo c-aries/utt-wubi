@@ -289,7 +289,9 @@ fill_content_area (GtkWidget *content_area, struct utt_plugin *plugin)
   GtkTreeViewColumn *column;
   GtkTreeIter iter;
   GtkListStore *store;
-  gint i;
+  GtkTreePath *path;
+  GtkTreeSelection *sel;
+  gint i, id;
 
   store = gtk_list_store_new (1, G_TYPE_STRING);
   for (i = 0; i < plugin->class_num; i++) {
@@ -299,6 +301,9 @@ fill_content_area (GtkWidget *content_area, struct utt_plugin *plugin)
 			-1);
   }
 
+  id = plugin->get_class_index ();
+  path = gtk_tree_path_new_from_indices (id, -1);
+
   view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (store));
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), FALSE);
   renderer = gtk_cell_renderer_text_new (); /* FIXME: memory leak? */
@@ -306,7 +311,10 @@ fill_content_area (GtkWidget *content_area, struct utt_plugin *plugin)
 						     "text", 0,
 						     NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (view), column);
+  sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (view));
+  gtk_tree_selection_select_path (sel, path);
   gtk_container_add (GTK_CONTAINER (content_area), view);
+  gtk_tree_path_free (path);
   return view;
 }
 
@@ -318,7 +326,7 @@ on_index_click (GtkToolButton *button, struct utt_wubi *utt)
   GtkTreePath *path;
   GtkTreeIter iter;
   gint ret, id;
-  struct utt_plugin *plugin;
+  struct utt_plugin *plugin, *pre_plugin;
 
   plugin = utt_nth_plugin (utt->plugin, utt_current_page (utt));
 
@@ -338,6 +346,15 @@ on_index_click (GtkToolButton *button, struct utt_wubi *utt)
     path = gtk_tree_model_get_path (gtk_tree_view_get_model (GTK_TREE_VIEW (view)),
 				    &iter);
     id = gtk_tree_path_get_indices (path)[0];
+    plugin->set_class_index (id);
+    gtk_tree_path_free (path);
+    if (utt_update_class_ids (utt, id)) {
+      if (utt->previous_class_id != CLASS_TYPE_NONE) {
+	pre_plugin = utt_nth_plugin (utt->plugin, utt->previous_class_id);
+	pre_plugin->class_clean ();
+      }
+    }
+    plugin->class_begin ();
   }
   gtk_widget_destroy (dialog);
 }
