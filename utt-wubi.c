@@ -364,6 +364,9 @@ on_index_click (GtkToolButton *button, struct utt_wubi *utt)
 	pre_plugin->class_clean ();
       }
     }
+    else {
+      plugin->class_clean ();
+    }
     plugin->class_begin ();
   }
   gtk_widget_destroy (dialog);

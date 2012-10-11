@@ -20,29 +20,6 @@ static struct priv {
 } _priv;			/* _ means instance */
 static struct priv *priv = &_priv;
 
-static void
-wubi_jianma_clean ()
-{
-  utt_class_record_end (priv->utt->record);
-  if (priv->gen_chars) {
-    g_free (priv->gen_chars);
-    priv->gen_chars = NULL;
-  }
-  priv->key_press = NULL;
-  priv->match = FALSE;
-  if (gtk_main_level () != 0) {
-    gtk_progress_bar_set_text (GTK_PROGRESS_BAR (priv->dash->progress), "0%");
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->dash->progress), 0);
-  }
-}
-
-/* register "class-clean" handler */
-static void
-wubi_jianma_class_clean_func (gpointer data, gpointer user_data)
-{
-  wubi_jianma_clean ();
-}
-
 /* utils */
 
 static gchar
@@ -131,32 +108,6 @@ set_class_index (gint index)
   return FALSE;
 }
 
-static void
-on_class_item_activate (GtkMenuItem *item, int subclass_id)
-{
-  /* @0 update utt class and subclass id,
-     if the previous class is not the current class,
-     clean previous class enviroment and set a new class clean handler */
-  if (utt_update_class_ids (priv->utt, subclass_id)) {
-    utt_reset_class_clean_func (priv->utt, wubi_jianma_class_clean_func);
-  }
-
-  /* @1 initialize the current class(init = clean + set),
-     set pause button inactive and sensitive, then update the notify content */
-  wubi_jianma_clean ();
-  utt_class_record_set_total (priv->utt->record, get_text_num ());
-  utt_class_record_set_mode (priv->utt->record, CLASS_ADVANCE_NEED_CORRECT);
-  wubi_jianma_genchars ();
-  gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON (priv->utt->ui.pause_button), FALSE);
-  gtk_widget_set_sensitive (GTK_WIDGET (priv->utt->ui.pause_button), TRUE);
-  utt_info (priv->utt, "");
-
-  /* @2 class begin, grab keyboard focus, and update all ui */
-  utt_class_record_begin (priv->utt->record);
-  gtk_widget_grab_focus (priv->ui.kb_draw);
-  gtk_widget_queue_draw (priv->utt->ui.main_window);
-}
-
 static gboolean
 on_kb_draw_expose (GtkWidget *widget, GdkEventExpose *event, gpointer data)
 {
@@ -192,17 +143,6 @@ on_kb_draw_expose (GtkWidget *widget, GdkEventExpose *event, gpointer data)
   }
   cairo_destroy (cr);
   return TRUE;
-}
-
-static gboolean
-on_button_press (GtkWidget *widget, GdkEventButton *event, GtkWidget *menu)
-{
-  if (event->button == 3) {
-    gtk_menu_popup (GTK_MENU (menu), NULL, NULL, NULL, NULL,
-		    event->button, event->time);
-    return TRUE;
-  }
-  return FALSE;
 }
 
 static gboolean
@@ -361,19 +301,10 @@ main_page (gpointer user_data)
   GtkWidget *vbox;
   struct utt_wubi *utt = user_data;
   GtkWidget *frame, *hbox, *hbox2, *align;
-  GtkWidget *menu, *class_item;
   gint i;
 
   vbox = gtk_vbox_new (FALSE, 0);
   priv->utt = utt;
-
-  menu = gtk_menu_new ();	/* take care of memory leak */
-  for (i = 0; i < wubi_class_get_subclass_num (&utt->wubi, CLASS_TYPE_JIANMA); i++) {
-    class_item = gtk_menu_item_new_with_label (wubi_class_get_subclass_name (&utt->wubi, CLASS_TYPE_JIANMA, i));
-    g_signal_connect (class_item, "activate", G_CALLBACK (on_class_item_activate), GINT_TO_POINTER (i));
-    gtk_menu_shell_append (GTK_MENU_SHELL (menu), class_item);
-  }
-  gtk_widget_show_all (menu);
 
   frame = gtk_frame_new ("显示区");
   hbox = gtk_hbox_new (FALSE, 0);
@@ -417,32 +348,12 @@ main_page (gpointer user_data)
   gtk_container_add (GTK_CONTAINER (align), priv->ui.kb_draw);
   gtk_container_set_border_width (GTK_CONTAINER (align), 4);
   gtk_box_pack_start (GTK_BOX (vbox), align, TRUE, TRUE, 0);
-  g_signal_connect (priv->ui.kb_draw, "button-press-event", G_CALLBACK (on_button_press), menu);
   g_signal_connect (priv->ui.kb_draw, "expose-event", G_CALLBACK (on_kb_draw_expose), NULL);
   g_signal_connect (priv->ui.kb_draw, "key-press-event", G_CALLBACK (on_key_press), utt);
 
   priv->dash = utt_dashboard_new (priv->utt);
   gtk_box_pack_start (GTK_BOX (vbox), priv->dash->align, FALSE, FALSE, 0);
   return vbox;
-}
-
-static void
-class_begin ()
-{
-  /* @1 initialize the current class(init = clean + set),
-     set pause button inactive and sensitive, then update the notify content */
-  wubi_jianma_clean ();
-  utt_class_record_set_total (priv->utt->record, get_text_num ());
-  utt_class_record_set_mode (priv->utt->record, CLASS_ADVANCE_NEED_CORRECT);
-  wubi_jianma_genchars ();
-  gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON (priv->utt->ui.pause_button), FALSE);
-  gtk_widget_set_sensitive (GTK_WIDGET (priv->utt->ui.pause_button), TRUE);
-  utt_info (priv->utt, "");
-
-  /* @2 class begin, grab keyboard focus, and update all ui */
-  utt_class_record_begin (priv->utt->record);
-  gtk_widget_grab_focus (priv->ui.kb_draw);
-  gtk_widget_queue_draw (priv->utt->ui.main_window);
 }
 
 static void
@@ -459,6 +370,22 @@ class_clean ()
     gtk_progress_bar_set_text (GTK_PROGRESS_BAR (priv->dash->progress), "0%");
     gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->dash->progress), 0);
   }
+}
+
+static void
+class_begin ()
+{
+  utt_class_record_set_total (priv->utt->record, get_text_num ());
+  utt_class_record_set_mode (priv->utt->record, CLASS_ADVANCE_NEED_CORRECT);
+  wubi_jianma_genchars ();
+  gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON (priv->utt->ui.pause_button), FALSE);
+  gtk_widget_set_sensitive (GTK_WIDGET (priv->utt->ui.pause_button), TRUE);
+  utt_info (priv->utt, "");
+
+  /* @2 class begin, grab keyboard focus, and update all ui */
+  utt_class_record_begin (priv->utt->record);
+  gtk_widget_grab_focus (priv->ui.kb_draw);
+  gtk_widget_queue_draw (priv->utt->ui.main_window);
 }
 
 static gchar *
