@@ -1,8 +1,12 @@
-utttextarea.c "compare-advance" event.
+插件合理性（清理由主程序做）
+文章课程模式
+用户自定义文章
+统计＆历史记录训练：
+让文章键码帮助功能更适合初级用户
+文章提示功能是最好的？
+全局配置，如字体大小
 设计LOGO，美化UI
 帮助文档
 ibus, scim, fcitx的支持
-用户可配置的能力
-让文章键码帮助功能更适合初级用户
 除BUG
 用autotools, gettext规范化
