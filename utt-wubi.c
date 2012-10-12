@@ -358,6 +358,9 @@ on_index_click (GtkToolButton *button, struct utt_wubi *utt)
     else {
       plugin->class_clean ();
     }
+    gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON (utt->ui.pause_button), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET (utt->ui.pause_button), TRUE);
+    utt_info (utt, "");
     plugin->class_begin ();
   }
   gtk_widget_destroy (dialog);

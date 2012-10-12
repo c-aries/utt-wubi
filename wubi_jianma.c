@@ -378,9 +378,6 @@ class_begin ()
   utt_class_record_set_total (priv->utt->record, get_text_num ());
   utt_class_record_set_mode (priv->utt->record, CLASS_ADVANCE_NEED_CORRECT);
   wubi_jianma_genchars ();
-  gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON (priv->utt->ui.pause_button), FALSE);
-  gtk_widget_set_sensitive (GTK_WIDGET (priv->utt->ui.pause_button), TRUE);
-  utt_info (priv->utt, "");
 
   /* @2 class begin, grab keyboard focus, and update all ui */
   utt_class_record_begin (priv->utt->record);

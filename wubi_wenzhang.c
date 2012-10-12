@@ -240,13 +240,8 @@ class_clean ()
 static void
 class_begin ()
 {
-  struct ui *ui = &priv->utt->ui;
-
   wubi_wenzhang_genchars ();
   utt_text_area_set_text (UTT_TEXT_AREA (priv->area), priv->gen_chars);
-  gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON (ui->pause_button), FALSE);
-  gtk_widget_set_sensitive (GTK_WIDGET (ui->pause_button), TRUE);
-  utt_info (priv->utt, "");
 
   gtk_widget_grab_focus (priv->area);
   utt_text_area_class_begin (UTT_TEXT_AREA (priv->area));
