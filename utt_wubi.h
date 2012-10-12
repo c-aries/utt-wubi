@@ -40,8 +40,6 @@ struct utt_wubi {
   /* variables */
   enum class_type class_id, previous_class_id;
   int subclass_id;
-  /* func */
-  GFunc class_clean_func;
 };
 
 /* utt interface */

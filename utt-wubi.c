@@ -5,6 +5,17 @@
 #include <gdk/gdkkeysyms.h>
 #include "utt_wubi.h"
 
+static void
+utt_previous_plugin_clean (struct utt_wubi *utt)
+{
+  struct utt_plugin *pre_plugin;
+
+  pre_plugin = utt_nth_plugin (utt->plugin, utt->previous_class_id);
+  if (pre_plugin) {
+    pre_plugin->class_clean ();
+  }
+}
+
 static struct utt_wubi *
 utt_wubi_new ()
 {
@@ -22,32 +33,10 @@ utt_wubi_new ()
   return utt;
 }
 
-void
-utt_previous_class_clean (struct utt_wubi *utt)
-{
-  if (utt->class_clean_func) {
-    utt->class_clean_func (NULL, NULL);
-    utt->class_clean_func = NULL;
-  }
-}
-
-void
-utt_set_class_clean_func (struct utt_wubi *utt, GFunc clean_func)
-{
-  utt->class_clean_func = clean_func;
-}
-
-void
-utt_reset_class_clean_func (struct utt_wubi *utt, GFunc class_clean)
-{
-  utt_previous_class_clean (utt);
-  utt_set_class_clean_func (utt, class_clean);
-}
-
 static void
 utt_wubi_destroy (struct utt_wubi *utt)
 {
-  utt_previous_class_clean (utt);
+  utt_previous_plugin_clean (utt);
   free_keyboard (&utt->kb_layout);
   wubi_class_free (&utt->wubi);
   g_object_unref (utt->record);
@@ -361,7 +350,9 @@ on_index_click (GtkToolButton *button, struct utt_wubi *utt)
     if (utt_update_class_ids (utt, id)) {
       if (utt->previous_class_id != CLASS_TYPE_NONE) {
 	pre_plugin = utt_nth_plugin (utt->plugin, utt->previous_class_id);
-	pre_plugin->class_clean ();
+	if (pre_plugin) {
+	  pre_plugin->class_clean ();
+	}
       }
     }
     else {

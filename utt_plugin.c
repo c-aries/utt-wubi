@@ -42,6 +42,10 @@ utt_plugin_lookup (struct utt_plugin_table *table, gchar *plugin_name)
 struct utt_plugin *
 utt_nth_plugin (struct utt_plugin_table *table, int n)
 {
+  if (n < 0 || n >= utt_get_plugin_num (table)) {
+    return NULL;
+  }
+
   return g_list_nth_data (table->list, n);
 }
 
