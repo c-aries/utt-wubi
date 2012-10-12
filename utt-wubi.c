@@ -3,7 +3,40 @@
 #include <gtk/gtk.h>
 #include <glib/gprintf.h>
 #include <gdk/gdkkeysyms.h>
+#include <gconf/gconf-client.h>
 #include "utt_wubi.h"
+
+#define PAGE_CONF "/apps/utt/wubi/page"
+
+static gint
+get_page ()
+{
+  GConfClient *config;
+  GConfValue *value;
+  gint default_index = 0;
+
+  config = gconf_client_get_default ();
+  value = gconf_client_get (config, PAGE_CONF, NULL);
+  if (value && value->type == GCONF_VALUE_INT) {
+    default_index = gconf_value_get_int (value);
+  }
+  g_object_unref (config);
+  return default_index;
+}
+
+static gboolean
+set_page (gint index, struct utt_wubi *utt)
+{
+  GConfClient *config;
+
+  if (index >= 0 && index < utt_get_plugin_num (utt->plugin)) {
+    config = gconf_client_get_default ();
+    gconf_client_set_int (config, PAGE_CONF, index, NULL);
+    g_object_unref (config);
+    return TRUE;
+  }
+  return FALSE;
+}
 
 static void
 utt_previous_plugin_clean (struct utt_wubi *utt)
@@ -354,6 +387,7 @@ on_index_click (GtkToolButton *button, struct utt_wubi *utt)
 	  pre_plugin->class_clean ();
 	}
       }
+      set_page (utt_current_page (utt), utt);
     }
     else {
       plugin->class_clean ();
@@ -443,6 +477,7 @@ int main (int argc, char *argv[])
   g_signal_connect (window, "focus-out-event", G_CALLBACK (on_focus_out), utt);
 
   gtk_widget_show_all (window);
+  gtk_notebook_set_current_page (GTK_NOTEBOOK (ui->notebook), get_page ());
   gtk_main ();
   exit (EXIT_SUCCESS);
 }
