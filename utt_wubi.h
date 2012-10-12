@@ -55,7 +55,8 @@ void utt_config_dialog_run (struct utt_wubi *utt, GtkWidget *box);
 
 #define load_plugin(name) \
   extern struct utt_plugin name##_plugin; \
-  utt_register_plugin (utt->plugin, &name##_plugin)
+  utt_register_plugin (utt->plugin, &name##_plugin); \
+  name##_plugin.init (utt)
 
 static inline gint utt_current_page (struct utt_wubi *utt)
 {

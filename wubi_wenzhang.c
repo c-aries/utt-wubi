@@ -26,7 +26,6 @@ static struct priv {
 static struct priv *priv = &_priv;
 
 static void on_config_click (GtkToolButton *button, gpointer user_data);
-static GtkWidget *main_page (gpointer user_data);
 
 static void
 wubi_wenzhang_genchars ()
@@ -196,14 +195,13 @@ on_config_click (GtkToolButton *button, gpointer user_data)
 }
 
 static GtkWidget *
-main_page (gpointer user_data)
+main_page ()
 {
   GtkWidget *vbox;
-  struct utt_wubi *utt = user_data;
+  struct utt_wubi *utt = priv->utt;
   GtkWidget *frame, *hbox;
 
   vbox = gtk_vbox_new (FALSE, 0);
-  priv->utt = utt;
 
   frame = gtk_frame_new ("对比输入");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
@@ -248,6 +246,12 @@ class_begin ()
   gtk_widget_queue_draw (priv->utt->ui.main_window);
 }
 
+static void
+init (gpointer user_data)
+{
+  priv->utt = user_data;
+}
+
 static gchar *
 nth_class_name (gint n)
 {
@@ -265,6 +269,7 @@ struct utt_plugin wubi_wenzhang_plugin = {
   .nth_class_name = nth_class_name,
   .get_class_index = get_class_index,
   .set_class_index = set_class_index,
+  .init = init,
   .create_main_page = main_page,
   .class_begin = class_begin,
   .class_clean = class_clean,

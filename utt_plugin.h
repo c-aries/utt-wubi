@@ -15,7 +15,8 @@ struct utt_plugin {
   gchar *(*nth_class_name) (gint n);
   gint (*get_class_index) ();
   gboolean (*set_class_index) (gint index);
-  GtkWidget *(*create_main_page) (gpointer user_data);
+  void (*init) (gpointer user_data);
+  GtkWidget *(*create_main_page) (void);
   void (*class_begin) (void);
   void (*class_clean) (void);
   void (*config_button_click) (GtkToolButton *button, gpointer user_data);

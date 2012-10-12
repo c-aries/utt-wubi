@@ -276,10 +276,10 @@ on_config_click (GtkToolButton *button, gpointer user_data)
 }
 
 static GtkWidget *
-main_page (gpointer user_data)
+main_page ()
 {
   GtkWidget *vbox;
-  struct utt_wubi *utt = user_data;
+  struct utt_wubi *utt = priv->utt;
   struct keyboard_layout *kb_layout = &utt->kb_layout;
   GtkWidget *frame, *hbox, *hbox2, *align;
   gint i;
@@ -366,6 +366,12 @@ class_begin ()
   gtk_widget_queue_draw (ui->main_window);
 }
 
+static void
+init (gpointer user_data)
+{
+  priv->utt = user_data;
+}
+
 static gchar *
 nth_class_name (gint n)
 {
@@ -387,6 +393,7 @@ struct utt_plugin wubi_zigen_plugin = {
   .nth_class_name = nth_class_name,
   .get_class_index = get_class_index,
   .set_class_index = set_class_index,
+  .init = init,
   .class_begin = class_begin,
   .class_clean = class_clean,
   .create_main_page = main_page,

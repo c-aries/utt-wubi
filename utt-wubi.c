@@ -428,7 +428,7 @@ int main (int argc, char *argv[])
     label = gtk_label_new (plugin->locale_name);
     vbox2 = gtk_vbox_new (FALSE, 0);
     gtk_notebook_append_page (GTK_NOTEBOOK (ui->notebook),
-			      plugin->create_main_page (utt),
+			      plugin->create_main_page (),
 			      label);
   }
   g_signal_connect (ui->notebook, "switch-page", G_CALLBACK (on_notebook_switch), utt);
