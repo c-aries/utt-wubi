@@ -241,39 +241,6 @@ on_delete (GtkWidget *window, GdkEvent *event, struct utt_wubi *utt)
   return FALSE;
 }
 
-void
-utt_config_dialog_run (struct utt_wubi *utt, GtkWidget *box)
-{
-  GtkWidget *dialog, *content, *notebook;
-  GtkWidget *vbox, *label;
-  gint page;
-  gchar *name;
-
-  dialog = gtk_dialog_new_with_buttons ("配置",
-					GTK_WINDOW (utt->ui.main_window),
-					GTK_DIALOG_DESTROY_WITH_PARENT,
-					GTK_STOCK_CLOSE,
-					GTK_RESPONSE_CLOSE,
-					NULL);
-  gtk_widget_set_size_request (dialog, 320, 240);
-  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-  notebook = gtk_notebook_new ();
-  gtk_container_add (GTK_CONTAINER (content), notebook);
-
-  page = gtk_notebook_get_current_page (GTK_NOTEBOOK (utt->ui.notebook));
-  name = wubi_class_get_class_name (&utt->wubi, page);
-  label = gtk_label_new (name);
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), box, label);
-
-  vbox = gtk_vbox_new (FALSE, 0);
-  label = gtk_label_new ("全局");
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
-
-  gtk_widget_show_all (dialog);
-  gtk_dialog_run (GTK_DIALOG (dialog));
-  gtk_widget_destroy (dialog);
-}
-
 static void
 on_preferences_click (GtkToolButton *button, struct utt_wubi *utt)
 {

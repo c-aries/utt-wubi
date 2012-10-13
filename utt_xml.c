@@ -136,7 +136,7 @@ utt_xml_get_content (struct utt_xml *xml)
 }
 
 void
-utt_xml_write (struct utt_xml *xml, gchar *filename, gchar *title, gchar *content)
+utt_xml_write (struct utt_xml *xml, gchar *filename, const gchar *title, const gchar *content)
 {
   xmlTextWriterPtr ptr;
 

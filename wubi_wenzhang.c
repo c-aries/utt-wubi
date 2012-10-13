@@ -1,4 +1,7 @@
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <glib/gprintf.h>
 #include <gdk/gdkkeysyms.h>
 #include <gconf/gconf-client.h>
@@ -167,34 +170,40 @@ on_radio_toggle (GtkToggleButton *button, enum mode mode)
   }
 }
 
-/* static void */
-/* test_utt_xml () */
-/* { */
-/*   struct utt_xml *xml; */
+static void
+write_to_new_xml (const gchar *title, const gchar *content)
+{
+  struct utt_xml *xml;
+  uuid_t uuid;
+  gchar uuid_str[37];
+  gchar *path, *dir;
 
-/*   xml = utt_xml_new (); */
-/*   utt_xml_write (xml, "/tmp/test.xml", "At ShangHai", "Programming Utt-五笔"); */
-/*   utt_parse_xml (xml, "/tmp/test.xml"); */
-/*   g_print ("Title: %s\nContent: %s\n", utt_xml_get_title (xml), utt_xml_get_content (xml)); */
-/*   utt_xml_destroy (xml); */
-/* } */
+  uuid_generate (uuid);
+  uuid_unparse (uuid, uuid_str);
+  dir = g_build_path ("/", g_get_user_data_dir (), "utt", "article", NULL);
+  if (!g_file_test (dir, G_FILE_TEST_EXISTS)) {
+    g_mkdir_with_parents (dir, S_IRWXU);
+  }
+  path = g_build_path ("/", dir, uuid_str, NULL);
+  g_free (dir);
 
-/* static void */
-/* test_uuid () */
-/* { */
-/*   uuid_t uuid; */
-/*   gchar uuid_str[37]; */
-
-/*   uuid_generate (uuid); */
-/*   uuid_unparse (uuid, uuid_str); */
-/*   g_print ("%s\n", uuid_str); */
-/* } */
+  xml = utt_xml_new ();
+  utt_xml_write (xml, path, title, content);
+  utt_parse_xml (xml, path);
+  g_print ("Title: %s\nContent: %s\n", utt_xml_get_title (xml), utt_xml_get_content (xml));
+  utt_xml_destroy (xml);
+  g_free (path);
+}
 
 static void
 on_add_button_click (GtkButton *button, GtkWindow *parent)
 {
-  GtkWidget *dialog, *content, *frame, *scroll;
+  GtkWidget *dialog, *content_area, *frame, *scroll;
   GtkWidget *vbox, *entry, *view;
+  GtkTextBuffer *view_buffer;
+  GtkTextIter start_iter, end_iter;
+  gint ret;
+  const gchar *title, *content;
 
   dialog = gtk_dialog_new_with_buttons ("添加文章",
 					parent,
@@ -206,20 +215,18 @@ on_add_button_click (GtkButton *button, GtkWindow *parent)
 					NULL);
   gtk_widget_set_size_request (dialog, 320, 240);
   gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER);
-  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
-  gtk_container_add (GTK_CONTAINER (content), vbox);
+  gtk_container_add (GTK_CONTAINER (content_area), vbox);
 
   frame = gtk_frame_new ("标题");
-/*   gtk_container_set_border_width (GTK_CONTAINER (frame), 4); */
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
   entry = gtk_entry_new ();
   gtk_container_add (GTK_CONTAINER (frame), entry);
   gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 0);
 
   frame = gtk_frame_new ("内容");
-/*   gtk_container_set_border_width (GTK_CONTAINER (frame), 4); */
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
   scroll = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
@@ -227,12 +234,23 @@ on_add_button_click (GtkButton *button, GtkWindow *parent)
   gtk_container_add (GTK_CONTAINER (frame), scroll);
   gtk_container_set_border_width (GTK_CONTAINER (scroll), 2);
   view = gtk_text_view_new ();
+  view_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
   gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (view), GTK_WRAP_CHAR);
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
 
   gtk_widget_show_all (dialog);
-  gtk_dialog_run (GTK_DIALOG (dialog));
+  ret = gtk_dialog_run (GTK_DIALOG (dialog));
+  if (ret == GTK_RESPONSE_APPLY) {
+    title = gtk_entry_get_text (GTK_ENTRY (entry));
+    gtk_text_buffer_get_start_iter (view_buffer, &start_iter);
+    gtk_text_buffer_get_end_iter (view_buffer, &end_iter);
+    content = gtk_text_buffer_get_text (view_buffer,
+					&start_iter,
+					&end_iter,
+					FALSE);
+    write_to_new_xml (title, content);
+  }
   gtk_widget_destroy (dialog);
 }
 
