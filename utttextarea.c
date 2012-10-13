@@ -219,7 +219,7 @@ utt_text_area_input_expose_exceed (UttTextArea *area, PangoLayout *layout,
   gchar word[4];
   gchar *input_cur = input_row_base;
   gchar *text_cur = text_row_base;
-  gint width, input_num, len, ret;
+  gint width, input_num, len;
   gdouble mark_width, input_width, temp_width, text_compare_width;
   gboolean is_last_row = FALSE;
   gboolean input_is_end = FALSE;
@@ -234,7 +234,6 @@ utt_text_area_input_expose_exceed (UttTextArea *area, PangoLayout *layout,
   }
 
   input_width = 0;
-  ret = 0;
   text_compare_width = 0;
   for (input_num = 0;
        input_num < text_num && *input_cur != '\0';
@@ -567,6 +566,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
       }
     }
   }
+  if (is_exceed) {};		/* to get rid of gcc warning */
 
   /* FIXME: display mark when class not end. */
   cairo_set_source_rgb (cr, 0, 0, 0);

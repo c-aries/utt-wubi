@@ -143,8 +143,8 @@ utt_xml_write (struct utt_xml *xml, gchar *filename, gchar *title, gchar *conten
   ptr = xmlNewTextWriterFilename (filename, 0);
   xmlTextWriterStartDocument (ptr, NULL, "UTF-8", NULL);
   xmlTextWriterStartElement (ptr, BAD_CAST "Article");
-  xmlTextWriterWriteFormatElement (ptr, BAD_CAST "Title", title);
-  xmlTextWriterWriteFormatElement (ptr, BAD_CAST "Content", content);
+  xmlTextWriterWriteFormatElement (ptr, BAD_CAST "Title", "%s", title);
+  xmlTextWriterWriteFormatElement (ptr, BAD_CAST "Content", "%s", content);
   xmlTextWriterEndElement (ptr);
   xmlTextWriterEndDocument (ptr);
   xmlFreeTextWriter (ptr);

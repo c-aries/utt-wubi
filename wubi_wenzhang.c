@@ -193,7 +193,7 @@ on_radio_toggle (GtkToggleButton *button, enum mode mode)
 static void
 on_add_button_click (GtkButton *button, GtkWindow *parent)
 {
-  GtkWidget *dialog, *content, *frame;
+  GtkWidget *dialog, *content, *frame, *scroll;
   GtkWidget *vbox, *entry, *view;
 
   dialog = gtk_dialog_new_with_buttons ("添加文件",
@@ -221,8 +221,12 @@ on_add_button_click (GtkButton *button, GtkWindow *parent)
   frame = gtk_frame_new ("内容");
 /*   gtk_container_set_border_width (GTK_CONTAINER (frame), 4); */
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
+  scroll = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
+				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_container_add (GTK_CONTAINER (frame), scroll);
   view = gtk_text_view_new ();
-  gtk_container_add (GTK_CONTAINER (frame), view);
+  gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
 
   gtk_widget_show_all (dialog);
