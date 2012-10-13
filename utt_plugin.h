@@ -17,9 +17,10 @@ struct utt_plugin {
   gboolean (*set_class_index) (gint index);
   void (*init) (gpointer user_data);
   void (*destroy) ();
-  GtkWidget *(*create_main_page) (void);
   void (*class_begin) (void);
   void (*class_clean) (void);
+  GtkWidget *(*create_main_page) (void);
+  GtkWidget *(*create_config_page) (GtkWidget *dialog);
   void (*config_button_click) (GtkToolButton *button, gpointer user_data);
 };
 

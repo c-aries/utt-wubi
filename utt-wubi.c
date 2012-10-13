@@ -277,10 +277,33 @@ utt_config_dialog_run (struct utt_wubi *utt, GtkWidget *box)
 static void
 on_preferences_click (GtkToolButton *button, struct utt_wubi *utt)
 {
+  GtkWidget *dialog, *content, *notebook;
+  GtkWidget *vbox, *label, *page;
   struct utt_plugin *plugin;
 
   plugin = utt_nth_plugin (utt->plugin, utt_current_page (utt));
-  plugin->config_button_click (button, utt);
+  dialog = gtk_dialog_new_with_buttons ("配置",
+					GTK_WINDOW (utt->ui.main_window),
+					GTK_DIALOG_DESTROY_WITH_PARENT,
+/* 					GTK_STOCK_CLOSE, */
+/* 					GTK_RESPONSE_CLOSE, */
+					NULL);
+  gtk_widget_set_size_request (dialog, 320, 240);
+  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  notebook = gtk_notebook_new ();
+  gtk_container_add (GTK_CONTAINER (content), notebook);
+
+  label = gtk_label_new (plugin->locale_name);
+  page = plugin->create_config_page (dialog);
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), page, label);
+
+  vbox = gtk_vbox_new (FALSE, 0);
+  label = gtk_label_new ("全局");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
+
+  gtk_widget_show_all (dialog);
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
 }
 
 static void

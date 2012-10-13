@@ -27,8 +27,6 @@ static struct priv {
 } _priv;
 static struct priv *priv = &_priv;
 
-static void on_config_click (GtkToolButton *button, gpointer user_data);
-
 static void
 wubi_wenzhang_genchars ()
 {
@@ -169,49 +167,116 @@ on_radio_toggle (GtkToggleButton *button, enum mode mode)
   }
 }
 
-static void
-test_utt_xml ()
-{
-  struct utt_xml *xml;
+/* static void */
+/* test_utt_xml () */
+/* { */
+/*   struct utt_xml *xml; */
 
-  xml = utt_xml_new ();
-  utt_xml_write (xml, "/tmp/test.xml", "At ShangHai", "Programming Utt-五笔");
-  utt_parse_xml (xml, "/tmp/test.xml");
-  g_print ("Title: %s\nContent: %s\n", utt_xml_get_title (xml), utt_xml_get_content (xml));
-  utt_xml_destroy (xml);
+/*   xml = utt_xml_new (); */
+/*   utt_xml_write (xml, "/tmp/test.xml", "At ShangHai", "Programming Utt-五笔"); */
+/*   utt_parse_xml (xml, "/tmp/test.xml"); */
+/*   g_print ("Title: %s\nContent: %s\n", utt_xml_get_title (xml), utt_xml_get_content (xml)); */
+/*   utt_xml_destroy (xml); */
+/* } */
+
+/* static void */
+/* test_uuid () */
+/* { */
+/*   uuid_t uuid; */
+/*   gchar uuid_str[37]; */
+
+/*   uuid_generate (uuid); */
+/*   uuid_unparse (uuid, uuid_str); */
+/*   g_print ("%s\n", uuid_str); */
+/* } */
+
+static void
+on_add_button_click (GtkButton *button, GtkWindow *parent)
+{
+  GtkWidget *dialog, *content, *frame;
+  GtkWidget *vbox, *entry, *view;
+
+  dialog = gtk_dialog_new_with_buttons ("添加文件",
+					parent,
+					GTK_DIALOG_DESTROY_WITH_PARENT,
+					GTK_STOCK_APPLY,
+					GTK_RESPONSE_APPLY,
+					GTK_STOCK_CANCEL,
+					GTK_RESPONSE_CANCEL,
+					NULL);
+  gtk_widget_set_size_request (dialog, 320, 240);
+  gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER);
+  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
+  gtk_container_add (GTK_CONTAINER (content), vbox);
+
+  frame = gtk_frame_new ("标题");
+/*   gtk_container_set_border_width (GTK_CONTAINER (frame), 4); */
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
+  entry = gtk_entry_new ();
+  gtk_container_add (GTK_CONTAINER (frame), entry);
+  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 0);
+
+  frame = gtk_frame_new ("内容");
+/*   gtk_container_set_border_width (GTK_CONTAINER (frame), 4); */
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
+  view = gtk_text_view_new ();
+  gtk_container_add (GTK_CONTAINER (frame), view);
+  gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
+
+  gtk_widget_show_all (dialog);
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
 }
 
 static void
-test_uuid ()
+on_button_click (GtkButton *button, GtkWindow *parent)
 {
-  uuid_t uuid;
-  gchar uuid_str[37];
+/*   test_uuid (); */
+/*   test_utt_xml (); */
+  GtkWidget *dialog, *content;
+  GtkWidget *vbox, *hbox, *button2;
 
-  uuid_generate (uuid);
-  uuid_unparse (uuid, uuid_str);
-  g_print ("%s\n", uuid_str);
+  dialog = gtk_dialog_new_with_buttons ("管理文件",
+					parent,
+					GTK_DIALOG_DESTROY_WITH_PARENT,
+/* 					GTK_STOCK_CLOSE, */
+/* 					GTK_RESPONSE_CLOSE, */
+					NULL);
+  gtk_widget_set_size_request (dialog, 320, 240);
+  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
+  gtk_container_add (GTK_CONTAINER (content), vbox);
+  hbox = gtk_hbox_new (TRUE, 2);
+  gtk_box_pack_end (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
+
+  button2 = gtk_button_new_with_label ("添加");
+  g_signal_connect (button2, "clicked", G_CALLBACK (on_add_button_click), dialog);
+  gtk_box_pack_start (GTK_BOX (hbox), button2, TRUE, TRUE, 0);
+  button2 = gtk_button_new_with_label ("修改");
+  gtk_box_pack_start (GTK_BOX (hbox), button2, TRUE, TRUE, 0);
+  button2 = gtk_button_new_with_label ("删除");
+  gtk_box_pack_start (GTK_BOX (hbox), button2, TRUE, TRUE, 0);
+
+  gtk_widget_show_all (dialog);
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
 }
 
-static void
-on_button_click (GtkButton *button, gpointer user_data)
+static GtkWidget *
+create_config_page (GtkWidget *dialog)
 {
-  test_uuid ();
-  test_utt_xml ();
-}
-
-static void
-on_config_click (GtkToolButton *button, gpointer user_data)
-{
-  GtkWidget *vbox, *hbox, *label, *button2;
+  GtkWidget *vbox, *hbox, *label, *button;
   GtkWidget *radio[N_MODE];
-  struct utt_wubi *utt = user_data;
 
   vbox = gtk_vbox_new (TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 6);
   hbox = gtk_hbox_new (FALSE, 0);
-  button2 = gtk_button_new_with_label ("管理文章");
-  g_signal_connect (button2, "clicked", G_CALLBACK (on_button_click), NULL);
-  gtk_box_pack_start (GTK_BOX (vbox), button2, FALSE, FALSE, 0);
+  button = gtk_button_new_with_label ("管理文章");
+  g_signal_connect (button, "clicked", G_CALLBACK (on_button_click), dialog);
+  gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
   label = gtk_label_new ("模式(下次训练时生效):");
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, TRUE, 0);
@@ -223,12 +288,11 @@ on_config_click (GtkToolButton *button, gpointer user_data)
   g_signal_connect (radio[TEST_MODE], "toggled", G_CALLBACK (on_radio_toggle), GINT_TO_POINTER (TEST_MODE));
   gtk_box_pack_end (GTK_BOX (hbox), radio[TEST_MODE], FALSE, TRUE, 0);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio[get_mode ()]), TRUE);
-
-  utt_config_dialog_run (utt, vbox);
+  return vbox;
 }
 
 static GtkWidget *
-main_page ()
+create_main_page ()
 {
   GtkWidget *vbox;
   struct utt_wubi *utt = priv->utt;
@@ -309,8 +373,8 @@ struct utt_plugin wubi_wenzhang_plugin = {
   .set_class_index = set_class_index,
   .init = init,
   .destroy = destroy,
-  .create_main_page = main_page,
   .class_begin = class_begin,
   .class_clean = class_clean,
-  .config_button_click = on_config_click,
+  .create_main_page = create_main_page,
+  .create_config_page = create_config_page,
 };

@@ -256,10 +256,9 @@ on_spin_change (GtkSpinButton *button, gpointer user_data)
   set_text_num (gtk_spin_button_get_value (button));
 }
 
-static void
-on_config_click (GtkToolButton *button, gpointer user_data)
+static GtkWidget *
+create_config_page (GtkWidget *dialog)
 {
-  struct utt_wubi *utt = user_data;
   GtkWidget *vbox, *hbox, *label, *spin;
 
   vbox = gtk_vbox_new (FALSE, 0);
@@ -272,11 +271,11 @@ on_config_click (GtkToolButton *button, gpointer user_data)
   g_signal_connect (spin, "value-changed", G_CALLBACK (on_spin_change), NULL);
   gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin), get_text_num ());
   gtk_box_pack_end (GTK_BOX (hbox), spin, FALSE, TRUE, 0);
-  utt_config_dialog_run (utt, vbox);
+  return vbox;
 }
 
 static GtkWidget *
-main_page ()
+create_main_page ()
 {
   GtkWidget *vbox;
   struct utt_wubi *utt = priv->utt;
@@ -401,6 +400,6 @@ struct utt_plugin wubi_zigen_plugin = {
   .destroy = destroy,
   .class_begin = class_begin,
   .class_clean = class_clean,
-  .create_main_page = main_page,
-  .config_button_click = on_config_click,
+  .create_main_page = create_main_page,
+  .create_config_page = create_config_page,
 };
