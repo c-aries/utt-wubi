@@ -13,6 +13,13 @@ utt_plugin_table_new ()
 void
 utt_plugin_table_destroy (struct utt_plugin_table *table)
 {
+  struct utt_plugin *plugin;
+  gint i;
+
+  for (i = 0; i < utt_get_plugin_num (table); i++) {
+    plugin = utt_nth_plugin (table, i);
+    plugin->destroy ();
+  }
   g_hash_table_unref (table->ht);
   g_list_free (table->list);
   g_free (table);

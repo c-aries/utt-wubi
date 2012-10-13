@@ -391,6 +391,11 @@ init (gpointer user_data)
   priv->utt = user_data;
 }
 
+static void
+destroy ()
+{
+}
+
 static gchar *
 nth_class_name (gint n)
 {
@@ -408,6 +413,7 @@ struct utt_plugin wubi_jianma_plugin = {
   .get_class_index = get_class_index,
   .set_class_index = set_class_index,
   .init = init,
+  .destroy = destroy,
   .create_main_page = main_page,
   .class_begin = class_begin,
   .class_clean = class_clean,

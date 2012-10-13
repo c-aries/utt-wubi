@@ -16,6 +16,7 @@ struct utt_plugin {
   gint (*get_class_index) ();
   gboolean (*set_class_index) (gint index);
   void (*init) (gpointer user_data);
+  void (*destroy) ();
   GtkWidget *(*create_main_page) (void);
   void (*class_begin) (void);
   void (*class_clean) (void);

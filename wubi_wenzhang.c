@@ -2,9 +2,11 @@
 #include <glib/gprintf.h>
 #include <gdk/gdkkeysyms.h>
 #include <gconf/gconf-client.h>
+#include <uuid.h>
 #include "utt_wubi.h"
 #include "utttextarea.h"
 #include "utt_dashboard.h"
+#include "utt_xml.h"
 
 enum mode {
   TEST_MODE,
@@ -168,17 +170,48 @@ on_radio_toggle (GtkToggleButton *button, enum mode mode)
 }
 
 static void
+test_utt_xml ()
+{
+  struct utt_xml *xml;
+
+  xml = utt_xml_new ();
+  utt_xml_write (xml, "/tmp/test.xml", "At ShangHai", "Programming Utt-五笔");
+  utt_parse_xml (xml, "/tmp/test.xml");
+  g_print ("Title: %s\nContent: %s\n", utt_xml_get_title (xml), utt_xml_get_content (xml));
+  utt_xml_destroy (xml);
+}
+
+static void
+test_uuid ()
+{
+  uuid_t uuid;
+  gchar uuid_str[37];
+
+  uuid_generate (uuid);
+  uuid_unparse (uuid, uuid_str);
+  g_print ("%s\n", uuid_str);
+}
+
+static void
+on_button_click (GtkButton *button, gpointer user_data)
+{
+  test_uuid ();
+  test_utt_xml ();
+}
+
+static void
 on_config_click (GtkToolButton *button, gpointer user_data)
 {
-  GtkWidget *vbox, *hbox, *label;
+  GtkWidget *vbox, *hbox, *label, *button2;
   GtkWidget *radio[N_MODE];
   struct utt_wubi *utt = user_data;
 
-  vbox = gtk_vbox_new (FALSE, 0);
+  vbox = gtk_vbox_new (TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 6);
   hbox = gtk_hbox_new (FALSE, 0);
-  label = gtk_label_new ("添加文章");
-  gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
+  button2 = gtk_button_new_with_label ("管理文章");
+  g_signal_connect (button2, "clicked", G_CALLBACK (on_button_click), NULL);
+  gtk_box_pack_start (GTK_BOX (vbox), button2, FALSE, FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
   label = gtk_label_new ("模式(下次训练时生效):");
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, TRUE, 0);
@@ -252,6 +285,11 @@ init (gpointer user_data)
   priv->utt = user_data;
 }
 
+static void
+destroy ()
+{
+}
+
 static gchar *
 nth_class_name (gint n)
 {
@@ -270,6 +308,7 @@ struct utt_plugin wubi_wenzhang_plugin = {
   .get_class_index = get_class_index,
   .set_class_index = set_class_index,
   .init = init,
+  .destroy = destroy,
   .create_main_page = main_page,
   .class_begin = class_begin,
   .class_clean = class_clean,

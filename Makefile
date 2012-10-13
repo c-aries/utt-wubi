@@ -1,11 +1,11 @@
-CFLAGS:=$(shell pkg-config --cflags gtk+-2.0 gconf-2.0) -Werror -Wall -g
-LDFLAGS:=$(shell pkg-config --libs gtk+-2.0 gconf-2.0)
+CFLAGS:=$(shell pkg-config --cflags gtk+-2.0 gconf-2.0 uuid libxml-2.0) -Werror -Wall -g
+LDFLAGS:=$(shell pkg-config --libs gtk+-2.0 gconf-2.0 uuid libxml-2.0)
 TARGET:= utt-wubi
 
 all: $(TARGET)
 
 utt-wubi: utt_wubi.h \
-	keyboard.o wubi_class.o wubi_article.o zigen_images.o wubi_table.o \
+	keyboard.o wubi_class.o wubi_article.o zigen_images.o wubi_table.o utt_xml.o \
 	wubi_zigen.o wubi_jianma.o wubi_wenzhang.o \
 	utttextarea.o utt_dashboard.o uttclassrecord.o \
 	utt_plugin.o
