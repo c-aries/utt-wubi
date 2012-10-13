@@ -196,7 +196,7 @@ on_add_button_click (GtkButton *button, GtkWindow *parent)
   GtkWidget *dialog, *content, *frame, *scroll;
   GtkWidget *vbox, *entry, *view;
 
-  dialog = gtk_dialog_new_with_buttons ("添加文件",
+  dialog = gtk_dialog_new_with_buttons ("添加文章",
 					parent,
 					GTK_DIALOG_DESTROY_WITH_PARENT,
 					GTK_STOCK_APPLY,
@@ -225,7 +225,9 @@ on_add_button_click (GtkButton *button, GtkWindow *parent)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
 				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_container_add (GTK_CONTAINER (frame), scroll);
+  gtk_container_set_border_width (GTK_CONTAINER (scroll), 2);
   view = gtk_text_view_new ();
+  gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (view), GTK_WRAP_CHAR);
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
 
@@ -242,7 +244,7 @@ on_button_click (GtkButton *button, GtkWindow *parent)
   GtkWidget *dialog, *content;
   GtkWidget *vbox, *hbox, *button2;
 
-  dialog = gtk_dialog_new_with_buttons ("管理文件",
+  dialog = gtk_dialog_new_with_buttons ("管理文章",
 					parent,
 					GTK_DIALOG_DESTROY_WITH_PARENT,
 /* 					GTK_STOCK_CLOSE, */
