@@ -427,10 +427,9 @@ int main (int argc, char *argv[])
 {
   struct utt_wubi *utt;
   struct ui *ui;
-  struct wubi_class *wubi;
   struct utt_plugin *plugin;
   GtkWidget *window;
-  GtkWidget *vbox, *vbox2, *label;
+  GtkWidget *vbox, *label;
   GtkWidget *toolbar;
   GtkToolItem *item;
   gint i;
@@ -440,7 +439,6 @@ int main (int argc, char *argv[])
   logo_setup ();
   utt = utt_wubi_new ();
   ui = &utt->ui;
-  wubi = &utt->wubi;
 
   utt->plugin = utt_plugin_table_new ();
   load_plugin (wubi_zigen);
@@ -483,7 +481,6 @@ int main (int argc, char *argv[])
   for (i = 0; i < utt_get_plugin_num (utt->plugin); i++) {
     plugin = utt_nth_plugin (utt->plugin, i);
     label = gtk_label_new (plugin->locale_name);
-    vbox2 = gtk_vbox_new (FALSE, 0);
     gtk_notebook_append_page (GTK_NOTEBOOK (ui->notebook),
 			      plugin->create_main_page (),
 			      label);
