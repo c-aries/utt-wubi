@@ -280,10 +280,7 @@ utt_class_record_can_end (UttClassRecord *record)
 gboolean
 utt_class_record_end_with_check (UttClassRecord *record)
 {
-  UttClassRecordPrivate *priv;
-
   g_return_val_if_fail (UTT_IS_CLASS_RECORD (record), FALSE);
-  priv = UTT_CLASS_RECORD_GET_PRIVATE (record);  
   if (utt_class_record_can_end (record)) {
     utt_class_record_end (record);
     return TRUE;
