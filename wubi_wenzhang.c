@@ -254,25 +254,51 @@ on_add_button_click (GtkButton *button, GtkWindow *parent)
   gtk_widget_destroy (dialog);
 }
 
+static GtkWidget *
+create_article_view ()
+{
+  GtkWidget *view;
+  GtkListStore *store;
+  GtkTreeIter iter;
+  GtkCellRenderer *renderer;
+  GtkTreeViewColumn *column;
+
+  store = gtk_list_store_new (1, G_TYPE_STRING);
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter,
+		      0, "just a test",
+		      -1);
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter,
+		      0, "2rd article",
+		      -1);
+  view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (store));
+  gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), FALSE);
+  renderer = gtk_cell_renderer_text_new (); /* FIXME: memory leak? */
+  column = gtk_tree_view_column_new_with_attributes ("", renderer,
+						     "text", 0,
+						     NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (view), column);
+  return view;
+}
+
 static void
 on_button_click (GtkButton *button, GtkWindow *parent)
 {
-/*   test_uuid (); */
-/*   test_utt_xml (); */
   GtkWidget *dialog, *content;
-  GtkWidget *vbox, *hbox, *button2;
+  GtkWidget *vbox, *hbox, *button2, *view;
 
   dialog = gtk_dialog_new_with_buttons ("管理文章",
 					parent,
 					GTK_DIALOG_DESTROY_WITH_PARENT,
-/* 					GTK_STOCK_CLOSE, */
-/* 					GTK_RESPONSE_CLOSE, */
 					NULL);
   gtk_widget_set_size_request (dialog, 320, 240);
   content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
   gtk_container_add (GTK_CONTAINER (content), vbox);
+  view = create_article_view ();
+  gtk_box_pack_start (GTK_BOX (vbox), view, TRUE, TRUE, 0);
   hbox = gtk_hbox_new (TRUE, 2);
   gtk_box_pack_end (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
 
