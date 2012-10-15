@@ -8,7 +8,7 @@ utt-wubi: utt_wubi.h \
 	keyboard.o wubi_class.o wubi_article.o zigen_images.o wubi_table.o utt_xml.o \
 	wubi_zigen.o wubi_jianma.o wubi_wenzhang.o \
 	utttextarea.o utt_dashboard.o uttclassrecord.o \
-	utt_plugin.o
+	utt_plugin.o utt_article.o
 
 utt_class.o: utt_class.c utt_class.h
 wubi_zigen.o: wubi_zigen.c
