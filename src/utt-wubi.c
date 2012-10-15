@@ -287,7 +287,7 @@ logo_setup ()
   GList *list = NULL;
   gchar *path = NULL;
 
-  path = g_build_filename (DATAROOTDIR, "icons", "hicolor", "48x48", "apps", "utt_wubi.png", NULL);
+  path = g_build_filename (DATAROOTDIR, "icons", "hicolor", "48x48", "apps", "utt-wubi.png", NULL);
   pixbuf = gdk_pixbuf_new_from_file (path, &error);
   if (!g_file_test (path, G_FILE_TEST_EXISTS)) {
     g_error (G_STRLOC ": %s doesn't exists.", path);

@@ -13,6 +13,18 @@ AM_INIT_AUTOMAKE([-Wall -Werror])
 AC_PROG_CC
 AM_PROG_CC_C_O
 
+# gettext
+IT_PROG_INTLTOOL([0.41.1])
+GETTEXT_PACKAGE=${PACKAGE_NAME}
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
+                                    [The prefix for our gettext translation domains.])
+
+# libtool
+AC_PROG_LIBTOOL
+LT_PREREQ([2.2.6])
+LT_INIT()
+
 # Checks for libraries.
 # gtk+, Debian 6.0
 GTK_MODULES="gtk+-2.0 >= 2.20.1 glib-2.0 >= 2.24.2"
@@ -46,7 +58,12 @@ AC_CHECK_FUNCS([memset])
 
 AC_CONFIG_FILES([Makefile
 		src/Makefile
+		po/Makefile.in
 		data/Makefile
+		data/utt-wubi.desktop.in
 		data/zigen/Makefile
-		data/zigen/png/Makefile])
+		data/zigen/png/Makefile
+		data/icons/Makefile
+		data/icons/48x48/Makefile
+		data/icons/48x48/apps/Makefile])
 AC_OUTPUT

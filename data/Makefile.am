@@ -1,12 +1,9 @@
-SUBDIRS = zigen
+SUBDIRS = zigen icons
 
-themedir = $(datadir)/icons/hicolor
-size = 48x48
-context = apps
-
-iconsdir = $(themedir)/$(size)/$(context)
-icons_DATA = \
-	utt_wubi.png
+desktopdir = $(datadir)/applications
+desktop_in_files = utt-wubi.desktop.in
+desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
+@INTLTOOL_DESKTOP_RULE@
 
 imagesdir = $(pkgdatadir)
 images_DATA = \
@@ -20,6 +17,12 @@ tables_DATA = \
 	Wubi.txt
 
 EXTRA_DIST = \
-	$(icons_DATA) \
 	$(images_DATA) \
-	$(tables_DATA)
+	$(tables_DATA) \
+        $(desktop_in_files)
+
+CLEANFILES = \
+	$(desktop_DATA)
+
+DISTCLEANFILES = \
+        $(desktop_DATA)

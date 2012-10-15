@@ -1,0 +1,22 @@
+# Chinese translations for utt-wubi package
+# utt-wubi 软件包的简体中文翻译.
+# Copyright (C) 2012 THE utt-wubi'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the utt-wubi package.
+# c-aries <babyaries2@gmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: utt-wubi 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-15 22:29+0800\n"
+"PO-Revision-Date: 2012-10-15 22:39+0800\n"
+"Last-Translator: c-aries <babyaries2@gmail.com>\n"
+"Language-Team: Chinese (simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../data/utt-wubi.desktop.in.h:1 ../data/utt-wubi.desktop.in.in.h:1
+msgid "Universal Typing Traning (Wubi)"
+msgstr "国际化打字训练(五笔)"
