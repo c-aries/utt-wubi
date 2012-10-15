@@ -428,9 +428,9 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   PangoFontDescription *desc;
   cairo_t *cr;
   gdouble text_x, text_y, input_x, input_y, temp_width;
-  gdouble text_width, exceed_text_start;
+  gdouble text_width;
   gint expose_width, expose_height, width, len;
-  gint input_num, text_num, row;
+  gint input_num, row;
   gchar *draw_text, *cmp_input;
   gchar *input_cur, *text_cur, *input_row_base, *text_row_base;
   gchar word[4];
@@ -441,6 +441,8 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
     gint num;
     gdouble width;
   } text_record;
+  gint text_num = 0;
+  gdouble exceed_text_start = 0;
 
   cr = gdk_cairo_create (event->window);
   cairo_set_source_rgba (cr, 1, 1, 1, 1);

@@ -74,7 +74,7 @@ utt_dashboard_new (struct utt_wubi *utt)
   struct utt_dashboard *dash;
   struct utt_dashboard_priv *priv;
   GtkWidget *fix, *align;
-
+  gchar *path;
 
   dash = g_new0 (struct utt_dashboard, 1);
   dash->align = align = gtk_alignment_new (0.5, 0.5, 0, 0);
@@ -85,7 +85,12 @@ utt_dashboard_new (struct utt_wubi *utt)
   priv = dash->priv = g_new0 (struct utt_dashboard, 1);
   priv->utt = utt;
   priv->record = utt->record;
-  priv->dashboard_image = cairo_image_surface_create_from_png ("dashboard.png");
+  path = g_build_filename (PKGDATADIR, "dashboard.png", NULL);
+  if (!g_file_test (path, G_FILE_TEST_EXISTS)) {
+    g_error (G_STRLOC ": %s doesn't exists.", path);
+  }
+  priv->dashboard_image = cairo_image_surface_create_from_png (path);
+  g_free (path);
   dash->draw = gtk_drawing_area_new ();
   gtk_widget_set_size_request (dash->draw,
 			       cairo_image_surface_get_width (priv->dashboard_image),

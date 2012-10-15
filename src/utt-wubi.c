@@ -53,6 +53,7 @@ static struct utt_wubi *
 utt_wubi_new ()
 {
   struct utt_wubi *utt;
+  gchar *path;
 
   utt = g_new0 (struct utt_wubi, 1);
   utt->record = utt_class_record_new ();
@@ -62,7 +63,12 @@ utt_wubi_new ()
   utt->subclass_id = SUBCLASS_TYPE_NONE;
 
   utt->table = wubi_table_new ();
-  wubi_table_parse_file (utt->table, "./Wubi.txt");
+  path = g_build_filename (PKGDATADIR, "Wubi.txt", NULL);
+  if (!g_file_test (path, G_FILE_TEST_EXISTS)) {
+    g_error (G_STRLOC ": %s doesn't exists.", path);
+  }
+  wubi_table_parse_file (utt->table, path);
+  g_free (path);
   return utt;
 }
 
@@ -279,8 +285,14 @@ logo_setup ()
   GdkPixbuf *pixbuf = NULL;
   GError *error = NULL;
   GList *list = NULL;
+  gchar *path = NULL;
 
-  pixbuf = gdk_pixbuf_new_from_file ("./logo.png", &error);
+  path = g_build_filename (DATAROOTDIR, "icons", "hicolor", "48x48", "apps", "utt_wubi.png", NULL);
+  pixbuf = gdk_pixbuf_new_from_file (path, &error);
+  if (!g_file_test (path, G_FILE_TEST_EXISTS)) {
+    g_error (G_STRLOC ": %s doesn't exists.", path);
+  }
+  g_free (path);
   if (error) {
     g_error_free (error);
     return;

@@ -1,51 +1,54 @@
-#include <glib/gprintf.h>
-#include <gdk/gdkkeysyms.h>
-#include <gconf/gconf-client.h>
-#include <ctype.h>
 #include <string.h>
+#include <ctype.h>
+#include <gdk/gdkkeysyms.h>
+#include <glib/gprintf.h>
+#include <gconf/gconf-client.h>
 #include "utt_wubi.h"
 #include "utt_dashboard.h"
+#include "utt_plugin.h"
 
-#define TEXT_NUM_CONF "/apps/utt/wubi/jianma/text_num"
-#define CLASS_INDEX_CONF "/apps/utt/wubi/jianma/class_index"
-#define CLASS_NUM 1
+#define TEXT_NUM_CONF "/apps/utt/wubi/zigen/text_num"
+#define CLASS_INDEX_CONF "/apps/utt/wubi/zigen/class_index"
+#define CLASS_NUM 6
 
 static struct priv {
   struct utt_wubi *utt;
   struct utt_ui ui;
   struct utt_dashboard *dash;
-  gchar *gen_chars;
+  struct zigen_chars *gen_chars;
   gchar *key_press;
   gboolean match;
-} _priv;			/* _ means instance */
+} _priv;
 static struct priv *priv = &_priv;
 
 /* utils */
 
-static gchar
-wubi_jianma_get_current_char ()
-{
-  return *(priv->gen_chars +
-	   utt_class_record_get_current (priv->utt->record) % TEXT_MOD);
-}
-
 static void
-wubi_jianma_genchars ()
+wubi_zigen_genchars ()
 {
   if (priv->gen_chars) {
-    g_free (priv->gen_chars);
+    free_zigen_chars (priv->gen_chars);
   }
-  priv->gen_chars = wubi_class_gen_jianma_chars (&priv->utt->wubi, DISPLAY_CHAR_NUM);
+  priv->gen_chars =
+    wubi_class_gen_zigen_chars (&priv->utt->wubi,
+				priv->utt->subclass_id, DISPLAY_CHAR_NUM);
 }
 
 static gboolean
-wubi_jianma_genchars_with_check ()
+wubi_zigen_genchars_with_check ()
 {
   if (utt_class_record_get_current (priv->utt->record) % TEXT_MOD == 0) {
-    wubi_jianma_genchars ();
+    wubi_zigen_genchars ();
     return TRUE;
   }
   return FALSE;
+}
+
+static gchar
+wubi_zigen_get_current_char ()
+{
+  return ((priv->gen_chars->ch +
+	   utt_class_record_get_current (priv->utt->record) % TEXT_MOD)->value);
 }
 
 static gint
@@ -109,10 +112,40 @@ set_class_index (gint index)
 }
 
 static gboolean
+on_ch_draw_expose (GtkWidget *widget, GdkEventExpose *event, gpointer data)
+{
+  struct keyboard_layout *kb_layout = &priv->utt->kb_layout;
+  cairo_t *cr;
+  gint index = GPOINTER_TO_INT (data);
+
+  /* @0 if the current page isn't related to the chosen class,
+     return, stop propagate the event further*/
+  if (!utt_current_page_is_chosen_class (priv->utt)) {
+    return TRUE;
+  }
+
+  cr = gdk_cairo_create (event->window);
+  cairo_set_source_surface (cr, priv->gen_chars->ch[index].img, 0, 0);
+  cairo_paint (cr);
+  /* if class end, don't paint color */
+  if (utt_class_record_has_begin (priv->utt->record) &&
+      utt_class_record_get_current (priv->utt->record) % TEXT_MOD == index) {
+    cairo_set_source_rgba (cr, 0, 0, 1, 0.3);
+    cairo_rectangle (cr, 0, 0,
+		     kb_layout->button_width,
+		     kb_layout->button_height);
+    cairo_fill (cr);
+  }
+  cairo_destroy (cr);
+  return TRUE;
+}
+
+static gboolean
 on_kb_draw_expose (GtkWidget *widget, GdkEventExpose *event, gpointer data)
 {
-  cairo_t *cr;
+  struct keyboard_layout *kb_layout = &priv->utt->kb_layout;
   struct button_pos *pos;
+  cairo_t *cr;
 
   /* @0 is current page is not the chosen class, draw keyboard only */
   if (!utt_current_page_is_chosen_class (priv->utt)) {
@@ -127,7 +160,7 @@ on_kb_draw_expose (GtkWidget *widget, GdkEventExpose *event, gpointer data)
   cairo_set_source_surface (cr, priv->ui.kb_image, 0, 0);
   cairo_paint (cr);
   if (priv->key_press) {
-    pos = g_hash_table_lookup (priv->utt->kb_layout.name_ht, priv->key_press);
+    pos = g_hash_table_lookup (kb_layout->name_ht, priv->key_press);
     if (pos) {
       if (!priv->match) {
 	cairo_set_source_rgba (cr, 1, 0, 0, 0.6);
@@ -136,61 +169,11 @@ on_kb_draw_expose (GtkWidget *widget, GdkEventExpose *event, gpointer data)
 	cairo_set_source_rgba (cr, 0, 1, 0, 0.3);
       }
       cairo_rectangle (cr, pos->x, pos->y,
-		       priv->utt->kb_layout.button_width,
-		       priv->utt->kb_layout.button_height);
+		       kb_layout->button_width,
+		       kb_layout->button_height);
       cairo_fill (cr);
     }
   }
-  cairo_destroy (cr);
-  return TRUE;
-}
-
-static gboolean
-on_ch_draw_expose (GtkWidget *widget, GdkEventExpose *event, gpointer data)
-{
-  cairo_t *cr;
-  PangoLayout *layout;
-  PangoFontDescription *desc;
-  gint index = GPOINTER_TO_INT (data);
-  gchar *jianma;
-  gint width, height;
-  gdouble x, y;
-
-  /* @0 if the current page isn't related to the chosen class,
-     return, stop propagate the event further*/
-  if (!utt_current_page_is_chosen_class (priv->utt)) {
-    return TRUE;
-  }
-
-  cr = gdk_cairo_create (event->window);
-  cairo_set_source_surface (cr, priv->ui.button_image, 0, 0);
-  cairo_paint (cr);
-
-  jianma = wubi_class_get_jianma_by_char (priv->gen_chars[index]);
-
-  layout = pango_cairo_create_layout (cr);
-  desc = pango_font_description_from_string ("Sans");
-  pango_font_description_set_absolute_size (desc, 26 * PANGO_SCALE);
-  pango_layout_set_font_description (layout, desc);
-  pango_layout_set_text (layout, jianma, -1);
-  pango_layout_get_size (layout, &width, &height);
-  x = (priv->ui.button_width - ((gdouble)width / PANGO_SCALE)) / 2;
-  y = (priv->ui.button_height - ((gdouble)height / PANGO_SCALE)) / 2;
-  cairo_move_to (cr, x, y);
-  cairo_set_source_rgb (cr, 0, 0, 0);
-  pango_cairo_show_layout (cr, layout);
-
-  /* if class end, don't paint color */
-  if (utt_class_record_has_begin (priv->utt->record) &&
-      utt_class_record_get_current (priv->utt->record) % TEXT_MOD == index) {
-    cairo_set_source_rgba (cr, 0, 0, 1, 0.3);
-    cairo_rectangle (cr, 0, 0,
-		     priv->ui.button_width,
-		     priv->ui.button_height);
-    cairo_fill (cr);
-  }
-  g_object_unref (layout);
-  pango_font_description_free (desc);
   cairo_destroy (cr);
   return TRUE;
 }
@@ -200,7 +183,7 @@ on_key_press (GtkWidget *widget, GdkEventKey *event, struct utt_wubi *utt)
 {
   struct ui *ui = &priv->utt->ui;
   gunichar unicode;
-  gboolean ret;
+  gint ret;
 
   /* @0 if class not begin,
      return, stop propagate the event further.
@@ -211,12 +194,10 @@ on_key_press (GtkWidget *widget, GdkEventKey *event, struct utt_wubi *utt)
     return TRUE;
   }
 
-
   /* @1 handle unprintable keys */
   if (event->keyval == GDK_F2) {			/* help button */
     if (priv->gen_chars) {
-      utt_info (utt, "按 %c 键",
-		toupper (wubi_jianma_get_current_char ()));
+      utt_info (utt, "按 %c 键", toupper (wubi_zigen_get_current_char ()));
     }
   }
 
@@ -232,10 +213,10 @@ on_key_press (GtkWidget *widget, GdkEventKey *event, struct utt_wubi *utt)
   g_assert (priv->gen_chars);
   /* @3 check if the key have pressed is one character length */
   if (strlen (priv->key_press) == 1) {
-    if (tolower(*priv->key_press) == wubi_jianma_get_current_char ()) {
-      /* @4 if the key has press equals to the generate key,
-	 class advance, current++, and set the match flag TRUE,
-	 else, set the match flag FALSE */
+    /* @4 if the key has press equals to the generate key,
+       class advance, current++, and set the match flag TRUE,
+       else, set the match flag FALSE */
+    if (tolower(*priv->key_press) == wubi_zigen_get_current_char ()) {
       utt_class_record_correct_inc (priv->utt->record);
       priv->match = TRUE;
 
@@ -246,10 +227,9 @@ on_key_press (GtkWidget *widget, GdkEventKey *event, struct utt_wubi *utt)
 	ret = utt_continue_dialog_run (priv->utt);
 	if (ret == GTK_RESPONSE_YES) {
 	  /* genchars, class begin, update ui */
-	  wubi_jianma_genchars ();
+	  wubi_zigen_genchars ();
 	  utt_class_record_begin (priv->utt->record);
 	  gtk_widget_queue_draw (ui->main_window);
-	  return FALSE;
 	}
 	else if (ret == GTK_RESPONSE_NO) {
 	  /* set subclass_id to NONE, set pause button insensitive */
@@ -259,7 +239,7 @@ on_key_press (GtkWidget *widget, GdkEventKey *event, struct utt_wubi *utt)
 	return FALSE;
       }
       /* @6 check if we shoud regenerate characters */
-      wubi_jianma_genchars_with_check ();
+      wubi_zigen_genchars_with_check ();
     }
     else {
       priv->match = FALSE;
@@ -285,7 +265,7 @@ create_config_page (GtkWidget *dialog)
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 6);
   hbox = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
-  label = gtk_label_new ("简码数目(下次训练时生效):");
+  label = gtk_label_new ("字根数目(下次训练时生效):");
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, TRUE, 0);
   spin = gtk_spin_button_new_with_range (MIN_KEYTEXT, MAX_KEYTEXT, TEXT_MOD);
   g_signal_connect (spin, "value-changed", G_CALLBACK (on_spin_change), NULL);
@@ -299,11 +279,12 @@ create_main_page ()
 {
   GtkWidget *vbox;
   struct utt_wubi *utt = priv->utt;
+  struct keyboard_layout *kb_layout = &utt->kb_layout;
   GtkWidget *frame, *hbox, *hbox2, *align;
+  gchar *path;
   gint i;
 
   vbox = gtk_vbox_new (FALSE, 0);
-  priv->utt = utt;
 
   frame = gtk_frame_new ("显示区");
   hbox = gtk_hbox_new (FALSE, 0);
@@ -315,14 +296,11 @@ create_main_page ()
   /* padding */
   hbox2 = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (hbox), hbox2, TRUE, TRUE, 0);
-  priv->ui.button_image = cairo_image_surface_create_from_png ("button.png"); /* FIXME: need to free */
-  priv->ui.button_width = cairo_image_surface_get_width (priv->ui.button_image);
-  priv->ui.button_height = cairo_image_surface_get_height (priv->ui.button_image);
   for (i = 0; i < DISPLAY_CHAR_NUM; i++) {
     priv->ui.ch_draw[i] = gtk_drawing_area_new ();
     gtk_widget_set_size_request (priv->ui.ch_draw[i],
-				 priv->ui.button_width,
-				 priv->ui.button_height);
+				 kb_layout->button_width,
+				 kb_layout->button_height);
     g_signal_connect (priv->ui.ch_draw[i], "expose-event", G_CALLBACK (on_ch_draw_expose), GINT_TO_POINTER (i));
     hbox2 = gtk_hbox_new (FALSE, 0);
     gtk_box_pack_start (GTK_BOX (hbox), hbox2, TRUE, TRUE, 0);
@@ -335,7 +313,12 @@ create_main_page ()
   gtk_box_pack_start (GTK_BOX (hbox), hbox2, TRUE, TRUE, 0);
 
   priv->ui.kb_draw = gtk_drawing_area_new ();
-  priv->ui.kb_image = cairo_image_surface_create_from_png ("keyboard_yiji.png"); /* FIXME: need to free */
+  path = g_build_filename (PKGDATADIR, "keyboard_wubi.png", NULL);
+  if (!g_file_test (path, G_FILE_TEST_EXISTS)) {
+    g_error (G_STRLOC ": %s doesn't exists.", path);
+  }
+  priv->ui.kb_image = cairo_image_surface_create_from_png (path);
+  g_free (path);
   gtk_widget_add_events (priv->ui.kb_draw, GDK_BUTTON_PRESS_MASK);
   gtk_widget_add_events (priv->ui.kb_draw, GDK_KEY_PRESS_MASK);
   /* set can focus and grab focus, so we can receive key press event */
@@ -348,7 +331,7 @@ create_main_page ()
   gtk_container_set_border_width (GTK_CONTAINER (align), 4);
   gtk_box_pack_start (GTK_BOX (vbox), align, TRUE, TRUE, 0);
   g_signal_connect (priv->ui.kb_draw, "expose-event", G_CALLBACK (on_kb_draw_expose), NULL);
-  g_signal_connect (priv->ui.kb_draw, "key-press-event", G_CALLBACK (on_key_press), utt);
+  g_signal_connect (priv->ui.kb_draw, "key-press-event", G_CALLBACK (on_key_press), priv->utt);
 
   priv->dash = utt_dashboard_new (priv->utt);
   gtk_box_pack_start (GTK_BOX (vbox), priv->dash->align, FALSE, FALSE, 0);
@@ -360,7 +343,7 @@ class_clean ()
 {
   utt_class_record_end (priv->utt->record);
   if (priv->gen_chars) {
-    g_free (priv->gen_chars);
+    free_zigen_chars (priv->gen_chars);
     priv->gen_chars = NULL;
   }
   priv->key_press = NULL;
@@ -374,14 +357,17 @@ class_clean ()
 static void
 class_begin ()
 {
+  struct ui *ui = &priv->utt->ui;
+
   utt_class_record_set_total (priv->utt->record, get_text_num ());
   utt_class_record_set_mode (priv->utt->record, CLASS_ADVANCE_NEED_CORRECT);
-  wubi_jianma_genchars ();
+  wubi_zigen_genchars ();
+  /* FIXME: need to set class mode */
 
   /* @2 class begin, grab keyboard focus, and update all ui */
   utt_class_record_begin (priv->utt->record);
   gtk_widget_grab_focus (priv->ui.kb_draw);
-  gtk_widget_queue_draw (priv->utt->ui.main_window);
+  gtk_widget_queue_draw (ui->main_window);
 }
 
 static void
@@ -399,14 +385,19 @@ static gchar *
 nth_class_name (gint n)
 {
   static gchar *name[] = {
-    "一级简码",
+    "横区(ASDFG)",
+    "竖区(HJKLM)",
+    "撇区(QWERT)",
+    "捺区(YUIOP)",
+    "折区(XCVBN)",
+    "综合",
   };
   return name[n];
 }
 
-struct utt_plugin wubi_jianma_plugin = {
-  .plugin_name = "wubi::jianma",
-  .locale_name = "简码",
+struct utt_plugin wubi_zigen_plugin = {
+  .plugin_name = "wubi::zigen",
+  .locale_name = "字根",
   .class_num = CLASS_NUM,
   .nth_class_name = nth_class_name,
   .get_class_index = get_class_index,

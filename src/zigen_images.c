@@ -4,7 +4,8 @@
 
 /* generate by zigen/main.sh */
 
-#define ZIGEN_IMG_PREFIX    "zigen/png/"
+#define ZIGEN_DIRNAME    "zigen"
+#define ZIGEN_IMAGE_TYPE "png"
 #define ZIGEN_FILENAME(name, index)	name##_png[index]
 #define ZIGEN_SIZE(name)	G_N_ELEMENTS (name##_png)
 
@@ -513,7 +514,10 @@ load_zigen_images (struct zigen_images *images)
     img->num = get_zigen_size (ch);
     img->img = (cairo_surface_t **)g_new (cairo_surface_t *, img->num);
     for (i = 0; i < img->num; i++) {
-      path = g_strdup_printf ("%s%s", ZIGEN_IMG_PREFIX, get_zigen_filename (ch, i));
+      path = g_build_filename (PKGDATADIR, ZIGEN_DIRNAME, ZIGEN_IMAGE_TYPE, get_zigen_filename (ch, i), NULL);
+      if (!g_file_test (path, G_FILE_TEST_EXISTS)) {
+	g_error (G_STRLOC ": %s doesn't exists.", path);
+      }
       img->img[i] = cairo_image_surface_create_from_png (path);
       g_free (path);
     }
