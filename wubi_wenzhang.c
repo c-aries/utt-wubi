@@ -1,15 +1,12 @@
 #include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <glib/gprintf.h>
 #include <gdk/gdkkeysyms.h>
 #include <gconf/gconf-client.h>
-#include <uuid.h>
 #include "utt_wubi.h"
 #include "utttextarea.h"
 #include "utt_dashboard.h"
 #include "utt_xml.h"
+#include "utt_article.h"
 
 enum mode {
   TEST_MODE,
@@ -174,20 +171,12 @@ static void
 write_to_new_xml (const gchar *title, const gchar *content)
 {
   struct utt_xml *xml;
-  uuid_t uuid;
-  gchar uuid_str[37];
-  gchar *path, *dir;
+  gchar *path;
 
-  uuid_generate (uuid);
-  uuid_unparse (uuid, uuid_str);
-  dir = g_build_path ("/", g_get_user_data_dir (), "utt", "article", NULL);
-  if (!g_file_test (dir, G_FILE_TEST_EXISTS)) {
-    g_mkdir_with_parents (dir, S_IRWXU);
-  }
-  path = g_build_path ("/", dir, uuid_str, NULL);
-  g_free (dir);
-
+  path = utt_generate_new_article_path ();
   xml = utt_xml_new ();
+  utt_article_validate_title (title);
+  utt_article_validate_content (content);
   utt_xml_write (xml, path, title, content);
   utt_parse_xml (xml, path);
   g_print ("Title: %s\nContent: %s\n", utt_xml_get_title (xml), utt_xml_get_content (xml));
