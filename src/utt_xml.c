@@ -9,6 +9,7 @@ utt_xml_new ()
 void
 utt_xml_destroy (struct utt_xml *xml)
 {
+  g_free (xml->filepath);
   g_free (xml->title);
   g_free (xml->content);
   g_free (xml);
@@ -119,6 +120,7 @@ utt_parse_xml (struct utt_xml *xml, gchar *filename)
 
   reader = xmlReaderForFile (filename, "UTF-8", 0);
   ret = parse_article (xml, reader);
+  xml->filepath = g_strdup (filename);
   xmlFreeTextReader (reader);
   return ret;
 }
@@ -133,6 +135,12 @@ gchar *
 utt_xml_get_content (struct utt_xml *xml)
 {
   return xml->content;
+}
+
+gchar *
+utt_xml_get_filepath (struct utt_xml *xml)
+{
+  return xml->filepath;
 }
 
 void

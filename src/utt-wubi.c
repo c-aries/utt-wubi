@@ -292,6 +292,9 @@ logo_setup ()
   if (!g_file_test (path, G_FILE_TEST_EXISTS)) {
     g_error (G_STRLOC ": %s doesn't exists.", path);
   }
+  if (error) {
+    g_error_free (error);
+  }
   g_free (path);
   if (error) {
     g_error_free (error);

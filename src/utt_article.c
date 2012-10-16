@@ -26,10 +26,13 @@ utt_get_user_articles ()
   gchar *base_path, *path;
   const gchar *name;
   GDir *dir;
-  GError *error;
+  GError *error = NULL;
 
   base_path = utt_get_article_base_dir ();
   dir = g_dir_open (base_path, 0, &error);
+  if (error) {
+    g_error_free (error);
+  }
   while ((name = g_dir_read_name (dir))) {
     xml = utt_xml_new ();
     path = g_build_path ("/", base_path, name, NULL);

@@ -260,12 +260,15 @@ create_article_view ()
   gint i;
 
   articles = utt_get_user_articles ();
-  store = gtk_list_store_new (1, G_TYPE_STRING);
+  store = gtk_list_store_new (2,
+			      G_TYPE_STRING,
+			      G_TYPE_STRING);
   for (i = 0; i < g_list_length (articles); i++) {
     xml = g_list_nth_data (articles, i);
     gtk_list_store_append (store, &iter);
     gtk_list_store_set (store, &iter,
 			0, utt_xml_get_title (xml),
+			1, utt_xml_get_filepath (xml),
 			-1);
     utt_xml_destroy (xml);
   }
@@ -284,17 +287,28 @@ static void
 on_delete_button_click (GtkButton *button, GtkTreeView *view)
 {
   GtkTreeSelection *sel;
-  GtkTreePath *path;
   GtkTreeIter iter;
-  gint id;
+  GtkTreeModel *store;
+  gchar *title, *filename;
+  GError *error = NULL;
+  GFile *file;
 
   sel = gtk_tree_view_get_selection (view);
-  gtk_tree_selection_get_selected (sel, NULL, &iter);
-  path = gtk_tree_model_get_path (gtk_tree_view_get_model (view),
-				  &iter);
-  id = gtk_tree_path_get_indices (path)[0];
-  g_print ("%d\n", id);
-  gtk_tree_path_free (path);
+  if (gtk_tree_selection_get_selected (sel, NULL, &iter)) {
+    store = gtk_tree_view_get_model (view);
+    gtk_tree_model_get (store, &iter,
+			0, &title,
+			1, &filename,
+			-1);
+    file = g_file_new_for_path (filename);
+    if (g_file_delete (file, NULL, &error)) {
+      gtk_list_store_remove (GTK_LIST_STORE (store), &iter);
+    }
+    g_object_unref (file);
+    if (error) {
+      g_error_free (error);
+    }
+  }
 }
 
 static void
