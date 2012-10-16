@@ -3,9 +3,13 @@
 
 #include <glib.h>
 
-gchar *utt_get_article_base_dir ();
-gchar *utt_generate_new_article_path ();
-gboolean utt_article_validate_title (const gchar *title);
-gboolean utt_article_validate_content (const gchar *content);
+enum article_add_result {
+  ARTICLE_ADD_SUCCESS = 0,
+  TITLE_INVALIDATE = 1 << 0,
+  CONTENT_INVALIDATE = 1 << 1,
+};
+
+GList *utt_get_user_articles ();
+enum article_add_result utt_add_article (const gchar *title, const gchar *content);
 
 #endif
