@@ -79,20 +79,26 @@ utt_article_validate_content (const gchar *content)
   return TRUE;
 }
 
-gboolean
+enum article_add_result
 utt_add_article (const gchar *title, const gchar *content)
 {
   struct utt_xml *xml;
   gchar *path;
+  enum article_add_result ret = ARTICLE_ADD_SUCCESS;
 
+  if (!utt_article_validate_title (title)) {
+    ret |= TITLE_INVALIDATE;
+  }
+  if (!utt_article_validate_content (content)) {
+    ret |= CONTENT_INVALIDATE;
+  }
+  if (ret) {
+    return ret;
+  }
   path = utt_generate_new_article_path ();
   xml = utt_xml_new ();
-  if (!utt_article_validate_title (title) ||
-      !utt_article_validate_content (content)) {
-    return FALSE;
-  }
   utt_xml_write (xml, path, title, content);
   utt_xml_destroy (xml);
   g_free (path);
-  return TRUE;
+  return ARTICLE_ADD_SUCCESS;
 }

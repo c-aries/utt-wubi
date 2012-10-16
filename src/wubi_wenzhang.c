@@ -170,12 +170,14 @@ on_radio_toggle (GtkToggleButton *button, enum mode mode)
 static void
 on_add_button_click (GtkButton *button, GtkWindow *parent)
 {
-  GtkWidget *dialog, *content_area, *frame, *scroll;
+  GtkWidget *dialog, *content_area, *scroll;
   GtkWidget *vbox, *entry, *view;
+  GtkWidget *title_frame, *content_frame, *label;
   GtkTextBuffer *view_buffer;
   GtkTextIter start_iter, end_iter;
   gint ret;
   const gchar *title, *content;
+  enum article_add_result result = ARTICLE_ADD_SUCCESS;
 
   dialog = gtk_dialog_new_with_buttons ("添加文章",
 					parent,
@@ -192,36 +194,55 @@ on_add_button_click (GtkButton *button, GtkWindow *parent)
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
   gtk_container_add (GTK_CONTAINER (content_area), vbox);
 
-  frame = gtk_frame_new ("标题");
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
+  title_frame = gtk_frame_new ("标题");
+  gtk_frame_set_shadow_type (GTK_FRAME (title_frame), GTK_SHADOW_NONE);
   entry = gtk_entry_new ();
-  gtk_container_add (GTK_CONTAINER (frame), entry);
-  gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 0);
+  gtk_container_add (GTK_CONTAINER (title_frame), entry);
+  gtk_box_pack_start (GTK_BOX (vbox), title_frame, FALSE, FALSE, 0);
 
-  frame = gtk_frame_new ("内容");
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
+  content_frame = gtk_frame_new ("内容");
+  gtk_frame_set_shadow_type (GTK_FRAME (content_frame), GTK_SHADOW_NONE);
   scroll = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
 				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-  gtk_container_add (GTK_CONTAINER (frame), scroll);
+  gtk_container_add (GTK_CONTAINER (content_frame), scroll);
   gtk_container_set_border_width (GTK_CONTAINER (scroll), 2);
   view = gtk_text_view_new ();
   view_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
   gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (view), GTK_WRAP_CHAR);
   gtk_container_add (GTK_CONTAINER (scroll), view);
-  gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), content_frame, TRUE, TRUE, 0);
 
   gtk_widget_show_all (dialog);
-  ret = gtk_dialog_run (GTK_DIALOG (dialog));
-  if (ret == GTK_RESPONSE_APPLY) {
-    title = gtk_entry_get_text (GTK_ENTRY (entry));
-    gtk_text_buffer_get_start_iter (view_buffer, &start_iter);
-    gtk_text_buffer_get_end_iter (view_buffer, &end_iter);
-    content = gtk_text_buffer_get_text (view_buffer,
-					&start_iter,
-					&end_iter,
-					FALSE);
-    g_print ("%d\n", utt_add_article (title, content));
+  for (;;) {
+    ret = gtk_dialog_run (GTK_DIALOG (dialog));
+    if (ret == GTK_RESPONSE_APPLY) {
+      title = gtk_entry_get_text (GTK_ENTRY (entry));
+      gtk_text_buffer_get_start_iter (view_buffer, &start_iter);
+      gtk_text_buffer_get_end_iter (view_buffer, &end_iter);
+      content = gtk_text_buffer_get_text (view_buffer,
+					  &start_iter,
+					  &end_iter,
+					  FALSE);
+      result = utt_add_article (title, content);
+    }
+    if (result == ARTICLE_ADD_SUCCESS || ret != GTK_RESPONSE_APPLY) {
+      break;
+    }
+    if (result & TITLE_INVALIDATE) {
+      label = gtk_frame_get_label_widget (GTK_FRAME (title_frame));
+      gtk_label_set_markup (GTK_LABEL (label), "标题<span color=\"red\">(不符合要求)</span>");
+    }
+    else {
+      gtk_frame_set_label (GTK_FRAME (title_frame), "标题");
+    }
+    if (result & CONTENT_INVALIDATE) {
+      label = gtk_frame_get_label_widget (GTK_FRAME (content_frame));
+      gtk_label_set_markup (GTK_LABEL (label), "内容<span color=\"red\">(不符合要求)</span>");
+    }
+    else {
+      gtk_frame_set_label (GTK_FRAME (content_frame), "内容");
+    }
   }
   gtk_widget_destroy (dialog);
 }
