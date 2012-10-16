@@ -11,7 +11,7 @@ enum article_result {
 };
 
 GList *utt_get_user_articles ();
-enum article_result utt_add_article (const gchar *title, const gchar *content);
+enum article_result utt_add_article (const gchar *title, const gchar *content, gchar **return_filepath);
 enum article_result utt_modify_article (const gchar *filepath, const gchar *title, const gchar *content);
 
 #endif

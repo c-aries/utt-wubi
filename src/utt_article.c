@@ -83,7 +83,7 @@ utt_article_validate_content (const gchar *content)
 }
 
 enum article_result
-utt_add_article (const gchar *title, const gchar *content)
+utt_add_article (const gchar *title, const gchar *content, gchar **return_filepath)
 {
   struct utt_xml *xml;
   gchar *path;
@@ -102,6 +102,7 @@ utt_add_article (const gchar *title, const gchar *content)
   xml = utt_xml_new ();
   utt_xml_write (xml, path, title, content);
   utt_xml_destroy (xml);
+  *return_filepath = g_strdup (path);
   g_free (path);
   return ARTICLE_ADD_SUCCESS;
 }

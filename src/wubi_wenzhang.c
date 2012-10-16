@@ -173,6 +173,20 @@ on_radio_toggle (GtkToggleButton *button, enum mode mode)
 }
 
 static void
+treeview_add_item (GtkTreeView *view, const gchar *title, const gchar *filepath)
+{
+  GtkTreeIter iter;
+  GtkTreeModel *store;
+
+  store = gtk_tree_view_get_model (view);
+  gtk_list_store_prepend (GTK_LIST_STORE (store), &iter);
+  gtk_list_store_set (GTK_LIST_STORE (store), &iter,
+		      0, title,
+		      1, filepath,
+		      -1);
+}
+
+static void
 on_add_button_click (GtkButton *button, struct article_dialog_data *user_data)
 {
   GtkWidget *dialog, *content_area, *scroll;
@@ -184,6 +198,7 @@ on_add_button_click (GtkButton *button, struct article_dialog_data *user_data)
   const gchar *title, *content;
   enum article_result result = ARTICLE_ADD_SUCCESS;
   GtkWindow *parent = user_data->parent;
+  gchar *filepath;
 
   dialog = gtk_dialog_new_with_buttons ("添加文章",
 					parent,
@@ -230,9 +245,14 @@ on_add_button_click (GtkButton *button, struct article_dialog_data *user_data)
 					  &start_iter,
 					  &end_iter,
 					  FALSE);
-      result = utt_add_article (title, content);
+      result = utt_add_article (title, content, &filepath);
+      if (result == ARTICLE_ADD_SUCCESS) {
+	treeview_add_item (user_data->view, title, filepath);
+	g_free (filepath);
+	break;
+      }
     }
-    if (result == ARTICLE_ADD_SUCCESS || ret != GTK_RESPONSE_APPLY) {
+    if (ret != GTK_RESPONSE_APPLY) {
       break;
     }
     if (result & TITLE_INVALIDATE) {
