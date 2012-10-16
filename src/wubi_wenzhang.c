@@ -178,8 +178,8 @@ write_to_new_xml (const gchar *title, const gchar *content)
   utt_article_validate_title (title);
   utt_article_validate_content (content);
   utt_xml_write (xml, path, title, content);
-  utt_parse_xml (xml, path);
-  g_print ("Title: %s\nContent: %s\n", utt_xml_get_title (xml), utt_xml_get_content (xml));
+/*   utt_parse_xml (xml, path); */
+/*   g_print ("Title: %s\nContent: %s\n", utt_xml_get_title (xml), utt_xml_get_content (xml)); */
   utt_xml_destroy (xml);
   g_free (path);
 }
@@ -251,16 +251,21 @@ create_article_view ()
   GtkTreeIter iter;
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
+  GList *articles;
+  struct utt_xml *xml;
+  gint i;
 
+  articles = utt_get_user_articles ();
   store = gtk_list_store_new (1, G_TYPE_STRING);
-  gtk_list_store_append (store, &iter);
-  gtk_list_store_set (store, &iter,
-		      0, "just a test",
-		      -1);
-  gtk_list_store_append (store, &iter);
-  gtk_list_store_set (store, &iter,
-		      0, "2rd article",
-		      -1);
+  for (i = 0; i < g_list_length (articles); i++) {
+    xml = g_list_nth_data (articles, i);
+    gtk_list_store_append (store, &iter);
+    gtk_list_store_set (store, &iter,
+			0, utt_xml_get_title (xml),
+			-1);
+    utt_xml_destroy (xml);
+  }
+  g_list_free (articles);
   view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (store));
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), FALSE);
   renderer = gtk_cell_renderer_text_new (); /* FIXME: memory leak? */
