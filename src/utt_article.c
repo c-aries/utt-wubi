@@ -6,7 +6,7 @@
 #include "utt_xml.h"
 
 /* return value should be free */
-gchar *
+static gchar *
 utt_get_article_base_dir ()
 {
   gchar *dir;
@@ -42,7 +42,7 @@ utt_get_user_articles ()
   return list;
 }
 
-gchar *
+static gchar *
 utt_generate_new_article_path ()
 {
   uuid_t uuid;
@@ -57,14 +57,42 @@ utt_generate_new_article_path ()
   return path;
 }
 
-gboolean
+static gboolean
 utt_article_validate_title (const gchar *title)
 {
+  if (!title ||
+      !g_utf8_validate (title, -1, NULL) ||
+      g_utf8_strlen (title, -1) <= 0) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+static gboolean
+utt_article_validate_content (const gchar *content)
+{
+  if (!content ||
+      !g_utf8_validate (content, -1, NULL) ||
+      g_utf8_strlen (content, -1) <= 0) {
+    return FALSE;
+  }
   return TRUE;
 }
 
 gboolean
-utt_article_validate_content (const gchar *content)
+utt_add_article (const gchar *title, const gchar *content)
 {
+  struct utt_xml *xml;
+  gchar *path;
+
+  path = utt_generate_new_article_path ();
+  xml = utt_xml_new ();
+  if (!utt_article_validate_title (title) ||
+      !utt_article_validate_content (content)) {
+    return FALSE;
+  }
+  utt_xml_write (xml, path, title, content);
+  utt_xml_destroy (xml);
+  g_free (path);
   return TRUE;
 }

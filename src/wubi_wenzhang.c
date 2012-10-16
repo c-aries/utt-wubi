@@ -168,23 +168,6 @@ on_radio_toggle (GtkToggleButton *button, enum mode mode)
 }
 
 static void
-write_to_new_xml (const gchar *title, const gchar *content)
-{
-  struct utt_xml *xml;
-  gchar *path;
-
-  path = utt_generate_new_article_path ();
-  xml = utt_xml_new ();
-  utt_article_validate_title (title);
-  utt_article_validate_content (content);
-  utt_xml_write (xml, path, title, content);
-/*   utt_parse_xml (xml, path); */
-/*   g_print ("Title: %s\nContent: %s\n", utt_xml_get_title (xml), utt_xml_get_content (xml)); */
-  utt_xml_destroy (xml);
-  g_free (path);
-}
-
-static void
 on_add_button_click (GtkButton *button, GtkWindow *parent)
 {
   GtkWidget *dialog, *content_area, *frame, *scroll;
@@ -238,7 +221,7 @@ on_add_button_click (GtkButton *button, GtkWindow *parent)
 					&start_iter,
 					&end_iter,
 					FALSE);
-    write_to_new_xml (title, content);
+    g_print ("%d\n", utt_add_article (title, content));
   }
   gtk_widget_destroy (dialog);
 }
