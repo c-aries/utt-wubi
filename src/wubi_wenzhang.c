@@ -281,6 +281,23 @@ create_article_view ()
 }
 
 static void
+on_delete_button_click (GtkButton *button, GtkTreeView *view)
+{
+  GtkTreeSelection *sel;
+  GtkTreePath *path;
+  GtkTreeIter iter;
+  gint id;
+
+  sel = gtk_tree_view_get_selection (view);
+  gtk_tree_selection_get_selected (sel, NULL, &iter);
+  path = gtk_tree_model_get_path (gtk_tree_view_get_model (view),
+				  &iter);
+  id = gtk_tree_path_get_indices (path)[0];
+  g_print ("%d\n", id);
+  gtk_tree_path_free (path);
+}
+
+static void
 on_button_click (GtkButton *button, GtkWindow *parent)
 {
   GtkWidget *dialog, *content;
@@ -306,6 +323,7 @@ on_button_click (GtkButton *button, GtkWindow *parent)
   button2 = gtk_button_new_with_label ("修改");
   gtk_box_pack_start (GTK_BOX (hbox), button2, TRUE, TRUE, 0);
   button2 = gtk_button_new_with_label ("删除");
+  g_signal_connect (button2, "clicked", G_CALLBACK (on_delete_button_click), view);
   gtk_box_pack_start (GTK_BOX (hbox), button2, TRUE, TRUE, 0);
 
   gtk_widget_show_all (dialog);
