@@ -82,12 +82,12 @@ utt_article_validate_content (const gchar *content)
   return TRUE;
 }
 
-enum article_add_result
+enum article_result
 utt_add_article (const gchar *title, const gchar *content)
 {
   struct utt_xml *xml;
   gchar *path;
-  enum article_add_result ret = ARTICLE_ADD_SUCCESS;
+  enum article_result ret = ARTICLE_ADD_SUCCESS;
 
   if (!utt_article_validate_title (title)) {
     ret |= TITLE_INVALIDATE;
@@ -104,4 +104,25 @@ utt_add_article (const gchar *title, const gchar *content)
   utt_xml_destroy (xml);
   g_free (path);
   return ARTICLE_ADD_SUCCESS;
+}
+
+enum article_result
+utt_modify_article (const gchar *filepath, const gchar *title, const gchar *content)
+{
+  struct utt_xml *xml;
+  enum article_result ret = ARTICLE_MODIFY_SUCCESS;
+
+  if (!utt_article_validate_title (title)) {
+    ret |= TITLE_INVALIDATE;
+  }
+  if (!utt_article_validate_content (content)) {
+    ret |= CONTENT_INVALIDATE;
+  }
+  if (ret) {
+    return ret;
+  }
+  xml = utt_xml_new ();
+  utt_xml_write (xml, filepath, title, content);
+  utt_xml_destroy (xml);
+  return ARTICLE_MODIFY_SUCCESS;
 }

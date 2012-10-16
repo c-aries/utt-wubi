@@ -27,6 +27,11 @@ static struct priv {
 } _priv;
 static struct priv *priv = &_priv;
 
+struct article_dialog_data {
+  GtkWindow *parent;
+  GtkTreeView *view;
+};
+
 static void
 wubi_wenzhang_genchars ()
 {
@@ -168,7 +173,7 @@ on_radio_toggle (GtkToggleButton *button, enum mode mode)
 }
 
 static void
-on_add_button_click (GtkButton *button, GtkWindow *parent)
+on_add_button_click (GtkButton *button, struct article_dialog_data *user_data)
 {
   GtkWidget *dialog, *content_area, *scroll;
   GtkWidget *vbox, *entry, *view;
@@ -177,7 +182,8 @@ on_add_button_click (GtkButton *button, GtkWindow *parent)
   GtkTextIter start_iter, end_iter;
   gint ret;
   const gchar *title, *content;
-  enum article_add_result result = ARTICLE_ADD_SUCCESS;
+  enum article_result result = ARTICLE_ADD_SUCCESS;
+  GtkWindow *parent = user_data->parent;
 
   dialog = gtk_dialog_new_with_buttons ("添加文章",
 					parent,
@@ -284,7 +290,7 @@ create_article_view ()
 }
 
 static void
-on_delete_button_click (GtkButton *button, GtkTreeView *view)
+on_delete_button_click (GtkButton *button, struct article_dialog_data *user_data)
 {
   GtkTreeSelection *sel;
   GtkTreeIter iter;
@@ -292,6 +298,9 @@ on_delete_button_click (GtkButton *button, GtkTreeView *view)
   gchar *title, *filename;
   GError *error = NULL;
   GFile *file;
+  GtkTreeView *view = user_data->view;
+  GtkWidget *dialog;
+  gint ret;
 
   sel = gtk_tree_view_get_selection (view);
   if (gtk_tree_selection_get_selected (sel, NULL, &iter)) {
@@ -300,14 +309,132 @@ on_delete_button_click (GtkButton *button, GtkTreeView *view)
 			0, &title,
 			1, &filename,
 			-1);
-    file = g_file_new_for_path (filename);
-    if (g_file_delete (file, NULL, &error)) {
-      gtk_list_store_remove (GTK_LIST_STORE (store), &iter);
+    dialog = gtk_message_dialog_new (user_data->parent,
+				     GTK_DIALOG_DESTROY_WITH_PARENT,
+				     GTK_MESSAGE_QUESTION,
+				     GTK_BUTTONS_YES_NO,
+				     "删除\"%s\"?", title);
+    ret = gtk_dialog_run (GTK_DIALOG (dialog));
+    if (ret == GTK_RESPONSE_YES) {
+      file = g_file_new_for_path (filename);
+      if (g_file_delete (file, NULL, &error)) {
+	gtk_list_store_remove (GTK_LIST_STORE (store), &iter);
+      }
+      g_object_unref (file);
+      if (error) {
+	g_error_free (error);
+      }
     }
-    g_object_unref (file);
-    if (error) {
-      g_error_free (error);
+    gtk_widget_destroy (dialog);
+  }
+}
+
+static void
+show_modify_dialog (GtkWindow *parent, struct utt_xml *xml)
+{
+  GtkWidget *dialog, *content_area, *scroll;
+  GtkWidget *vbox, *entry, *view, *label;
+  GtkWidget *title_frame, *content_frame;
+  GtkTextBuffer *view_buffer;
+  GtkTextIter start_iter, end_iter;
+  gchar *title, *content, *filepath;
+  const gchar *const_title;
+  gint ret;
+  enum article_result result = ARTICLE_MODIFY_SUCCESS;
+
+  dialog = gtk_dialog_new_with_buttons ("修改文章",
+					parent,
+					GTK_DIALOG_DESTROY_WITH_PARENT,
+					GTK_STOCK_APPLY,
+					GTK_RESPONSE_APPLY,
+					GTK_STOCK_CANCEL,
+					GTK_RESPONSE_CANCEL,
+					NULL);
+  gtk_widget_set_size_request (dialog, 320, 240);
+  gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER);
+  content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  vbox = gtk_vbox_new (FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
+  gtk_container_add (GTK_CONTAINER (content_area), vbox);
+
+  title_frame = gtk_frame_new ("标题");
+  gtk_frame_set_shadow_type (GTK_FRAME (title_frame), GTK_SHADOW_NONE);
+  entry = gtk_entry_new ();
+  title = utt_xml_get_title (xml);
+  gtk_entry_set_text (GTK_ENTRY (entry), title);
+  gtk_container_add (GTK_CONTAINER (title_frame), entry);
+  gtk_box_pack_start (GTK_BOX (vbox), title_frame, FALSE, FALSE, 0);
+
+  content_frame = gtk_frame_new ("内容");
+  gtk_frame_set_shadow_type (GTK_FRAME (content_frame), GTK_SHADOW_NONE);
+  scroll = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
+				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_container_add (GTK_CONTAINER (content_frame), scroll);
+  gtk_container_set_border_width (GTK_CONTAINER (scroll), 2);
+  view = gtk_text_view_new ();
+  view_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+  gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (view), GTK_WRAP_CHAR);
+  content = utt_xml_get_content (xml);
+  gtk_text_buffer_set_text (GTK_TEXT_BUFFER (view_buffer), content, -1);
+  gtk_container_add (GTK_CONTAINER (scroll), view);
+  gtk_box_pack_start (GTK_BOX (vbox), content_frame, TRUE, TRUE, 0);
+
+  gtk_widget_show_all (dialog);
+  for (;;) {
+    ret = gtk_dialog_run (GTK_DIALOG (dialog));
+    if (ret == GTK_RESPONSE_APPLY) {
+      const_title = gtk_entry_get_text (GTK_ENTRY (entry));
+      gtk_text_buffer_get_start_iter (view_buffer, &start_iter);
+      gtk_text_buffer_get_end_iter (view_buffer, &end_iter);
+      content = gtk_text_buffer_get_text (view_buffer,
+					  &start_iter,
+					  &end_iter,
+					  FALSE);
+      filepath = utt_xml_get_filepath (xml);
+      result = utt_modify_article (filepath, const_title, content);
     }
+    if (result == ARTICLE_MODIFY_SUCCESS || ret != GTK_RESPONSE_APPLY) {
+      break;
+    }
+    if (result & TITLE_INVALIDATE) {
+      label = gtk_frame_get_label_widget (GTK_FRAME (title_frame));
+      gtk_label_set_markup (GTK_LABEL (label), "标题<span color=\"red\">(不符合要求)</span>");
+    }
+    else {
+      gtk_frame_set_label (GTK_FRAME (title_frame), "标题");
+    }
+    if (result & CONTENT_INVALIDATE) {
+      label = gtk_frame_get_label_widget (GTK_FRAME (content_frame));
+      gtk_label_set_markup (GTK_LABEL (label), "内容<span color=\"red\">(不符合要求)</span>");
+    }
+    else {
+      gtk_frame_set_label (GTK_FRAME (content_frame), "内容");
+    }
+  }
+  gtk_widget_destroy (dialog);
+}
+
+static void
+on_modify_button_click (GtkButton *button, struct article_dialog_data *user_data)
+{
+  GtkTreeSelection *sel;
+  GtkTreeIter iter;
+  GtkTreeModel *store;
+  gchar *title, *filepath;
+  struct utt_xml *xml;
+
+  sel = gtk_tree_view_get_selection (user_data->view);
+  if (gtk_tree_selection_get_selected (sel, NULL, &iter)) {
+    store = gtk_tree_view_get_model (user_data->view);
+    gtk_tree_model_get (store, &iter,
+			0, &title,
+			1, &filepath,
+			-1);
+    xml = utt_xml_new ();
+    utt_parse_xml (xml, filepath);
+    show_modify_dialog (user_data->parent, xml);
+    utt_xml_destroy (xml);
   }
 }
 
@@ -316,6 +443,7 @@ on_button_click (GtkButton *button, GtkWindow *parent)
 {
   GtkWidget *dialog, *content;
   GtkWidget *vbox, *hbox, *button2, *view;
+  struct article_dialog_data user_data;
 
   dialog = gtk_dialog_new_with_buttons ("管理文章",
 					parent,
@@ -331,13 +459,16 @@ on_button_click (GtkButton *button, GtkWindow *parent)
   hbox = gtk_hbox_new (TRUE, 2);
   gtk_box_pack_end (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
 
+  user_data.parent = GTK_WINDOW (dialog);
+  user_data.view = GTK_TREE_VIEW (view);
   button2 = gtk_button_new_with_label ("添加");
-  g_signal_connect (button2, "clicked", G_CALLBACK (on_add_button_click), dialog);
+  g_signal_connect (button2, "clicked", G_CALLBACK (on_add_button_click), &user_data);
   gtk_box_pack_start (GTK_BOX (hbox), button2, TRUE, TRUE, 0);
   button2 = gtk_button_new_with_label ("修改");
+  g_signal_connect (button2, "clicked", G_CALLBACK (on_modify_button_click), &user_data);
   gtk_box_pack_start (GTK_BOX (hbox), button2, TRUE, TRUE, 0);
   button2 = gtk_button_new_with_label ("删除");
-  g_signal_connect (button2, "clicked", G_CALLBACK (on_delete_button_click), view);
+  g_signal_connect (button2, "clicked", G_CALLBACK (on_delete_button_click), &user_data);
   gtk_box_pack_start (GTK_BOX (hbox), button2, TRUE, TRUE, 0);
 
   gtk_widget_show_all (dialog);
