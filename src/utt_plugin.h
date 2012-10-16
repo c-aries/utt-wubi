@@ -11,7 +11,7 @@ struct utt_plugin_table {
 struct utt_plugin {
   gchar *plugin_name;
   gchar *locale_name;
-  gint class_num;
+  gint (*class_num) (void);
   gchar *(*nth_class_name) (gint n);
   gint (*get_class_index) ();
   gboolean (*set_class_index) (gint index);

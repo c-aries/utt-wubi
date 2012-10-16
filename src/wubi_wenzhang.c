@@ -24,6 +24,7 @@ static struct priv {
   struct utt_dashboard *dash;
   GtkWidget *area;
   gchar *gen_chars;
+  GtkListStore *article_store;
 } _priv;
 static struct priv *priv = &_priv;
 
@@ -35,10 +36,22 @@ struct article_dialog_data {
 static void
 wubi_wenzhang_genchars ()
 {
+  GtkTreeIter iter;
+  GtkTreePath *path;
+  gchar *filepath;
+
   if (priv->gen_chars) {
     g_free (priv->gen_chars);
   }
-  priv->gen_chars = wubi_class_gen_wenzhang_chars (&priv->utt->wubi, priv->utt->subclass_id);
+  path = gtk_tree_path_new_from_indices (priv->utt->subclass_id, -1);
+  gtk_tree_model_get_iter (GTK_TREE_MODEL (priv->article_store),
+			   &iter,
+			   path);
+  gtk_tree_model_get (GTK_TREE_MODEL (priv->article_store),
+		      &iter,
+		      1, &filepath,
+		      -1);
+  priv->gen_chars = utt_article_get_content (filepath);
 }
 
 static void
@@ -277,29 +290,10 @@ static GtkWidget *
 create_article_view ()
 {
   GtkWidget *view;
-  GtkListStore *store;
-  GtkTreeIter iter;
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
-  GList *articles;
-  struct utt_xml *xml;
-  gint i;
 
-  articles = utt_get_user_articles ();
-  store = gtk_list_store_new (2,
-			      G_TYPE_STRING,
-			      G_TYPE_STRING);
-  for (i = 0; i < g_list_length (articles); i++) {
-    xml = g_list_nth_data (articles, i);
-    gtk_list_store_append (store, &iter);
-    gtk_list_store_set (store, &iter,
-			0, utt_xml_get_title (xml),
-			1, utt_xml_get_filepath (xml),
-			-1);
-    utt_xml_destroy (xml);
-  }
-  g_list_free (articles);
-  view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (store));
+  view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (priv->article_store));
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), FALSE);
   renderer = gtk_cell_renderer_text_new (); /* FIXME: memory leak? */
   column = gtk_tree_view_column_new_with_attributes ("", renderer,
@@ -577,28 +571,64 @@ class_begin ()
 static void
 init (gpointer user_data)
 {
+  GList *articles;
+  GtkTreeIter iter;
+  struct utt_xml *xml;
+  gint i;
+
   priv->utt = user_data;
+
+  articles = utt_get_user_articles ();
+  priv->article_store = gtk_list_store_new (2,
+					    G_TYPE_STRING,
+					    G_TYPE_STRING);
+  for (i = 0; i < g_list_length (articles); i++) {
+    xml = g_list_nth_data (articles, i);
+    gtk_list_store_append (priv->article_store, &iter);
+    gtk_list_store_set (priv->article_store, &iter,
+			0, utt_xml_get_title (xml),
+			1, utt_xml_get_filepath (xml),
+			-1);
+    utt_xml_destroy (xml);
+  }
+  g_list_free (articles);
 }
 
 static void
 destroy ()
 {
+  g_object_unref (priv->article_store);
 }
 
 static gchar *
 nth_class_name (gint n)
 {
-  static gchar *name[] = {
-    "石苍舒醉墨堂",
-    "测试",
-  };
-  return name[n];
+  GtkTreeIter iter;
+  GtkTreePath *path;
+  gchar *title;
+
+  path = gtk_tree_path_new_from_indices (n, -1);
+  gtk_tree_model_get_iter (GTK_TREE_MODEL (priv->article_store),
+			   &iter,
+			   path);
+  gtk_tree_model_get (GTK_TREE_MODEL (priv->article_store),
+		      &iter,
+		      0, &title,
+		      -1);
+  gtk_tree_path_free (path);
+  return title;
+}
+
+static gint
+class_num (void)
+{
+  return gtk_tree_model_iter_n_children (GTK_TREE_MODEL (priv->article_store), NULL);
 }
 
 struct utt_plugin wubi_wenzhang_plugin = {
   .plugin_name = "wubi::wenzhang",
   .locale_name = "文章",
-  .class_num = CLASS_NUM,
+  .class_num = class_num,
   .nth_class_name = nth_class_name,
   .get_class_index = get_class_index,
   .set_class_index = set_class_index,

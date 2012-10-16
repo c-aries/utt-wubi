@@ -127,3 +127,16 @@ utt_modify_article (const gchar *filepath, const gchar *title, const gchar *cont
   utt_xml_destroy (xml);
   return ARTICLE_MODIFY_SUCCESS;
 }
+
+gchar *
+utt_article_get_content (gchar *filepath)
+{
+  struct utt_xml *xml;
+  gchar *content;
+
+  xml = utt_xml_new ();
+  utt_parse_xml (xml, filepath);
+  content = g_strdup (utt_xml_get_content (xml));
+  utt_xml_destroy (xml);
+  return content;
+}

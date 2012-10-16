@@ -321,7 +321,7 @@ fill_content_area (GtkWidget *content_area, struct utt_plugin *plugin)
   gint i, id;
 
   store = gtk_list_store_new (1, G_TYPE_STRING);
-  for (i = 0; i < plugin->class_num; i++) {
+  for (i = 0; i < plugin->class_num (); i++) {
     gtk_list_store_append (store, &iter);
     gtk_list_store_set (store, &iter,
 			0, plugin->nth_class_name (i),

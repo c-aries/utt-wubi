@@ -395,10 +395,16 @@ nth_class_name (gint n)
   return name[n];
 }
 
+static gint
+class_num (void)
+{
+  return CLASS_NUM;
+}
+
 struct utt_plugin wubi_zigen_plugin = {
   .plugin_name = "wubi::zigen",
   .locale_name = "字根",
-  .class_num = CLASS_NUM,
+  .class_num = class_num,
   .nth_class_name = nth_class_name,
   .get_class_index = get_class_index,
   .set_class_index = set_class_index,
