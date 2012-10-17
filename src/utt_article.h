@@ -8,6 +8,7 @@ enum article_result {
   ARTICLE_MODIFY_SUCCESS = 0,
   TITLE_INVALIDATE = 1 << 0,
   CONTENT_INVALIDATE = 1 << 1,
+  ARTICLE_PERMISSION_DENY = 1 << 2,
 };
 
 GList *utt_get_user_articles ();
