@@ -74,6 +74,12 @@ on_end_of_class (UttTextArea *area, struct utt_wubi *utt)
   }
 }
 
+static void
+on_statistics (UttTextArea *area, struct utt_wubi *utt)
+{
+  utt_dashboard_queue_draw (priv->dash);
+}
+
 static gboolean
 on_key_press (GtkWidget *widget, GdkEventKey *event, struct utt_wubi *utt)
 {
@@ -545,6 +551,7 @@ create_main_page ()
   gtk_container_set_border_width (GTK_CONTAINER (hbox), 6);
   priv->area = utt_text_area_new ();
   g_signal_connect (priv->area, "class-end", G_CALLBACK (on_end_of_class), utt);
+  g_signal_connect (priv->area, "statistics", G_CALLBACK (on_statistics), utt);
   utt_text_area_set_class_recorder (UTT_TEXT_AREA (priv->area), utt->record);
   gtk_box_pack_start (GTK_BOX (hbox), priv->area, TRUE, TRUE, 0);
   gtk_container_add (GTK_CONTAINER (frame), hbox);
@@ -572,8 +579,20 @@ class_clean ()
 static void
 class_begin ()
 {
+  UttClassMode class_mode = UTT_CLASS_EXERCISE_MODE;
+  enum mode mode;
+
   wubi_wenzhang_genchars ();
   utt_text_area_set_text (UTT_TEXT_AREA (priv->area), priv->gen_chars);
+
+  mode = get_mode ();
+  if (mode == TEST_MODE) {
+    class_mode = UTT_CLASS_EXERCISE_MODE;
+  }
+  else if (mode == EXAM_MODE) {
+    class_mode = UTT_CLASS_EXAM_MODE;
+  }
+  utt_text_area_set_class_mode (UTT_TEXT_AREA (priv->area), class_mode);
 
   gtk_widget_grab_focus (priv->area);
   utt_text_area_class_begin (UTT_TEXT_AREA (priv->area));

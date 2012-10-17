@@ -48,7 +48,9 @@ void utt_class_record_set_mode (UttClassRecord *record, enum class_mode mode);
 void utt_class_record_begin (UttClassRecord *record);
 gboolean utt_class_record_has_begin (UttClassRecord *record);
 void utt_class_record_type_inc (UttClassRecord *record);
+void utt_class_record_type_dec (UttClassRecord *record);
 void utt_class_record_correct_inc (UttClassRecord *record);
+void utt_class_record_correct_dec (UttClassRecord *record);
 void utt_class_record_format_elapse_time (UttClassRecord *record,
 					  gint *hour, gint *min, gint *sec);
 gint utt_class_record_stat_correct (UttClassRecord *record);

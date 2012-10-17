@@ -13,5 +13,6 @@ struct utt_dashboard {
 struct utt_dashboard *utt_dashboard_new (struct utt_wubi *utt);
 void utt_dashboard_destroy (struct utt_dashboard *dash);
 void utt_dashboard_set_class_recorder (struct utt_dashboard *dash, UttClassRecord *record);
+void utt_dashboard_queue_draw (struct utt_dashboard *dash);
 
 #endif

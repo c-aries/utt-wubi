@@ -39,6 +39,7 @@ struct _UttTextAreaPrivate
 enum {
   CLASS_BEGIN,
   CLASS_END,
+  STATISTICS,
   LAST_SIGNAL,
 };
 static guint signals[LAST_SIGNAL] = { 0 };
@@ -150,6 +151,7 @@ utt_text_area_class_end (UttTextArea *area)
   priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   if (utt_class_record_end_with_check (priv->record)) {
     utt_text_area_underscore_stop_timeout (area);
+    g_signal_emit (area, signals[STATISTICS], 0);
     g_signal_emit (area, signals[CLASS_END], 0);
     utt_class_record_handlers_disconnect (priv->record);
   }
@@ -206,6 +208,7 @@ utt_text_area_handle_keyevent_unicode (UttTextArea *area, gunichar unicode)
       return TRUE;
     }
   }
+  g_signal_emit (area, signals[STATISTICS], 0);
   return FALSE;
 }
 
@@ -385,7 +388,7 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 {
   UttTextArea *area = UTT_TEXT_AREA (widget);
   UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
-  gunichar unicode;
+  gunichar unicode, text_unicode;
   gboolean class_should_end = FALSE;
 
   if (!utt_class_record_has_begin (priv->record)) {
@@ -396,8 +399,22 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
     /* FIXME */
     return TRUE;
   }
-  if (event->keyval == GDK_BackSpace) {
-    /* g_print ("backspace\n"); */
+  if (event->keyval == GDK_BackSpace &&
+      utt_text_area_get_class_mode (area) == UTT_CLASS_EXERCISE_MODE) {
+    if (priv->text_cmp > priv->text_base) {
+      priv->input_ptr = g_utf8_prev_char (priv->input_ptr);
+      unicode = g_utf8_get_char (priv->input_ptr);
+      priv->text_cmp = g_utf8_prev_char (priv->text_cmp);
+      text_unicode = g_utf8_get_char (priv->text_cmp);
+      utt_class_record_type_dec (priv->record);
+      if (unicode == text_unicode) {
+	utt_class_record_correct_dec (priv->record);
+      }
+      *priv->input_ptr = '\0';
+      utt_text_area_underscore_restart_timeout (area);
+    }
+    g_signal_emit (area, signals[STATISTICS], 0);
+    return TRUE;
   }
   if (gtk_im_context_filter_keypress (priv->im_context, event)) {
     return TRUE;
@@ -731,6 +748,14 @@ utt_text_area_class_init (UttTextAreaClass *class)
 		  G_TYPE_NONE, 0);
   signals[CLASS_END] =
     g_signal_new ("class-end",
+		  G_OBJECT_CLASS_TYPE (gobject_class),
+		  G_SIGNAL_RUN_LAST,
+		  0,
+		  NULL, NULL,
+		  gtk_marshal_VOID__VOID,
+		  G_TYPE_NONE, 0);
+  signals[STATISTICS] =
+    g_signal_new ("statistics",
 		  G_OBJECT_CLASS_TYPE (gobject_class),
 		  G_SIGNAL_RUN_LAST,
 		  0,

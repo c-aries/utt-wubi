@@ -107,6 +107,12 @@ utt_dashboard_new (struct utt_wubi *utt)
 }
 
 void
+utt_dashboard_queue_draw (struct utt_dashboard *dash)
+{
+  gtk_widget_queue_draw (dash->draw);
+}
+
+void
 utt_dashboard_destroy (struct utt_dashboard *dash)
 {
   struct utt_dashboard_priv *priv = dash->priv;

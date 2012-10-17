@@ -249,12 +249,30 @@ utt_class_record_type_inc (UttClassRecord *record)
 }
 
 void
+utt_class_record_type_dec (UttClassRecord *record)
+{
+  UttClassRecordPrivate *priv;
+
+  priv = UTT_CLASS_RECORD_GET_PRIVATE (record);
+  priv->stat.typed--;
+}
+
+void
 utt_class_record_correct_inc (UttClassRecord *record)
 {
   UttClassRecordPrivate *priv;
 
   priv = UTT_CLASS_RECORD_GET_PRIVATE (record);
   priv->stat.correct++;
+}
+
+void
+utt_class_record_correct_dec (UttClassRecord *record)
+{
+  UttClassRecordPrivate *priv;
+
+  priv = UTT_CLASS_RECORD_GET_PRIVATE (record);
+  priv->stat.correct--;
 }
 
 static gboolean
