@@ -7,13 +7,27 @@
 
 /* return value should be free */
 static gchar *
-utt_get_article_base_dir ()
+utt_get_user_article_dir ()
 {
   gchar *dir;
 
   dir = g_build_path ("/", g_get_user_data_dir (), "utt", "wubi", "article", NULL);
   if (!g_file_test (dir, G_FILE_TEST_EXISTS)) {
     g_mkdir_with_parents (dir, S_IRWXU);
+  }
+  return dir;
+}
+
+/* return value should be free */
+static gchar *
+utt_get_system_article_dir ()
+{
+  gchar *dir;
+
+  dir = g_build_path ("/", PKGDATADIR, "article", NULL);
+  if (!g_file_test (dir, G_FILE_TEST_EXISTS)) {
+    g_free (dir);
+    return NULL;
   }
   return dir;
 }
@@ -28,7 +42,24 @@ utt_get_user_articles ()
   GDir *dir;
   GError *error = NULL;
 
-  base_path = utt_get_article_base_dir ();
+  base_path = utt_get_system_article_dir ();
+  if (base_path) {
+    dir = g_dir_open (base_path, 0, &error);
+    if (error) {
+      g_error_free (error);
+    }
+    while ((name = g_dir_read_name (dir))) {
+      xml = utt_xml_new ();
+      path = g_build_path ("/", base_path, name, NULL);
+      utt_parse_xml (xml, path);
+      list = g_list_prepend (list, xml);
+      g_free (path);
+    }
+    g_dir_close (dir);
+  }
+  g_free (base_path);
+
+  base_path = utt_get_user_article_dir ();
   dir = g_dir_open (base_path, 0, &error);
   if (error) {
     g_error_free (error);
@@ -54,7 +85,7 @@ utt_generate_new_article_path ()
 
   uuid_generate (uuid);
   uuid_unparse (uuid, uuid_str);
-  dir = utt_get_article_base_dir ();
+  dir = utt_get_user_article_dir ();
   path = g_build_path ("/", dir, uuid_str, NULL);
   g_free (dir);
   return path;

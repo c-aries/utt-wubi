@@ -65,5 +65,6 @@ AC_CONFIG_FILES([Makefile
 		data/zigen/png/Makefile
 		data/icons/Makefile
 		data/icons/48x48/Makefile
-		data/icons/48x48/apps/Makefile])
+		data/icons/48x48/apps/Makefile
+		data/article/Makefile])
 AC_OUTPUT
