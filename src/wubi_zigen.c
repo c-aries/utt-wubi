@@ -9,7 +9,15 @@
 
 #define TEXT_NUM_CONF "/apps/utt/wubi/zigen/text_num"
 #define CLASS_INDEX_CONF "/apps/utt/wubi/zigen/class_index"
-#define CLASS_NUM 6
+
+static gchar *class_name[] = {
+  "横区(ASDFG)",
+  "竖区(HJKLM)",
+  "撇区(QWERT)",
+  "捺区(YUIOP)",
+  "折区(XCVBN)",
+  "综合",
+};
 
 static struct priv {
   struct utt_wubi *utt;
@@ -20,6 +28,8 @@ static struct priv {
   gboolean match;
 } _priv;
 static struct priv *priv = &_priv;
+
+static gint class_num (void);
 
 /* utils */
 
@@ -102,7 +112,7 @@ set_class_index (gint index)
 {
   GConfClient *config;
 
-  if (index >= 0 && index < CLASS_NUM) {
+  if (index >= 0 && index < class_num ()) {
     config = gconf_client_get_default ();
     gconf_client_set_int (config, CLASS_INDEX_CONF, index, NULL);
     g_object_unref (config);
@@ -384,21 +394,13 @@ destroy ()
 static gchar *
 nth_class_name (gint n)
 {
-  static gchar *name[] = {
-    "横区(ASDFG)",
-    "竖区(HJKLM)",
-    "撇区(QWERT)",
-    "捺区(YUIOP)",
-    "折区(XCVBN)",
-    "综合",
-  };
-  return name[n];
+  return class_name[n];
 }
 
 static gint
 class_num (void)
 {
-  return CLASS_NUM;
+  return G_N_ELEMENTS (class_name);
 }
 
 struct utt_plugin wubi_zigen_plugin = {

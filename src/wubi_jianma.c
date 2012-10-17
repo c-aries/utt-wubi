@@ -8,7 +8,10 @@
 
 #define TEXT_NUM_CONF "/apps/utt/wubi/jianma/text_num"
 #define CLASS_INDEX_CONF "/apps/utt/wubi/jianma/class_index"
-#define CLASS_NUM 1
+
+static gchar *class_name[] = {
+  "一级简码",
+};
 
 static struct priv {
   struct utt_wubi *utt;
@@ -19,6 +22,8 @@ static struct priv {
   gboolean match;
 } _priv;			/* _ means instance */
 static struct priv *priv = &_priv;
+
+static gint class_num (void);
 
 /* utils */
 
@@ -99,7 +104,7 @@ set_class_index (gint index)
 {
   GConfClient *config;
 
-  if (index >= 0 && index < CLASS_NUM) {
+  if (index >= 0 && index < class_num ()) {
     config = gconf_client_get_default ();
     gconf_client_set_int (config, CLASS_INDEX_CONF, index, NULL);
     g_object_unref (config);
@@ -409,16 +414,13 @@ destroy ()
 static gchar *
 nth_class_name (gint n)
 {
-  static gchar *name[] = {
-    "一级简码",
-  };
-  return name[n];
+  return class_name[n];
 }
 
 static gint
 class_num (void)
 {
-  return CLASS_NUM;
+  return G_N_ELEMENTS (class_name);
 }
 
 struct utt_plugin wubi_jianma_plugin = {

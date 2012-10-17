@@ -2142,7 +2142,7 @@ $as_echo "$as_me: loading site script $ac_site_file" >&6;}
       || { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "failed to load site script $ac_site_file
-See \`config.log' for more details" "$LINENO" 5; }
+See \`config.log' for more details" "$LINENO" 5 ; }
   fi
 done
 
@@ -2218,7 +2218,7 @@ if $ac_cache_corrupted; then
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
   { $as_echo "$as_me:${as_lineno-$LINENO}: error: changes in the environment can compromise the build" >&5
 $as_echo "$as_me: error: changes in the environment can compromise the build" >&2;}
-  as_fn_error $? "run \`make distclean' and/or \`rm $cache_file' and start over" "$LINENO" 5
+  as_fn_error $? "run \`make distclean' and/or \`rm $cache_file' and start over" "$LINENO" 5 
 fi
 ## -------------------- ##
 ## Main body of script. ##
@@ -2251,7 +2251,7 @@ for ac_dir in build-aux "$srcdir"/build-aux; do
   fi
 done
 if test -z "$ac_aux_dir"; then
-  as_fn_error $? "cannot find install-sh, install.sh, or shtool in build-aux \"$srcdir\"/build-aux" "$LINENO" 5
+  as_fn_error $? "cannot find install-sh, install.sh, or shtool in build-aux \"$srcdir\"/build-aux" "$LINENO" 5 
 fi
 
 # These three variables are undocumented and unsupported,
@@ -2370,11 +2370,11 @@ am_lf='
 '
 case `pwd` in
   *[\\\"\#\$\&\'\`$am_lf]*)
-    as_fn_error $? "unsafe absolute working directory name" "$LINENO" 5;;
+    as_fn_error $? "unsafe absolute working directory name" "$LINENO" 5 ;;
 esac
 case $srcdir in
   *[\\\"\#\$\&\'\`$am_lf\ \	]*)
-    as_fn_error $? "unsafe srcdir value: \`$srcdir'" "$LINENO" 5;;
+    as_fn_error $? "unsafe srcdir value: \`$srcdir'" "$LINENO" 5 ;;
 esac
 
 # Do `set' in a subshell so we don't clobber the current shell's
@@ -2397,7 +2397,7 @@ if (
       # broken ls alias from the environment.  This has actually
       # happened.  Such a system could not be considered "sane".
       as_fn_error $? "ls -t appears to fail.  Make sure there is not a broken
-alias in your environment" "$LINENO" 5
+alias in your environment" "$LINENO" 5 
    fi
 
    test "$2" = conftest.file
@@ -2407,7 +2407,7 @@ then
    :
 else
    as_fn_error $? "newly created file is older than distributed files!
-Check your system clock" "$LINENO" 5
+Check your system clock" "$LINENO" 5 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
@@ -2686,7 +2686,7 @@ if test "`cd $srcdir && pwd`" != "`pwd`"; then
   am__isrc=' -I$(srcdir)'
   # test to see if srcdir already configured
   if test -f $srcdir/config.status; then
-    as_fn_error $? "source directory already configured; run \"make distclean\" there first" "$LINENO" 5
+    as_fn_error $? "source directory already configured; run \"make distclean\" there first" "$LINENO" 5 
   fi
 fi
 
@@ -3045,7 +3045,7 @@ fi
 test -z "$CC" && { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "no acceptable C compiler found in \$PATH
-See \`config.log' for more details" "$LINENO" 5; }
+See \`config.log' for more details" "$LINENO" 5 ; }
 
 # Provide some information about the compiler.
 $as_echo "$as_me:${as_lineno-$LINENO}: checking for C compiler version" >&5
@@ -3160,7 +3160,7 @@ sed 's/^/| /' conftest.$ac_ext >&5
 { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error 77 "C compiler cannot create executables
-See \`config.log' for more details" "$LINENO" 5; }
+See \`config.log' for more details" "$LINENO" 5 ; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
@@ -3203,7 +3203,7 @@ else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "cannot compute suffix of executables: cannot compile and link
-See \`config.log' for more details" "$LINENO" 5; }
+See \`config.log' for more details" "$LINENO" 5 ; }
 fi
 rm -f conftest conftest$ac_cv_exeext
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_exeext" >&5
@@ -3262,7 +3262,7 @@ $as_echo "$ac_try_echo"; } >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "cannot run C compiled programs.
 If you meant to cross compile, use \`--host'.
-See \`config.log' for more details" "$LINENO" 5; }
+See \`config.log' for more details" "$LINENO" 5 ; }
     fi
   fi
 fi
@@ -3314,7 +3314,7 @@ sed 's/^/| /' conftest.$ac_ext >&5
 { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "cannot compute suffix of object files: cannot compile
-See \`config.log' for more details" "$LINENO" 5; }
+See \`config.log' for more details" "$LINENO" 5 ; }
 fi
 rm -f conftest.$ac_cv_objext conftest.$ac_ext
 fi
@@ -3870,7 +3870,7 @@ $as_echo "$USE_NLS" >&6; }
 
 case "$am__api_version" in
     1.01234)
-	as_fn_error $? "Automake 1.5 or newer is required to use intltool" "$LINENO" 5
+	as_fn_error $? "Automake 1.5 or newer is required to use intltool" "$LINENO" 5 
     ;;
     *)
     ;;
@@ -3887,7 +3887,7 @@ $as_echo_n "checking for intltool >= 0.41.1... " >&6; }
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $INTLTOOL_APPLIED_VERSION found" >&5
 $as_echo "$INTLTOOL_APPLIED_VERSION found" >&6; }
     test "$INTLTOOL_APPLIED_VERSION_AS_INT" -ge "$INTLTOOL_REQUIRED_VERSION_AS_INT" ||
-	as_fn_error $? "Your intltool is too old.  You need intltool 0.41.1 or later." "$LINENO" 5
+	as_fn_error $? "Your intltool is too old.  You need intltool 0.41.1 or later." "$LINENO" 5 
 fi
 
 # Extract the first word of "intltool-update", so it can be a program name with args.
@@ -4011,7 +4011,7 @@ fi
 
 
 if test -z "$INTLTOOL_UPDATE" -o -z "$INTLTOOL_MERGE" -o -z "$INTLTOOL_EXTRACT"; then
-    as_fn_error $? "The intltool scripts were not found. Please install intltool." "$LINENO" 5
+    as_fn_error $? "The intltool scripts were not found. Please install intltool." "$LINENO" 5 
 fi
 
   INTLTOOL_DESKTOP_RULE='%.desktop:   %.desktop.in   $(INTLTOOL_MERGE) $(wildcard $(top_srcdir)/po/*.po) ; LC_ALL=C $(INTLTOOL_MERGE) -d -u -c $(top_builddir)/po/.intltool-merge-cache $(top_srcdir)/po $< $@' 
@@ -4293,13 +4293,13 @@ fi
 
 
 if test -z "$XGETTEXT" -o -z "$MSGMERGE" -o -z "$MSGFMT"; then
-    as_fn_error $? "GNU gettext tools not found; required for intltool" "$LINENO" 5
+    as_fn_error $? "GNU gettext tools not found; required for intltool" "$LINENO" 5 
 fi
 xgversion="`$XGETTEXT --version|grep '(GNU ' 2> /dev/null`"
 mmversion="`$MSGMERGE --version|grep '(GNU ' 2> /dev/null`"
 mfversion="`$MSGFMT --version|grep '(GNU ' 2> /dev/null`"
 if test -z "$xgversion" -o -z "$mmversion" -o -z "$mfversion"; then
-    as_fn_error $? "GNU gettext tools not found; required for intltool" "$LINENO" 5
+    as_fn_error $? "GNU gettext tools not found; required for intltool" "$LINENO" 5 
 fi
 
 # Extract the first word of "perl", so it can be a program name with args.
@@ -4343,13 +4343,13 @@ fi
 
 
 if test -z "$INTLTOOL_PERL"; then
-   as_fn_error $? "perl not found" "$LINENO" 5
+   as_fn_error $? "perl not found" "$LINENO" 5 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for perl >= 5.8.1" >&5
 $as_echo_n "checking for perl >= 5.8.1... " >&6; }
 $INTLTOOL_PERL -e "use 5.8.1;" > /dev/null 2>&1
 if test $? -ne 0; then
-   as_fn_error $? "perl 5.8.1 is required for intltool" "$LINENO" 5
+   as_fn_error $? "perl 5.8.1 is required for intltool" "$LINENO" 5 
 else
    IT_PERL_VERSION="`$INTLTOOL_PERL -e \"printf '%vd', $^V\"`"
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $IT_PERL_VERSION" >&5
@@ -4362,7 +4362,7 @@ $as_echo_n "checking for XML::Parser... " >&6; }
        { $as_echo "$as_me:${as_lineno-$LINENO}: result: ok" >&5
 $as_echo "ok" >&6; }
    else
-       as_fn_error $? "XML::Parser perl module is required for intltool" "$LINENO" 5
+       as_fn_error $? "XML::Parser perl module is required for intltool" "$LINENO" 5 
    fi
 fi
 
@@ -4446,7 +4446,7 @@ ltmain="$ac_aux_dir/ltmain.sh"
 
 # Make sure we can run config.sub.
 $SHELL "$ac_aux_dir/config.sub" sun4 >/dev/null 2>&1 ||
-  as_fn_error $? "cannot run $SHELL $ac_aux_dir/config.sub" "$LINENO" 5
+  as_fn_error $? "cannot run $SHELL $ac_aux_dir/config.sub" "$LINENO" 5 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking build system type" >&5
 $as_echo_n "checking build system type... " >&6; }
@@ -4457,16 +4457,16 @@ else
 test "x$ac_build_alias" = x &&
   ac_build_alias=`$SHELL "$ac_aux_dir/config.guess"`
 test "x$ac_build_alias" = x &&
-  as_fn_error $? "cannot guess build type; you must specify one" "$LINENO" 5
+  as_fn_error $? "cannot guess build type; you must specify one" "$LINENO" 5 
 ac_cv_build=`$SHELL "$ac_aux_dir/config.sub" $ac_build_alias` ||
-  as_fn_error $? "$SHELL $ac_aux_dir/config.sub $ac_build_alias failed" "$LINENO" 5
+  as_fn_error $? "$SHELL $ac_aux_dir/config.sub $ac_build_alias failed" "$LINENO" 5 
 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_build" >&5
 $as_echo "$ac_cv_build" >&6; }
 case $ac_cv_build in
 *-*-*) ;;
-*) as_fn_error $? "invalid value of canonical build" "$LINENO" 5;;
+*) as_fn_error $? "invalid value of canonical build" "$LINENO" 5 ;;
 esac
 build=$ac_cv_build
 ac_save_IFS=$IFS; IFS='-'
@@ -4491,7 +4491,7 @@ else
   ac_cv_host=$ac_cv_build
 else
   ac_cv_host=`$SHELL "$ac_aux_dir/config.sub" $host_alias` ||
-    as_fn_error $? "$SHELL $ac_aux_dir/config.sub $host_alias failed" "$LINENO" 5
+    as_fn_error $? "$SHELL $ac_aux_dir/config.sub $host_alias failed" "$LINENO" 5 
 fi
 
 fi
@@ -4499,7 +4499,7 @@ fi
 $as_echo "$ac_cv_host" >&6; }
 case $ac_cv_host in
 *-*-*) ;;
-*) as_fn_error $? "invalid value of canonical host" "$LINENO" 5;;
+*) as_fn_error $? "invalid value of canonical host" "$LINENO" 5 ;;
 esac
 host=$ac_cv_host
 ac_save_IFS=$IFS; IFS='-'
@@ -4641,7 +4641,7 @@ esac
   done
 IFS=$as_save_IFS
   if test -z "$ac_cv_path_SED"; then
-    as_fn_error $? "no acceptable sed could be found in \$PATH" "$LINENO" 5
+    as_fn_error $? "no acceptable sed could be found in \$PATH" "$LINENO" 5 
   fi
 else
   ac_cv_path_SED=$SED
@@ -4717,7 +4717,7 @@ esac
   done
 IFS=$as_save_IFS
   if test -z "$ac_cv_path_GREP"; then
-    as_fn_error $? "no acceptable grep could be found in $PATH$PATH_SEPARATOR/usr/xpg4/bin" "$LINENO" 5
+    as_fn_error $? "no acceptable grep could be found in $PATH$PATH_SEPARATOR/usr/xpg4/bin" "$LINENO" 5 
   fi
 else
   ac_cv_path_GREP=$GREP
@@ -4783,7 +4783,7 @@ esac
   done
 IFS=$as_save_IFS
   if test -z "$ac_cv_path_EGREP"; then
-    as_fn_error $? "no acceptable egrep could be found in $PATH$PATH_SEPARATOR/usr/xpg4/bin" "$LINENO" 5
+    as_fn_error $? "no acceptable egrep could be found in $PATH$PATH_SEPARATOR/usr/xpg4/bin" "$LINENO" 5 
   fi
 else
   ac_cv_path_EGREP=$EGREP
@@ -4850,7 +4850,7 @@ esac
   done
 IFS=$as_save_IFS
   if test -z "$ac_cv_path_FGREP"; then
-    as_fn_error $? "no acceptable fgrep could be found in $PATH$PATH_SEPARATOR/usr/xpg4/bin" "$LINENO" 5
+    as_fn_error $? "no acceptable fgrep could be found in $PATH$PATH_SEPARATOR/usr/xpg4/bin" "$LINENO" 5 
   fi
 else
   ac_cv_path_FGREP=$FGREP
@@ -4966,7 +4966,7 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
-test -z "$LD" && as_fn_error $? "no acceptable ld found in \$PATH" "$LINENO" 5
+test -z "$LD" && as_fn_error $? "no acceptable ld found in \$PATH" "$LINENO" 5 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if the linker ($LD) is GNU ld" >&5
 $as_echo_n "checking if the linker ($LD) is GNU ld... " >&6; }
 if test "${lt_cv_prog_gnu_ld+set}" = set; then :
@@ -7321,7 +7321,7 @@ else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "C preprocessor \"$CPP\" fails sanity check
-See \`config.log' for more details" "$LINENO" 5; }
+See \`config.log' for more details" "$LINENO" 5 ; }
 fi
 
 ac_ext=c
@@ -11492,7 +11492,7 @@ installed software in a non-standard prefix.
 
 Alternatively, you may set the environment variables GTK_CFLAGS
 and GTK_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5        
+See the pkg-config man page for more details." "$LINENO" 5         
 elif test $pkg_failed = untried; then
      	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -11507,7 +11507,7 @@ and GTK_LIBS to avoid the need to call pkg-config.
 See the pkg-config man page for more details.
 
 To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }        
+See \`config.log' for more details" "$LINENO" 5 ; }        
 else
 	GTK_CFLAGS=$pkg_cv_GTK_CFLAGS
 	GTK_LIBS=$pkg_cv_GTK_LIBS
@@ -11585,7 +11585,7 @@ installed software in a non-standard prefix.
 
 Alternatively, you may set the environment variables UUID_CFLAGS
 and UUID_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5        
+See the pkg-config man page for more details." "$LINENO" 5         
 elif test $pkg_failed = untried; then
      	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -11600,7 +11600,7 @@ and UUID_LIBS to avoid the need to call pkg-config.
 See the pkg-config man page for more details.
 
 To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }        
+See \`config.log' for more details" "$LINENO" 5 ; }        
 else
 	UUID_CFLAGS=$pkg_cv_UUID_CFLAGS
 	UUID_LIBS=$pkg_cv_UUID_LIBS
@@ -11678,7 +11678,7 @@ installed software in a non-standard prefix.
 
 Alternatively, you may set the environment variables LIBXML2_CFLAGS
 and LIBXML2_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5        
+See the pkg-config man page for more details." "$LINENO" 5         
 elif test $pkg_failed = untried; then
      	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -11693,7 +11693,7 @@ and LIBXML2_LIBS to avoid the need to call pkg-config.
 See the pkg-config man page for more details.
 
 To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }        
+See \`config.log' for more details" "$LINENO" 5 ; }        
 else
 	LIBXML2_CFLAGS=$pkg_cv_LIBXML2_CFLAGS
 	LIBXML2_LIBS=$pkg_cv_LIBXML2_LIBS
@@ -11771,7 +11771,7 @@ installed software in a non-standard prefix.
 
 Alternatively, you may set the environment variables GCONF2_CFLAGS
 and GCONF2_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5        
+See the pkg-config man page for more details." "$LINENO" 5         
 elif test $pkg_failed = untried; then
      	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -11786,7 +11786,7 @@ and GCONF2_LIBS to avoid the need to call pkg-config.
 See the pkg-config man page for more details.
 
 To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }        
+See \`config.log' for more details" "$LINENO" 5 ; }        
 else
 	GCONF2_CFLAGS=$pkg_cv_GCONF2_CFLAGS
 	GCONF2_LIBS=$pkg_cv_GCONF2_LIBS
@@ -11979,11 +11979,11 @@ fi
 
 if test -z "${AMDEP_TRUE}" && test -z "${AMDEP_FALSE}"; then
   as_fn_error $? "conditional \"AMDEP\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
+Usually this means the macro was only invoked conditionally." "$LINENO" 5 
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
+Usually this means the macro was only invoked conditionally." "$LINENO" 5 
 fi
 
   ac_config_commands="$ac_config_commands po/stamp-it"
@@ -12868,7 +12868,7 @@ do
     "data/article/Makefile") CONFIG_FILES="$CONFIG_FILES data/article/Makefile" ;;
     "po/stamp-it") CONFIG_COMMANDS="$CONFIG_COMMANDS po/stamp-it" ;;
 
-  *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
+  *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5 ;;
   esac
 done
 
@@ -12906,7 +12906,7 @@ $debug ||
 {
   tmp=./conf$$-$RANDOM
   (umask 077 && mkdir "$tmp")
-} || as_fn_error $? "cannot create a temporary directory in ." "$LINENO" 5
+} || as_fn_error $? "cannot create a temporary directory in ." "$LINENO" 5 
 
 # Set up the scripts for CONFIG_FILES section.
 # No need to generate them if there are no CONFIG_FILES.
@@ -12937,18 +12937,18 @@ _ACEOF
   echo "$ac_subst_vars" | sed 's/.*/&!$&$ac_delim/' &&
   echo "_ACEOF"
 } >conf$$subs.sh ||
-  as_fn_error $? "could not make $CONFIG_STATUS" "$LINENO" 5
+  as_fn_error $? "could not make $CONFIG_STATUS" "$LINENO" 5 
 ac_delim_num=`echo "$ac_subst_vars" | grep -c '^'`
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   . ./conf$$subs.sh ||
-    as_fn_error $? "could not make $CONFIG_STATUS" "$LINENO" 5
+    as_fn_error $? "could not make $CONFIG_STATUS" "$LINENO" 5 
 
   ac_delim_n=`sed -n "s/.*$ac_delim\$/X/p" conf$$subs.awk | grep -c X`
   if test $ac_delim_n = $ac_delim_num; then
     break
   elif $ac_last_try; then
-    as_fn_error $? "could not make $CONFIG_STATUS" "$LINENO" 5
+    as_fn_error $? "could not make $CONFIG_STATUS" "$LINENO" 5 
   else
     ac_delim="$ac_delim!$ac_delim _$ac_delim!! "
   fi
@@ -13037,7 +13037,7 @@ if sed "s/$ac_cr//" < /dev/null > /dev/null 2>&1; then
 else
   cat
 fi < "$tmp/subs1.awk" > "$tmp/subs.awk" \
-  || as_fn_error $? "could not setup config files machinery" "$LINENO" 5
+  || as_fn_error $? "could not setup config files machinery" "$LINENO" 5 
 _ACEOF
 
 # VPATH may cause trouble with some makes, so we remove sole $(srcdir),
@@ -13086,7 +13086,7 @@ for ac_last_try in false false :; do
   if test -z "$ac_t"; then
     break
   elif $ac_last_try; then
-    as_fn_error $? "could not make $CONFIG_HEADERS" "$LINENO" 5
+    as_fn_error $? "could not make $CONFIG_HEADERS" "$LINENO" 5 
   else
     ac_delim="$ac_delim!$ac_delim _$ac_delim!! "
   fi
@@ -13171,7 +13171,7 @@ cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
 _ACAWK
 _ACEOF
 cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
-  as_fn_error $? "could not setup config headers machinery" "$LINENO" 5
+  as_fn_error $? "could not setup config headers machinery" "$LINENO" 5 
 fi # test -n "$CONFIG_HEADERS"
 
 
@@ -13184,7 +13184,7 @@ do
   esac
   case $ac_mode$ac_tag in
   :[FHL]*:*);;
-  :L* | :C*:*) as_fn_error $? "invalid tag \`$ac_tag'" "$LINENO" 5;;
+  :L* | :C*:*) as_fn_error $? "invalid tag \`$ac_tag'" "$LINENO" 5 ;;
   :[FH]-) ac_tag=-:-;;
   :[FH]*) ac_tag=$ac_tag:$ac_tag.in;;
   esac
@@ -13212,7 +13212,7 @@ do
 	   [\\/$]*) false;;
 	   *) test -f "$srcdir/$ac_f" && ac_f="$srcdir/$ac_f";;
 	   esac ||
-	   as_fn_error 1 "cannot find input file: \`$ac_f'" "$LINENO" 5;;
+	   as_fn_error 1 "cannot find input file: \`$ac_f'" "$LINENO" 5 ;;
       esac
       case $ac_f in *\'*) ac_f=`$as_echo "$ac_f" | sed "s/'/'\\\\\\\\''/g"`;; esac
       as_fn_append ac_file_inputs " '$ac_f'"
@@ -13239,7 +13239,7 @@ $as_echo "$as_me: creating $ac_file" >&6;}
 
     case $ac_tag in
     *:-:* | *:-) cat >"$tmp/stdin" \
-      || as_fn_error $? "could not create $ac_file" "$LINENO" 5 ;;
+      || as_fn_error $? "could not create $ac_file" "$LINENO" 5  ;;
     esac
     ;;
   esac
@@ -13376,7 +13376,7 @@ s&@MKDIR_P@&$ac_MKDIR_P&;t t
 $ac_datarootdir_hack
 "
 eval sed \"\$ac_sed_extra\" "$ac_file_inputs" | $AWK -f "$tmp/subs.awk" >$tmp/out \
-  || as_fn_error $? "could not create $ac_file" "$LINENO" 5
+  || as_fn_error $? "could not create $ac_file" "$LINENO" 5 
 
 test -z "$ac_datarootdir_hack$ac_datarootdir_seen" &&
   { ac_out=`sed -n '/\${datarootdir}/p' "$tmp/out"`; test -n "$ac_out"; } &&
@@ -13391,7 +13391,7 @@ which seems to be undefined.  Please make sure it is defined" >&2;}
   -) cat "$tmp/out" && rm -f "$tmp/out";;
   *) rm -f "$ac_file" && mv "$tmp/out" "$ac_file";;
   esac \
-  || as_fn_error $? "could not create $ac_file" "$LINENO" 5
+  || as_fn_error $? "could not create $ac_file" "$LINENO" 5 
  ;;
   :H)
   #
@@ -13402,19 +13402,19 @@ which seems to be undefined.  Please make sure it is defined" >&2;}
       $as_echo "/* $configure_input  */" \
       && eval '$AWK -f "$tmp/defines.awk"' "$ac_file_inputs"
     } >"$tmp/config.h" \
-      || as_fn_error $? "could not create $ac_file" "$LINENO" 5
+      || as_fn_error $? "could not create $ac_file" "$LINENO" 5 
     if diff "$ac_file" "$tmp/config.h" >/dev/null 2>&1; then
       { $as_echo "$as_me:${as_lineno-$LINENO}: $ac_file is unchanged" >&5
 $as_echo "$as_me: $ac_file is unchanged" >&6;}
     else
       rm -f "$ac_file"
       mv "$tmp/config.h" "$ac_file" \
-	|| as_fn_error $? "could not create $ac_file" "$LINENO" 5
+	|| as_fn_error $? "could not create $ac_file" "$LINENO" 5 
     fi
   else
     $as_echo "/* $configure_input  */" \
       && eval '$AWK -f "$tmp/defines.awk"' "$ac_file_inputs" \
-      || as_fn_error $? "could not create -" "$LINENO" 5
+      || as_fn_error $? "could not create -" "$LINENO" 5 
   fi
 # Compute "$ac_file"'s index in $config_headers.
 _am_arg="$ac_file"
@@ -14196,7 +14196,7 @@ _LT_EOF
  ;;
     "po/stamp-it":C) 
     if  ! grep "^# INTLTOOL_MAKEFILE$" "po/Makefile.in" > /dev/null ; then
-       as_fn_error $? "po/Makefile.in.in was not created by intltoolize." "$LINENO" 5
+       as_fn_error $? "po/Makefile.in.in was not created by intltoolize." "$LINENO" 5 
     fi
     rm -f "po/stamp-it" "po/stamp-it.tmp" "po/POTFILES" "po/Makefile.tmp"
     >"po/stamp-it.tmp"
@@ -14224,7 +14224,7 @@ _ACEOF
 ac_clean_files=$ac_clean_files_save
 
 test $ac_write_fail = 0 ||
-  as_fn_error $? "write failure creating $CONFIG_STATUS" "$LINENO" 5
+  as_fn_error $? "write failure creating $CONFIG_STATUS" "$LINENO" 5 
 
 
 # configure is writing to config.log, and then calls config.status.

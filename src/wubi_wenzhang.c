@@ -16,7 +16,6 @@ enum mode {
 
 #define MODE_CONF "/apps/utt/wubi/jianma/mode"
 #define CLASS_INDEX_CONF "/apps/utt/wubi/wenzhang/class_index"
-#define CLASS_NUM 2
 
 static struct priv {
   struct utt_wubi *utt;
@@ -32,6 +31,8 @@ struct article_dialog_data {
   GtkWindow *parent;
   GtkTreeView *view;
 };
+
+static gint class_num (void);
 
 static void
 wubi_wenzhang_genchars ()
@@ -163,12 +164,18 @@ get_class_index ()
   return default_index;
 }
 
+static gint
+class_num (void)
+{
+  return gtk_tree_model_iter_n_children (GTK_TREE_MODEL (priv->article_store), NULL);
+}
+
 static gboolean
 set_class_index (gint index)
 {
   GConfClient *config;
 
-  if (index >= 0 && index < CLASS_NUM) {
+  if (index >= 0 && index < class_num ()) {
     config = gconf_client_get_default ();
     gconf_client_set_int (config, CLASS_INDEX_CONF, index, NULL);
     g_object_unref (config);
@@ -622,12 +629,6 @@ nth_class_name (gint n)
 		      -1);
   gtk_tree_path_free (path);
   return title;
-}
-
-static gint
-class_num (void)
-{
-  return gtk_tree_model_iter_n_children (GTK_TREE_MODEL (priv->article_store), NULL);
 }
 
 struct utt_plugin wubi_wenzhang_plugin = {
