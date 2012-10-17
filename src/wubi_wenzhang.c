@@ -259,6 +259,9 @@ on_add_button_click (GtkButton *button, struct article_dialog_data *user_data)
 					  &end_iter,
 					  FALSE);
       result = utt_add_article (title, content, &filepath);
+      if (result & ARTICLE_PERMISSION_DENY) {
+	break;
+      }
       if (result == ARTICLE_ADD_SUCCESS) {
 	treeview_add_item (user_data->view, title, filepath);
 	g_free (filepath);
@@ -408,7 +411,9 @@ show_modify_dialog (GtkWindow *parent, struct utt_xml *xml)
       filepath = utt_xml_get_filepath (xml);
       result = utt_modify_article (filepath, const_title, content);
     }
-    if (result == ARTICLE_MODIFY_SUCCESS || ret != GTK_RESPONSE_APPLY) {
+    if (result == ARTICLE_MODIFY_SUCCESS ||
+	result & ARTICLE_PERMISSION_DENY ||
+	ret != GTK_RESPONSE_APPLY) {
       break;
     }
     if (result & TITLE_INVALIDATE) {

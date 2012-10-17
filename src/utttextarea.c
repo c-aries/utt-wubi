@@ -396,6 +396,9 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
     /* FIXME */
     return TRUE;
   }
+  if (event->keyval == GDK_BackSpace) {
+    /* g_print ("backspace\n"); */
+  }
   if (gtk_im_context_filter_keypress (priv->im_context, event)) {
     return TRUE;
   }

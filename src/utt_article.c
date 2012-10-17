@@ -1,7 +1,9 @@
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <uuid.h>
+#include <glib/gstdio.h>
 #include "utt_article.h"
 #include "utt_xml.h"
 
@@ -152,6 +154,9 @@ utt_modify_article (const gchar *filepath, const gchar *title, const gchar *cont
   }
   if (ret) {
     return ret;
+  }
+  if (g_access (filepath, W_OK) != 0) {
+    return ARTICLE_PERMISSION_DENY;
   }
   xml = utt_xml_new ();
   utt_xml_write (xml, filepath, title, content);
