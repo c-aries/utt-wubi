@@ -248,7 +248,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = zigen icons
+SUBDIRS = zigen icons article
 desktopdir = $(datadir)/applications
 desktop_in_files = utt-wubi.desktop.in
 desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)

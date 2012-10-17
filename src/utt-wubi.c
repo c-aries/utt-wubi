@@ -379,28 +379,29 @@ on_index_click (GtkToolButton *button, struct utt_wubi *utt)
   ret = gtk_dialog_run (GTK_DIALOG (dialog));
   if (ret == GTK_RESPONSE_OK) {
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (view));
-    gtk_tree_selection_get_selected (sel, NULL, &iter);
-    path = gtk_tree_model_get_path (gtk_tree_view_get_model (GTK_TREE_VIEW (view)),
-				    &iter);
-    id = gtk_tree_path_get_indices (path)[0];
-    plugin->set_class_index (id);
-    gtk_tree_path_free (path);
-    if (utt_update_class_ids (utt, id)) {
-      if (utt->previous_class_id != CLASS_TYPE_NONE) {
-	pre_plugin = utt_nth_plugin (utt->plugin, utt->previous_class_id);
-	if (pre_plugin) {
-	  pre_plugin->class_clean ();
+    if (gtk_tree_selection_get_selected (sel, NULL, &iter)) {
+      path = gtk_tree_model_get_path (gtk_tree_view_get_model (GTK_TREE_VIEW (view)),
+				      &iter);
+      id = gtk_tree_path_get_indices (path)[0];
+      plugin->set_class_index (id);
+      gtk_tree_path_free (path);
+      if (utt_update_class_ids (utt, id)) {
+	if (utt->previous_class_id != CLASS_TYPE_NONE) {
+	  pre_plugin = utt_nth_plugin (utt->plugin, utt->previous_class_id);
+	  if (pre_plugin) {
+	    pre_plugin->class_clean ();
+	  }
 	}
+	set_page (utt_current_page (utt), utt);
       }
-      set_page (utt_current_page (utt), utt);
+      else {
+	plugin->class_clean ();
+      }
+      gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON (utt->ui.pause_button), FALSE);
+      gtk_widget_set_sensitive (GTK_WIDGET (utt->ui.pause_button), TRUE);
+      utt_info (utt, "");
+      plugin->class_begin ();
     }
-    else {
-      plugin->class_clean ();
-    }
-    gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON (utt->ui.pause_button), FALSE);
-    gtk_widget_set_sensitive (GTK_WIDGET (utt->ui.pause_button), TRUE);
-    utt_info (utt, "");
-    plugin->class_begin ();
   }
   gtk_widget_destroy (dialog);
 }

@@ -13,6 +13,13 @@ G_BEGIN_DECLS
 #define UTT_IS_TEXT_AREA_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((kalss), UTT_TYPE_TEXT_AREA))
 #define UTT_TEXT_AREA_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), UTT_TYPE_TEXT_AREA, UttTextAreaClass))
 
+#define UTT_TYPE_CLASS_MODE (utt_class_mode_get_type ())
+
+typedef enum {
+  UTT_CLASS_EXERCISE_MODE,
+  UTT_CLASS_EXAM_MODE,
+} UttClassMode;
+
 typedef struct _UttTextArea UttTextArea;
 typedef struct _UttTextAreaClass UttTextAreaClass;
 typedef struct _UttTextAreaPrivate UttTextAreaPrivate;
@@ -38,6 +45,10 @@ void utt_text_area_underscore_restart_timeout (UttTextArea *area);
 void utt_text_area_class_begin (UttTextArea *area);
 void utt_text_area_class_end (UttTextArea *area);
 gchar *utt_text_area_get_compare_text (UttTextArea *area);
+
+GType utt_class_mode_get_type (void) G_GNUC_CONST;
+UttClassMode utt_text_area_get_class_mode (UttTextArea *area);
+void utt_text_area_set_class_mode (UttTextArea *area, UttClassMode mode);
 
 G_END_DECLS
 
