@@ -3,6 +3,11 @@
 #include <gdk/gdkkeysyms.h>
 #include "utttextarea.h"
 
+enum {
+  PROP_0,
+  PROP_CLASS_MODE,
+};
+
 #define UTT_TEXT_AREA_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE ((obj), UTT_TYPE_TEXT_AREA, UttTextAreaPrivate))
 G_DEFINE_TYPE (UttTextArea, utt_text_area, GTK_TYPE_WIDGET)
 
@@ -614,6 +619,15 @@ utt_text_area_class_init (UttTextAreaClass *class)
 
   g_type_class_add_private (gobject_class, sizeof (UttTextAreaPrivate));
   gobject_class->finalize = utt_text_area_finalize;
+
+/*   g_object_class_install_property (gobject_class, */
+/* 				   PROP_CLASS_MODE, */
+/* 				   g_param_spec_enum ("class-mode", */
+/* 						      "Class mode", */
+/* 						      "class mode, exercise or exam", */
+/* 						      GTK_TYPE_CLASS_MODE, */
+/* 						      GTK_CLASS_EXERCISE_MODE, */
+/* 						      GTK_PARAM_READWRITE)); */
 
   widget_class->realize = utt_text_area_realize;
   widget_class->unrealize = utt_text_area_unrealize;
