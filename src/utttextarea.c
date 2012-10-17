@@ -32,6 +32,8 @@ struct _UttTextAreaPrivate
   GtkIMContext *im_context;
   /* signals */
   gulong pause_id, resume_id;
+  /* class mode */
+  UttClassMode class_mode;
 };
 
 enum {
@@ -40,6 +42,21 @@ enum {
   LAST_SIGNAL,
 };
 static guint signals[LAST_SIGNAL] = { 0 };
+
+GType
+utt_class_mode_get_type (void)
+{
+  static GType etype = 0;
+  if (G_UNLIKELY (etype == 0)) {
+        static const GEnumValue values[] = {
+	  { UTT_CLASS_EXERCISE_MODE, "UTT_CLASS_EXERCISE_MODE", "exercise-mode" },
+	  { UTT_CLASS_EXAM_MODE, "UTT_CLASS_EXAM_MODE", "exam-mode" },
+	  { 0, NULL, NULL }
+        };
+        etype = g_enum_register_static (g_intern_static_string ("UttClassMode"), values);
+  }
+  return etype;
+}
 
 static gdouble
 utt_text_area_get_font_height (GtkWidget *widget)
@@ -611,6 +628,69 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   return TRUE;
 }
 
+UttClassMode
+utt_text_area_get_class_mode (UttTextArea *area)
+{
+  UttTextAreaPrivate *priv;
+
+  g_return_val_if_fail (UTT_IS_TEXT_AREA (area), 0);
+
+  priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  return priv->class_mode;
+}
+
+void
+utt_text_area_set_class_mode (UttTextArea *area, UttClassMode mode)
+{
+  UttTextAreaPrivate *priv;
+
+  g_return_if_fail (UTT_IS_TEXT_AREA (area));
+
+  priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  if (priv->class_mode == mode) {
+    return;
+  }
+  priv->class_mode = mode;
+  g_object_notify (G_OBJECT (area), "class-mode");
+}
+
+static void
+utt_text_area_get_property (GObject *object,
+			    guint prop_id,
+			    GValue *value,
+			    GParamSpec *pspec)
+{
+  UttTextArea *area = UTT_TEXT_AREA (object);
+
+  switch (prop_id) {
+  case PROP_CLASS_MODE:
+    g_value_set_enum (value,
+		      utt_text_area_get_class_mode (area));
+    break;
+  default:
+    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    break;
+  }
+}
+
+static void
+utt_text_area_set_property (GObject *object,
+			    guint prop_id,
+			    const GValue *value,
+			    GParamSpec *pspec)
+{
+  UttTextArea *area = UTT_TEXT_AREA (object);
+
+  switch (prop_id) {
+  case PROP_CLASS_MODE:
+    utt_text_area_set_class_mode (area, g_value_get_enum (value));
+    break;
+  default:
+    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    break;
+  }
+}
+
 static void
 utt_text_area_class_init (UttTextAreaClass *class)
 {
@@ -619,15 +699,16 @@ utt_text_area_class_init (UttTextAreaClass *class)
 
   g_type_class_add_private (gobject_class, sizeof (UttTextAreaPrivate));
   gobject_class->finalize = utt_text_area_finalize;
-
-/*   g_object_class_install_property (gobject_class, */
-/* 				   PROP_CLASS_MODE, */
-/* 				   g_param_spec_enum ("class-mode", */
-/* 						      "Class mode", */
-/* 						      "class mode, exercise or exam", */
-/* 						      GTK_TYPE_CLASS_MODE, */
-/* 						      GTK_CLASS_EXERCISE_MODE, */
-/* 						      GTK_PARAM_READWRITE)); */
+  gobject_class->get_property = utt_text_area_get_property;
+  gobject_class->set_property = utt_text_area_set_property;
+  g_object_class_install_property (gobject_class,
+				   PROP_CLASS_MODE,
+				   g_param_spec_enum ("class-mode",
+						      "Class mode",
+						      "class mode, exercise or exam",
+						      UTT_TYPE_CLASS_MODE,
+						      UTT_CLASS_EXERCISE_MODE,
+						      GTK_PARAM_READWRITE));
 
   widget_class->realize = utt_text_area_realize;
   widget_class->unrealize = utt_text_area_unrealize;
