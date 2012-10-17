@@ -403,10 +403,10 @@ wubi_table_parse_file (struct wubi_table *table, gchar *path)
     if (!begin) {
       continue;
     }
-    sscanf (buf, "%s %s %lu", code, word, &count);
     if (g_strcmp0 (buf, "END_TABLE") == 0) {
       break;
     }
+    sscanf (buf, "%s %s %lu", code, word, &count);
     wubi_table_insert (table, g_strdup (word), g_strdup (code));
   }
   fclose (fp);
