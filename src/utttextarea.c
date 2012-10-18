@@ -813,29 +813,30 @@ gchar *
 utt_text_area_dup_strip_text (const gchar *orig_text)
 {
   gint orig_len = g_utf8_strlen (orig_text, -1);
-  gint orig_strlen = strlen (orig_text);
   const gchar *orig_p = orig_text;
   gunichar unicode;
-  gchar *text = g_malloc0 ((orig_strlen + 1) * sizeof (gchar));
+  gchar *text = g_malloc0 ((strlen (orig_text) + 1) * sizeof (gchar));
   gchar *text_p = text;
   const gchar *copy_base = NULL;
-  gint i, base_i, save_i;
+  gint i, base_i, save_i, j;
   gchar *ret = NULL;
 
   for (i = 0, copy_base = NULL; i < orig_len;) {
-    for (; i < orig_len;
-	 i++, orig_p = g_utf8_next_char (orig_p)) {
+    for (; i < orig_len; i++) {
       unicode = g_utf8_get_char (orig_p);
       if (g_unichar_isspace (unicode)) {
+	orig_p = g_utf8_next_char (orig_p);
 	continue;
       }
       copy_base = orig_p;
-      base_i = save_i = i;
+      base_i = save_i = i++;
+      g_print ("%d\n", base_i);
       break;
     }
     /* i >= orig_len or has a word */
     for (; i < orig_len;
 	 i++, orig_p = g_utf8_next_char (orig_p)) {
+      unicode = g_utf8_get_char (orig_p);
       if (!g_unichar_isspace (unicode)) {
 	save_i = i;
       }
@@ -845,7 +846,10 @@ utt_text_area_dup_strip_text (const gchar *orig_text)
       }
     }
     if (copy_base) {
-      text_p = g_utf8_strncpy (text_p, copy_base, save_i - base_i + 1);
+      g_utf8_strncpy (text_p, copy_base, save_i - base_i + 1);
+      for (j = 0; j < save_i - base_i + 1; j++) { /* FIXME */
+	text_p = g_utf8_next_char (text_p);
+      }
       copy_base = NULL;
     }
   }
