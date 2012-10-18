@@ -27,6 +27,42 @@ ftp://ftp.gnome.org/pub/GNOME/sources/GConf/2.28/GConf-2.28.1.tar.bz2
 http://developer.gnome.org/gtk/2.24/api-index-full.html
 http://git.gnome.org/browse/gtk+/tree/gtk/gtkwidget.c?h=gtk-2-20#n5973
 
+USING GETTEXT AND INTLTOOL
+==========================
+
+Location: http://oriya.sarovar.org/docs/gettext/node6.html
+Location: http://www.heiner-eichmann.de/autotools/using_gettext.html
+* init
+xgettext -d utt -s -k_ -o po/utt.pot src/article.c
+msginit -l "zh_CN.utf8" -o utt.po -i utt.pot
+msgfmt -c -v -o utt.mo utt.po
+cp utt.mo /usr/share/locale/zh_CN/LC_MESSAGES/
+* merge
+msgmerge -s -U utt.po utt.pot
+* cat
+msgcat -s -o zh_CN.po zh_CN.po~ ~/git/utt-old/utt-0.2/po/utt.po
+* gettextize
+$ cat LINGUAS
+zh_CN
+$ cp utt.po zh_CN.po
+* or use intltoolize
+$ grep -i macro configure.ac
+AC_CONFIG_MACRO_DIR([m4])
+$ intltoolize --copy
+$ cat po/POTFILES.in
+[encoding: UTF-8]
+src/article.c
+[type: gettext/glade]data/article-ui.xml
+$ cat po/POTFILES.skip
+data/utt.desktop.in
+$ grep translatable data/article-ui.xml | head -n 1
+    <property name="title" translatable="yes">Artical Typing Traning</property>
+$ make -C po utt.pot
+$ cd po; msgmerge -s -U zh_CN.po utt.pot; cd ..
+= =b> edit zh_CN.po
+$ make -C po update-po
+= =b> you can install gettext po-mode.el in the gettext tar ball
+
 GitHub SSH
 ==========
 
@@ -69,39 +105,3 @@ Password:
   If you have the upsterm account, you can push yourself
 $ git push upstream
 >> https://help.github.com/articles/using-pull-requests
-
-USING GETTEXT AND INTLTOOL
-==========================
-
-Location: http://oriya.sarovar.org/docs/gettext/node6.html
-Location: http://www.heiner-eichmann.de/autotools/using_gettext.html
-* init
-xgettext -d utt -s -k_ -o po/utt.pot src/article.c
-msginit -l "zh_CN.utf8" -o utt.po -i utt.pot
-msgfmt -c -v -o utt.mo utt.po
-cp utt.mo /usr/share/locale/zh_CN/LC_MESSAGES/
-* merge
-msgmerge -s -U utt.po utt.pot
-* cat
-msgcat -s -o zh_CN.po zh_CN.po~ ~/git/utt-old/utt-0.2/po/utt.po
-* gettextize
-$ cat LINGUAS
-zh_CN
-$ cp utt.po zh_CN.po
-* or use intltoolize
-$ grep -i macro configure.ac
-AC_CONFIG_MACRO_DIR([m4])
-$ intltoolize --copy
-$ cat po/POTFILES.in
-[encoding: UTF-8]
-src/article.c
-[type: gettext/glade]data/article-ui.xml
-$ cat po/POTFILES.skip
-data/utt.desktop.in
-$ grep translatable data/article-ui.xml | head -n 1
-    <property name="title" translatable="yes">Artical Typing Traning</property>
-$ make -C po utt.pot
-$ cd po; msgmerge -s -U zh_CN.po utt.pot; cd ..
-= =b> edit zh_CN.po
-$ make -C po update-po
-= =b> you can install gettext po-mode.el in the gettext tar ball

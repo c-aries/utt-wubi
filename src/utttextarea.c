@@ -852,7 +852,7 @@ utt_text_area_dup_strip_text (const gchar *orig_text)
 	text_p = g_utf8_next_char (text_p);
       }
       if (unicode == '\n') {
-	g_utf8_strncpy (text_p, "\n", 1);
+	g_utf8_strncpy (text_p, "!", 1);
 	text_p = g_utf8_next_char (text_p);
       }
       copy_base = NULL;
