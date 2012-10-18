@@ -858,6 +858,11 @@ utt_text_area_dup_strip_text (const gchar *orig_text)
       copy_base = NULL;
     }
   }
+  text_p = g_utf8_prev_char (text_p);
+  unicode = g_utf8_get_char (text_p);
+  if (unicode == '!') {
+    *text_p = '\0';
+  }
   ret = g_strdup (text);
   g_free (text);
   return ret;
