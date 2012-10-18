@@ -821,18 +821,20 @@ utt_text_area_dup_strip_text (const gchar *orig_text)
   gint i, base_i, save_i, j;
   gchar *ret = NULL;
 
-  for (i = 0, copy_base = NULL; i < orig_len;) {
-    for (; i < orig_len; i++) {
+  for (base_i = save_i = i = 0, copy_base = NULL; i < orig_len;) {
+    while (i < orig_len) {
       unicode = g_utf8_get_char (orig_p);
       if (g_unichar_isspace (unicode)) {
 	orig_p = g_utf8_next_char (orig_p);
+	i++;
 	continue;
       }
       copy_base = orig_p;
-      base_i = save_i = i++;
-      g_print ("%d\n", base_i);
+      base_i = save_i = i;
       break;
     }
+    orig_p = g_utf8_next_char (orig_p);
+    i++;
     /* i >= orig_len or has a word */
     for (; i < orig_len;
 	 i++, orig_p = g_utf8_next_char (orig_p)) {
@@ -841,13 +843,16 @@ utt_text_area_dup_strip_text (const gchar *orig_text)
 	save_i = i;
       }
       if (unicode == '\n') {
-	save_i = i;
 	break;
       }
     }
     if (copy_base) {
       g_utf8_strncpy (text_p, copy_base, save_i - base_i + 1);
       for (j = 0; j < save_i - base_i + 1; j++) { /* FIXME */
+	text_p = g_utf8_next_char (text_p);
+      }
+      if (unicode == '\n') {
+	g_utf8_strncpy (text_p, "!", 1);
 	text_p = g_utf8_next_char (text_p);
       }
       copy_base = NULL;
