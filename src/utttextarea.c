@@ -852,7 +852,7 @@ utt_text_area_dup_strip_text (const gchar *orig_text)
 	text_p = g_utf8_next_char (text_p);
       }
       if (unicode == '\n') {
-	g_utf8_strncpy (text_p, "!", 1);
+	g_utf8_strncpy (text_p, "\n", 1);
 	text_p = g_utf8_next_char (text_p);
       }
       copy_base = NULL;
@@ -866,6 +866,35 @@ utt_text_area_dup_strip_text (const gchar *orig_text)
   ret = g_strdup (text);
   g_free (text);
   return ret;
+}
+
+/* FIXME: glib advise to use pango deal with the complicate */
+gint
+utt_text_area_calc_text_newline (const gchar *text)
+{
+  gint len = g_utf8_strlen (text, -1);
+  gint i;
+  gint count = 0;
+  gunichar unicode;
+  const gchar *text_p = text;
+
+  for (i = 0; i < len; i++) {
+    unicode = g_utf8_get_char (text_p);
+    if (unicode == '\n') {	/* woedows sucks */
+      count++;
+    }
+    text_p = g_utf8_next_char (text_p);
+  }
+  return count;
+}
+
+static gint
+utt_text_area_count_text (const gchar *text)
+{
+  gint count;
+
+  count = g_utf8_strlen (text, -1) - utt_text_area_calc_text_newline (text);
+  return count;
 }
 
 gboolean
@@ -887,7 +916,7 @@ utt_text_area_set_text (UttTextArea *area, const gchar *text)
     utt_class_record_set_total (priv->record, 0);
   }
   else {
-    utt_class_record_set_total (priv->record, g_utf8_strlen (text, -1));
+    utt_class_record_set_total (priv->record, utt_text_area_count_text (text));
   }
   return TRUE;
 }

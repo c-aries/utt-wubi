@@ -46,6 +46,7 @@ void utt_text_area_class_begin (UttTextArea *area);
 void utt_text_area_class_end (UttTextArea *area);
 gchar *utt_text_area_get_compare_text (UttTextArea *area);
 gchar *utt_text_area_dup_strip_text (const gchar *orig_text);
+gint utt_text_area_calc_text_newline (const gchar *text);
 
 GType utt_class_mode_get_type (void) G_GNUC_CONST;
 UttClassMode utt_text_area_get_class_mode (UttTextArea *area);
