@@ -39,6 +39,7 @@ wubi_wenzhang_genchars ()
 {
   GtkTreeIter iter;
   GtkTreePath *path;
+  gchar *content;
   gchar *filepath;
 
   if (priv->gen_chars) {
@@ -52,7 +53,9 @@ wubi_wenzhang_genchars ()
 		      &iter,
 		      1, &filepath,
 		      -1);
-  priv->gen_chars = utt_article_get_content (filepath);
+  content = utt_article_get_content (filepath);
+  priv->gen_chars = utt_text_area_dup_strip_text (content);
+  g_free (content);
 }
 
 static void
