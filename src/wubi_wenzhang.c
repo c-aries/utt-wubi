@@ -170,6 +170,9 @@ get_class_index ()
     default_index = gconf_value_get_int (value);
   }
   g_object_unref (config);
+  if (default_index >= class_num ()) {
+    default_index = 0;		/* FIXME, lazy */
+  }
   return default_index;
 }
 
@@ -311,6 +314,8 @@ create_article_view ()
   GtkWidget *view;
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
+  GtkTreePath *path;
+  GtkTreeSelection *sel;
 
   view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (priv->article_store));
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), FALSE);
@@ -319,6 +324,11 @@ create_article_view ()
 						     "text", 0,
 						     NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (view), column);
+
+  sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (view));
+  path = gtk_tree_path_new_from_indices (get_class_index (), -1);
+  gtk_tree_selection_select_path (sel, path);
+  gtk_tree_path_free (path);
   return view;
 }
 
