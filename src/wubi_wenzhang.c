@@ -54,7 +54,7 @@ wubi_wenzhang_genchars ()
 		      1, &filepath,
 		      -1);
   content = utt_article_get_content (filepath);
-  priv->gen_chars = utt_text_area_dup_strip_text (content);
+  priv->gen_chars = g_strdup (content);
   g_free (content);
 }
 

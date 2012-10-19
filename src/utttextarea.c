@@ -22,6 +22,8 @@ struct _UttTextAreaPrivate
   gchar input_buffer[2048];
   gchar *input_base;
   gchar *input_ptr;
+  /* utt_text */
+  struct utt_text *text;
   /* mark */
   gboolean mark_show;
   gint timeout_id;
@@ -43,6 +45,8 @@ enum {
   LAST_SIGNAL,
 };
 static guint signals[LAST_SIGNAL] = { 0 };
+
+static void utt_text_destroy (struct utt_text *text);
 
 GType
 utt_class_mode_get_type (void)
@@ -335,6 +339,9 @@ utt_text_area_finalize (GObject *object)
 
   if (priv->text_buffer) {
     g_free (priv->text_buffer);
+  }
+  if (priv->text) {
+    utt_text_destroy (priv->text);
   }
   g_object_unref (priv->im_context);
   utt_text_area_underscore_stop_timeout (area);
@@ -774,6 +781,7 @@ utt_text_area_init (UttTextArea *area)
 
   priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   priv->record = NULL;
+  priv->text = NULL;
   priv->text_buffer = priv->text_base = priv->text_cmp = NULL;
   memset (priv->input_buffer, 0, sizeof (priv->input_buffer));
   priv->input_ptr = priv->input_base = priv->input_buffer;
@@ -897,6 +905,120 @@ utt_text_area_count_text (const gchar *text)
   return count;
 }
 
+struct utt_text {
+  GList *paragraphs;
+  gint total;
+};
+
+struct utt_paragraph {
+  gchar *text_buffer;
+  gchar *input_buffer;
+  gint num;
+};
+
+static struct utt_paragraph *
+utt_paragraph_new (const gchar *base, gint num, gint size)
+{
+  struct utt_paragraph *para = g_new0 (struct utt_paragraph, 1);
+
+  para->text_buffer = g_malloc (size + 1);
+  g_utf8_strncpy (para->text_buffer, base, num);
+  para->input_buffer = g_malloc0 (size + 1);
+  para->num = num;
+  return para;
+}
+
+static void
+utt_paragraph_destroy (struct utt_paragraph *para)
+{
+  g_free (para->text_buffer);
+  g_free (para->input_buffer);
+  g_free (para);
+}
+
+static GList *
+utt_text_split_paragraphs (const gchar *orig_text)
+{
+  struct utt_paragraph *para;
+  GList *list = NULL;
+  const gchar *text = orig_text;
+  gint text_len = g_utf8_strlen (orig_text, -1);
+  const gchar *base = NULL;
+  gint i, base_i, save_i;
+  gunichar unicode;
+
+  /* strip */
+  for (i = 0; i < text_len;) {
+    while (i < text_len) {
+      unicode = g_utf8_get_char (text);
+      if (g_unichar_isspace (unicode)) {
+	text = g_utf8_next_char (text);
+	i++;
+	continue;
+      }
+      base = text;
+      /* know it's a validate character, step forward */
+      text = g_utf8_next_char (text);
+      base_i = save_i = i++;
+      break;
+    }
+    while (i < text_len) {
+      unicode = g_utf8_get_char (text);
+      if (!g_unichar_isspace (unicode)) {
+	save_i = i;
+      }
+      if (unicode == '\n' || unicode == '\0') {
+	break;
+      }
+      text = g_utf8_next_char (text);
+      i++;
+    }
+    if (base) {
+      para = utt_paragraph_new (base, save_i - base_i + 1, text - base);
+      list = g_list_append (list, para);
+      base = NULL;
+      unicode = g_utf8_get_char (text);
+      if (unicode != '\0') {
+	text = g_utf8_next_char (text);
+	i++;
+      }
+    }
+  }
+  return list;
+}
+
+static struct utt_text *
+utt_text_new (const gchar *orig_text)
+{
+  struct utt_text *text = g_new0 (struct utt_text, 1);
+  struct utt_paragraph *para;
+  GList *list;
+  gint total = 0;
+
+  list = text->paragraphs = utt_text_split_paragraphs (orig_text);
+  while (list) {
+    para = list->data;
+    total += para->num;
+    list = g_list_next (list);
+  }
+  text->total = total;
+  return text;
+}
+
+static void
+utt_text_destroy (struct utt_text *text)
+{
+  GList *list = text->paragraphs;
+  struct utt_paragraph *para;
+
+  while (list) {
+    para = list->data;
+    utt_paragraph_destroy (para);
+    list = g_list_next (list);
+  }
+  g_list_free (text->paragraphs);
+}
+
 gboolean
 utt_text_area_set_text (UttTextArea *area, const gchar *text)
 {
@@ -911,6 +1033,10 @@ utt_text_area_set_text (UttTextArea *area, const gchar *text)
   if (priv->text_buffer) {
     g_free (priv->text_buffer);
   }
+  if (priv->text) {
+    utt_text_destroy (priv->text);
+  }
+  priv->text = utt_text_new (text);
   priv->text_cmp = priv->text_base = priv->text_buffer = g_strdup (text);
   if (text == NULL) {
     utt_class_record_set_total (priv->record, 0);
