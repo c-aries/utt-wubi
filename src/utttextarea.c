@@ -33,13 +33,6 @@ struct _UttTextAreaPrivate
 {
   /* class recorder */
   UttClassRecord *record;
-  /* display */
-  gchar *text_buffer;
-  gchar *text_base;
-  gchar *text_cmp;
-  gchar input_buffer[2048];
-  gchar *input_base;
-  gchar *input_ptr;
   /* utt_text */
   struct utt_text *text;
   /* mark */
@@ -275,9 +268,6 @@ utt_text_area_finalize (GObject *object)
   UttTextArea *area = UTT_TEXT_AREA (object);
   UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
 
-  if (priv->text_buffer) {
-    g_free (priv->text_buffer);
-  }
   if (priv->text) {
     utt_text_destroy (priv->text);
   }
@@ -816,9 +806,6 @@ utt_text_area_init (UttTextArea *area)
   priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   priv->record = NULL;
   priv->text = NULL;
-  priv->text_buffer = priv->text_base = priv->text_cmp = NULL;
-  memset (priv->input_buffer, 0, sizeof (priv->input_buffer));
-  priv->input_ptr = priv->input_base = priv->input_buffer;
   priv->mark_show = TRUE;
   priv->mark_x = priv->mark_y = 0;
   priv->timeout_id = 0;
@@ -894,7 +881,7 @@ utt_text_area_dup_strip_text (const gchar *orig_text)
 	text_p = g_utf8_next_char (text_p);
       }
       if (unicode == '\n') {
-	g_utf8_strncpy (text_p, "!", 1); /* just a test */
+	g_utf8_strncpy (text_p, "\n", 1); /* just a test */
 	text_p = g_utf8_next_char (text_p);
       }
       copy_base = NULL;
@@ -902,41 +889,12 @@ utt_text_area_dup_strip_text (const gchar *orig_text)
   }
   text_p = g_utf8_prev_char (text_p);
   unicode = g_utf8_get_char (text_p);
-  if (unicode == '!') {
+  if (unicode == '\n') {
     *text_p = '\0';
   }
   ret = g_strdup (text);
   g_free (text);
   return ret;
-}
-
-/* FIXME: glib advise to use pango deal with the complicate */
-gint
-utt_text_area_calc_text_newline (const gchar *text)
-{
-  gint len = g_utf8_strlen (text, -1);
-  gint i;
-  gint count = 0;
-  gunichar unicode;
-  const gchar *text_p = text;
-
-  for (i = 0; i < len; i++) {
-    unicode = g_utf8_get_char (text_p);
-    if (unicode == '\n') {	/* woedows sucks */
-      count++;
-    }
-    text_p = g_utf8_next_char (text_p);
-  }
-  return count;
-}
-
-static gint
-utt_text_area_count_text (const gchar *text)
-{
-  gint count;
-
-  count = g_utf8_strlen (text, -1) - utt_text_area_calc_text_newline (text);
-  return count;
 }
 
 static struct utt_paragraph *
@@ -1060,20 +1018,11 @@ utt_text_area_set_text (UttTextArea *area, const gchar *text)
   priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   g_return_val_if_fail (priv->record != NULL, FALSE);
 
-  if (priv->text_buffer) {
-    g_free (priv->text_buffer);
-  }
   if (priv->text) {
     utt_text_destroy (priv->text);
   }
   priv->text = utt_text_new (text);
-  priv->text_cmp = priv->text_base = priv->text_buffer = g_strdup (text);
-  if (text == NULL) {
-    utt_class_record_set_total (priv->record, 0);
-  }
-  else {
-    utt_class_record_set_total (priv->record, utt_text_area_count_text (text));
-  }
+  utt_class_record_set_total (priv->record, priv->text->total);
   return TRUE;
 }
 
@@ -1082,9 +1031,6 @@ utt_text_area_reset (UttTextArea *area)
 {
   UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
 
-  priv->text_cmp = priv->text_base = priv->text_buffer;
-  memset (priv->input_buffer, 0, sizeof (priv->input_buffer));
-  priv->input_ptr = priv->input_base = priv->input_buffer;
   priv->mark_show = TRUE;
   priv->mark_x = priv->mark_y = 0;
   utt_class_record_set_mode (priv->record, CLASS_ADVANCE_WITHOUT_CHECK);
@@ -1094,6 +1040,7 @@ gchar *
 utt_text_area_get_compare_text (UttTextArea *area)
 {
   UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  struct utt_text *text = priv->text;
 
-  return priv->text_cmp;
+  return text->text_cmp;
 }
