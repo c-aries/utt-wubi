@@ -29,6 +29,9 @@ struct utt_paragraph {
   gint num;
 };
 
+static struct utt_text *utt_text_new (const gchar *orig_text);
+static void utt_text_destroy (struct utt_text *text);
+
 struct _UttTextAreaPrivate
 {
   /* class recorder */
@@ -57,7 +60,6 @@ enum {
 };
 static guint signals[LAST_SIGNAL] = { 0 };
 
-static void utt_text_destroy (struct utt_text *text);
 static gboolean utt_text_area_handle_keyevent_unicode (UttTextArea *area, gunichar unicode);
 
 GType
@@ -467,14 +469,13 @@ utt_text_area_handle_keyevent_unicode (UttTextArea *area, gunichar unicode)
   ret = g_unichar_to_utf8 (unicode, word);
   word[ret] = '\0';
   if (text->input_ptr + ret <= para->input_buffer_end) {
-    strcpy (text->input_ptr, word);
+    g_utf8_strncpy (text->input_ptr, word, 1);
     text->input_ptr = g_utf8_next_char (text->input_ptr);
     utt_class_record_type_inc (priv->record);
     text_unicode = g_utf8_get_char (text->text_cmp);
     if (unicode == text_unicode) {
       utt_class_record_correct_inc (priv->record);
     }
-    ret = g_unichar_to_utf8 (text_unicode, word);
     text->text_cmp = g_utf8_next_char (text->text_cmp);
     utt_text_area_underscore_restart_timeout (area);
     if (g_utf8_strlen (para->input_buffer, -1) == g_utf8_strlen (para->text_buffer, -1)) {
@@ -917,6 +918,46 @@ utt_text_area_dup_strip_text (const gchar *orig_text)
   return ret;
 }
 
+gboolean
+utt_text_area_set_text (UttTextArea *area, const gchar *text)
+{
+  UttTextAreaPrivate *priv;
+
+  g_return_val_if_fail (UTT_IS_TEXT_AREA (area) &&
+			g_utf8_validate (text, -1, NULL), FALSE);
+
+  priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  g_return_val_if_fail (priv->record != NULL, FALSE);
+
+  if (priv->text) {
+    utt_text_destroy (priv->text);
+  }
+  priv->text = utt_text_new (text);
+  utt_class_record_set_total (priv->record, priv->text->total);
+  return TRUE;
+}
+
+void
+utt_text_area_reset (UttTextArea *area)
+{
+  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+
+  priv->mark_show = TRUE;
+  priv->mark_x = priv->mark_y = 0;
+  utt_class_record_set_mode (priv->record, CLASS_ADVANCE_WITHOUT_CHECK);
+}
+
+gchar *
+utt_text_area_get_compare_text (UttTextArea *area)
+{
+  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  struct utt_text *text = priv->text;
+
+  return text->text_cmp;
+}
+
+/* utt_text and utt_text_paragraph */
+
 static struct utt_paragraph *
 utt_paragraph_new (const gchar *base, gint num, gint size)
 {
@@ -1025,42 +1066,4 @@ utt_text_destroy (struct utt_text *text)
     list = g_list_next (list);
   }
   g_list_free (text->paragraphs);
-}
-
-gboolean
-utt_text_area_set_text (UttTextArea *area, const gchar *text)
-{
-  UttTextAreaPrivate *priv;
-
-  g_return_val_if_fail (UTT_IS_TEXT_AREA (area) &&
-			g_utf8_validate (text, -1, NULL), FALSE);
-
-  priv = UTT_TEXT_AREA_GET_PRIVATE (area);
-  g_return_val_if_fail (priv->record != NULL, FALSE);
-
-  if (priv->text) {
-    utt_text_destroy (priv->text);
-  }
-  priv->text = utt_text_new (text);
-  utt_class_record_set_total (priv->record, priv->text->total);
-  return TRUE;
-}
-
-void
-utt_text_area_reset (UttTextArea *area)
-{
-  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
-
-  priv->mark_show = TRUE;
-  priv->mark_x = priv->mark_y = 0;
-  utt_class_record_set_mode (priv->record, CLASS_ADVANCE_WITHOUT_CHECK);
-}
-
-gchar *
-utt_text_area_get_compare_text (UttTextArea *area)
-{
-  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
-  struct utt_text *text = priv->text;
-
-  return text->text_cmp;
 }
