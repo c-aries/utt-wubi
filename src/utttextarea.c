@@ -2,6 +2,7 @@
 #include <gtk/gtkprivate.h>
 #include <gdk/gdkkeysyms.h>
 #include "utttextarea.h"
+#include "utt_gtk_compat.h"
 
 enum {
   PROP_0,
