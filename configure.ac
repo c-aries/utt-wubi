@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.67])
+AC_PREREQ([2.65])
 AC_INIT([utt-wubi], [0.1], [babyaries2@gmail.com])
 AC_CONFIG_SRCDIR([src/utt_article.h])
 AC_CONFIG_HEADERS([config.h])
@@ -14,7 +14,7 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 
 # gettext
-IT_PROG_INTLTOOL([0.41.1])
+IT_PROG_INTLTOOL([0.40.6])
 GETTEXT_PACKAGE=${PACKAGE_NAME}
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
@@ -27,7 +27,7 @@ LT_INIT()
 
 # Checks for libraries.
 # gtk+, Debian 6.0
-GTK_MODULES="gtk+-2.0 >= 2.20.1 glib-2.0 >= 2.24.2"
+GTK_MODULES="gtk+-2.0 >= 2.18.9 glib-2.0 >= 2.22.5"
 PKG_CHECK_MODULES(GTK,$GTK_MODULES)
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
@@ -37,7 +37,7 @@ PKG_CHECK_MODULES(UUID,$UUID_MODULES)
 AC_SUBST(UUID_CFLAGS)
 AC_SUBST(UUID_LIBS)
 
-LIBXML2_MODULES="libxml-2.0 >= 2.7.8"
+LIBXML2_MODULES="libxml-2.0 >= 2.7.6"
 PKG_CHECK_MODULES(LIBXML2,$LIBXML2_MODULES)
 AC_SUBST(LIBXML2_CFLAGS)
 AC_SUBST(LIBXML2_LIBS)
