@@ -345,6 +345,10 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
     return TRUE;
   }
 
+  if (gtk_im_context_filter_keypress (priv->im_context, event)) {
+    return TRUE;
+  }
+
   unicode = gdk_keyval_to_unicode (event->keyval);
   class_should_end = utt_text_area_handle_keyevent_unicode (area, unicode);
   if (class_should_end) {
@@ -357,6 +361,12 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 static gboolean
 utt_text_area_key_release (GtkWidget *widget, GdkEventKey *event)
 {
+  UttTextArea *area = UTT_TEXT_AREA (widget);
+  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+
+  if (gtk_im_context_filter_keypress (priv->im_context, event)) {
+    return TRUE;
+  }
   return GTK_WIDGET_CLASS (utt_text_area_parent_class)->key_release_event (widget, event);
 }
 
@@ -564,13 +574,15 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
       text_record.width += temp_width;
       if (*draw_text == '\0') {
 	g_array_append_val (text_array, text_record);
+	text_record.num = text_record.width = 0;
       }
     }
     else {
+      g_array_append_val (text_array, text_record);
+      text_record.num = text_record.width = 0;
       if (text_y + 4 * priv->font_height > expose_height) {
 	break;
       }
-      g_array_append_val (text_array, text_record);
       text_x = 0;
       text_y += 2 *priv->font_height;
     }
@@ -664,11 +676,10 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   priv->mark_y = input_y;
 
   if (row == text_array->len && text_cur != NULL && *text_cur != '\0') {
-    g_print ("%d\n", row);
-/*     text->text_base = text_cur; */
-/*     text->input_base = input_cur; */
-/*     text->para_base = text->current_para; */
-/*     gtk_widget_queue_draw (widget); */
+    text->text_base = text_cur;
+    text->input_base = input_cur;
+    text->para_base = text->current_para;
+    gtk_widget_queue_draw (widget);
   }
 
   g_array_free (text_array, TRUE);
