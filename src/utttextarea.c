@@ -58,6 +58,7 @@ enum {
 static guint signals[LAST_SIGNAL] = { 0 };
 
 static void utt_text_destroy (struct utt_text *text);
+static gboolean utt_text_area_handle_keyevent_unicode (UttTextArea *area, gunichar unicode);
 
 GType
 utt_class_mode_get_type (void)
@@ -191,54 +192,6 @@ utt_text_area_preedit_cb (GtkIMContext *context, UttTextArea *area)
   utt_text_area_update_im_location (area);
 }
 
-/* return value indicate should we end the class */
-static gboolean
-utt_text_area_handle_keyevent_unicode (UttTextArea *area, gunichar unicode)
-{
-  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
-  struct utt_text *text = priv->text;
-  struct utt_paragraph *para;
-  gunichar text_unicode;
-  gchar word[4];
-  gint ret;
-
-  if (!g_unichar_isprint (unicode)) {
-    return FALSE;
-  }
-
-  if (!text->current_para) {
-    return TRUE;
-  }
-  para = text->current_para->data;
-
-  ret = g_unichar_to_utf8 (unicode, word);
-  word[ret] = '\0';
-  if (text->input_ptr + ret <= para->input_buffer_end) {
-    strcpy (text->input_ptr, word);
-    text->input_ptr = g_utf8_next_char (text->input_ptr);
-    utt_class_record_type_inc (priv->record);
-    text_unicode = g_utf8_get_char (text->text_cmp);
-    if (unicode == text_unicode) {
-      utt_class_record_correct_inc (priv->record);
-    }
-    ret = g_unichar_to_utf8 (text_unicode, word);
-    text->text_cmp = g_utf8_next_char (text->text_cmp);
-    utt_text_area_underscore_restart_timeout (area);
-    if (g_utf8_strlen (para->input_buffer, -1) == g_utf8_strlen (para->text_buffer, -1)) {
-      text->current_para = g_list_next (text->current_para);
-      if (!text->current_para) {
-	g_signal_emit (area, signals[STATISTICS], 0);
-	return TRUE;
-      }
-      para = text->current_para->data;
-      text->text_cmp = para->text_buffer;
-      text->input_ptr = para->input_buffer;
-    }
-  }
-  g_signal_emit (area, signals[STATISTICS], 0);
-  return FALSE;
-}
-
 static void
 utt_text_area_commit_cb (GtkIMContext *context, const gchar *input_str, UttTextArea *area)
 {
@@ -323,7 +276,8 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 {
   UttTextArea *area = UTT_TEXT_AREA (widget);
   UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
-  gunichar unicode;
+  struct utt_text *text = priv->text;
+  gunichar unicode, text_unicode;
   gboolean class_should_end = FALSE;
 
   if (!utt_class_record_has_begin (priv->record)) {
@@ -332,6 +286,24 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 
   if (event->keyval == GDK_Pause) {
     /* FIXME */
+    return TRUE;
+  }
+
+  if (event->keyval == GDK_BackSpace &&
+      utt_text_area_get_class_mode (area) == UTT_CLASS_EXERCISE_MODE) {
+    if (text->text_cmp > text->text_base) {
+      text->input_ptr = g_utf8_prev_char (text->input_ptr);
+      unicode = g_utf8_get_char (text->input_ptr);
+      text->text_cmp = g_utf8_prev_char (text->text_cmp);
+      text_unicode = g_utf8_get_char (text->text_cmp);
+      utt_class_record_type_dec (priv->record);
+      if (unicode == text_unicode) {
+	utt_class_record_correct_dec (priv->record);
+      }
+      *text->input_ptr = '\0';
+      utt_text_area_underscore_restart_timeout (area);
+    }
+    g_signal_emit (area, signals[STATISTICS], 0);
     return TRUE;
   }
 
@@ -469,6 +441,54 @@ utt_text_area_input_expose_exceed (UttTextArea *area, PangoLayout *layout,
       }
     }
   }
+  return FALSE;
+}
+
+/* return value indicate should we end the class */
+static gboolean
+utt_text_area_handle_keyevent_unicode (UttTextArea *area, gunichar unicode)
+{
+  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  struct utt_text *text = priv->text;
+  struct utt_paragraph *para;
+  gunichar text_unicode;
+  gchar word[4];
+  gint ret;
+
+  if (!g_unichar_isprint (unicode)) {
+    return FALSE;
+  }
+
+  if (!text->current_para) {
+    return TRUE;
+  }
+  para = text->current_para->data;
+
+  ret = g_unichar_to_utf8 (unicode, word);
+  word[ret] = '\0';
+  if (text->input_ptr + ret <= para->input_buffer_end) {
+    strcpy (text->input_ptr, word);
+    text->input_ptr = g_utf8_next_char (text->input_ptr);
+    utt_class_record_type_inc (priv->record);
+    text_unicode = g_utf8_get_char (text->text_cmp);
+    if (unicode == text_unicode) {
+      utt_class_record_correct_inc (priv->record);
+    }
+    ret = g_unichar_to_utf8 (text_unicode, word);
+    text->text_cmp = g_utf8_next_char (text->text_cmp);
+    utt_text_area_underscore_restart_timeout (area);
+    if (g_utf8_strlen (para->input_buffer, -1) == g_utf8_strlen (para->text_buffer, -1)) {
+      text->current_para = g_list_next (text->current_para);
+      if (!text->current_para) {
+	g_signal_emit (area, signals[STATISTICS], 0);
+	return TRUE;
+      }
+      para = text->current_para->data;
+      text->text_cmp = para->text_buffer;
+      text->input_ptr = para->input_buffer;
+    }
+  }
+  g_signal_emit (area, signals[STATISTICS], 0);
   return FALSE;
 }
 
