@@ -569,7 +569,6 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
       else {
 	cairo_set_source_rgb (cr, 1, 0, 0);
       }
-      cmp_input = g_utf8_next_char (cmp_input);
     }
     g_utf8_strncpy (word, draw_text, 1);
     len = strlen (word);
@@ -587,6 +586,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
 	g_array_append_val (text_array, text_record);
 	text_record.num = text_record.width = 0;
       }
+      cmp_input = g_utf8_next_char (cmp_input);
     }
     else {
       g_array_append_val (text_array, text_record);
