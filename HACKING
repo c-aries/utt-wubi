@@ -8,6 +8,7 @@ the following packages installed:
     - GNU automake 1.11
     - GNU libtool 2.2.10
     - GNU gettext 0.18
+    - intltool 0.40.6
 
 These should be available by ftp from ftp.gnu.org or any of the
 fine GNU mirrors. Beta software can be found at alpha.gnu.org.

@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.65])
+AC_PREREQ([2.67])
 AC_INIT([utt-wubi], [0.1], [babyaries2@gmail.com])
 AC_CONFIG_SRCDIR([src/utt_article.h])
 AC_CONFIG_HEADERS([config.h])
@@ -22,7 +22,7 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
 
 # libtool
 AC_PROG_LIBTOOL
-LT_PREREQ([2.2.6])
+LT_PREREQ([2.2.10])
 LT_INIT()
 
 # Checks for libraries.
