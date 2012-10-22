@@ -279,8 +279,11 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
   UttTextArea *area = UTT_TEXT_AREA (widget);
   UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   struct utt_text *text = priv->text;
+  GList *para_list = text->current_para;
+  struct utt_paragraph *para = para_list->data;
   gunichar unicode, text_unicode;
   gboolean class_should_end = FALSE;
+  gint i;
 
   if (!utt_class_record_has_begin (priv->record)) {
     return TRUE;
@@ -293,7 +296,7 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 
   if (event->keyval == GDK_BackSpace &&
       utt_text_area_get_class_mode (area) == UTT_CLASS_EXERCISE_MODE) {
-    if (text->text_cmp > text->text_base) {
+    if (text->text_cmp > para->text_buffer) {
       text->input_ptr = g_utf8_prev_char (text->input_ptr);
       unicode = g_utf8_get_char (text->input_ptr);
       text->text_cmp = g_utf8_prev_char (text->text_cmp);
@@ -304,6 +307,27 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
       }
       *text->input_ptr = '\0';
       utt_text_area_underscore_restart_timeout (area);
+    }
+    else {
+      para_list = g_list_previous (para_list);
+      if (para_list) {
+	text->current_para = para_list;
+	para = para_list->data;
+	text->text_cmp = para->text_buffer;
+	text->input_ptr = para->input_buffer;
+	for (i = 0; i < para->num - 1; i ++) { /* FIXME */
+	  text->text_cmp = g_utf8_next_char (text->text_cmp);
+	  text->input_ptr = g_utf8_next_char (text->input_ptr);
+	}
+	unicode = g_utf8_get_char (text->input_ptr);
+	text_unicode = g_utf8_get_char (text->text_cmp);
+	utt_class_record_type_dec (priv->record);
+	if (unicode == text_unicode) {
+	  utt_class_record_correct_dec (priv->record);
+	}
+	*text->input_ptr = '\0';
+	utt_text_area_underscore_restart_timeout (area);
+      }
     }
     g_signal_emit (area, signals[STATISTICS], 0);
     return TRUE;
