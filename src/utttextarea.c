@@ -295,35 +295,40 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 
   if (event->keyval == GDK_BackSpace &&
       utt_text_area_get_class_mode (area) == UTT_CLASS_EXERCISE_MODE) {
-    if (para->text_cmp > para->text_buffer) {
-      para->input_ptr = g_utf8_prev_char (para->input_ptr);
-      unicode = g_utf8_get_char (para->input_ptr);
-      para->text_cmp = g_utf8_prev_char (para->text_cmp);
-      text_unicode = g_utf8_get_char (para->text_cmp);
-      utt_class_record_type_dec (priv->record);
-      if (unicode == text_unicode) {
-	utt_class_record_correct_dec (priv->record);
-      }
-      *para->input_ptr = '\0';
-      utt_text_area_underscore_restart_timeout (area);
+    if (text->current_para == text->para_base &&
+	para->text_cmp <= para->text_buffer) {
+      /* for stable branch */
     }
     else {
-      para_list = g_list_previous (para_list);
-      if (para_list) {
-	text->current_para = para_list;
-	para = para_list->data;
-	para->text_cmp = g_utf8_prev_char (para->text_cmp);
+      if (para->text_cmp > para->text_buffer) {
 	para->input_ptr = g_utf8_prev_char (para->input_ptr);
 	unicode = g_utf8_get_char (para->input_ptr);
+	para->text_cmp = g_utf8_prev_char (para->text_cmp);
 	text_unicode = g_utf8_get_char (para->text_cmp);
 	utt_class_record_type_dec (priv->record);
 	if (unicode == text_unicode) {
 	  utt_class_record_correct_dec (priv->record);
 	}
 	*para->input_ptr = '\0';
-	utt_text_area_underscore_restart_timeout (area);
+      }
+      else {
+	para_list = g_list_previous (para_list);
+	if (para_list) {
+	  text->current_para = para_list;
+	  para = para_list->data;
+	  para->text_cmp = g_utf8_prev_char (para->text_cmp);
+	  para->input_ptr = g_utf8_prev_char (para->input_ptr);
+	  unicode = g_utf8_get_char (para->input_ptr);
+	  text_unicode = g_utf8_get_char (para->text_cmp);
+	  utt_class_record_type_dec (priv->record);
+	  if (unicode == text_unicode) {
+	    utt_class_record_correct_dec (priv->record);
+	  }
+	  *para->input_ptr = '\0';
+	}
       }
     }
+    utt_text_area_underscore_restart_timeout (area);
     g_signal_emit (area, signals[STATISTICS], 0);
     return TRUE;
   }
