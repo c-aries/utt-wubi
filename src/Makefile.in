@@ -231,7 +231,7 @@ utt_wubi_SOURCES = \
 	wubi_table.c wubi_table.h \
 	wubi_article.c \
 	zigen_images.c zigen_images.h \
-	utt_gtk_compat.h
+	utt_compat.h
 
 utt_wubi_CPPFLAGS = \
 	$(GTK_CFLAGS) \
