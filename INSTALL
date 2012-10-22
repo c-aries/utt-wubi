@@ -363,7 +363,3 @@ operates.
 `configure' also accepts some other, not widely useful, options.  Run
 `configure --help' for more details.
 
-Suggest Parameters
-==================
-
-./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc --libexecdir=/usr/lib --mandir=/usr/share/man --infodir=/usr/share/info
