@@ -602,7 +602,9 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
 	g_array_append_val (text_array, text_record);
 	text_record.num = text_record.width = 0;
       }
-      cmp_input = g_utf8_next_char (cmp_input);
+      if (*cmp_input != '\0') {
+	cmp_input = g_utf8_next_char (cmp_input);
+      }
     }
     else {
       g_array_append_val (text_array, text_record);
