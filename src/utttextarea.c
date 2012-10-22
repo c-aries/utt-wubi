@@ -43,8 +43,9 @@ struct _UttTextAreaPrivate
   gboolean mark_show;
   gint timeout_id;
   gdouble mark_x, mark_y;
-  /*  */
+  /* cache data */
   gdouble font_height;
+  gint expose_width, expose_height;
   /* input method */
   GtkIMContext *im_context;
   /* signals */
@@ -557,6 +558,8 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
 
   text_x = text_y = 0;
   gdk_drawable_get_size (widget->window, &expose_width, &expose_height);
+  priv->expose_width = expose_width;
+  priv->expose_height = expose_height;
   draw_text = text->text_base;
   cmp_input = text->input_base;
   para_list = text->para_base;
@@ -853,6 +856,7 @@ utt_text_area_init (UttTextArea *area)
   priv->text = NULL;
   priv->mark_show = TRUE;
   priv->mark_x = priv->mark_y = 0;
+  priv->expose_width = priv->expose_height = 0;
   priv->timeout_id = 0;
   priv->font_height = utt_text_area_get_font_height (GTK_WIDGET (area));
 
