@@ -37,3 +37,6 @@ An IOException at key_snooper ()
 (utt-wubi:7902): GLib-GObject-CRITICAL **: g_signal_handlers_disconnect_matched: assertion `G_TYPE_CHECK_INSTANCE (instance)' failed
 $ 
 
+* fcitx
+耀子 11:53:22:
+不行啊，打字好像用fcitx我打错字，backspace会把已经输入的删除而不是删除fcitx打错 
