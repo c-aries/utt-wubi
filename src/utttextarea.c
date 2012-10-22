@@ -18,14 +18,14 @@ struct utt_text {
   gchar *text_base;		/* text display base */
   gchar *input_base;		/* input display base */
   GList *current_para;		/* current paragraph */
-  gchar *text_cmp;
-  gchar *input_ptr;
 };
 
 struct utt_paragraph {
   gchar *text_buffer;
   gchar *input_buffer;
   gchar *input_buffer_end;
+  gchar *text_cmp;		/* current compare pointer, for comfortable use, utt_text don't need to maintain these pointers */
+  gchar *input_ptr;		/* current input pointer */
   gint num;
 };
 
@@ -283,7 +283,6 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
   struct utt_paragraph *para = para_list->data;
   gunichar unicode, text_unicode;
   gboolean class_should_end = FALSE;
-  gint i;
 
   if (!utt_class_record_has_begin (priv->record)) {
     return TRUE;
@@ -296,16 +295,16 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 
   if (event->keyval == GDK_BackSpace &&
       utt_text_area_get_class_mode (area) == UTT_CLASS_EXERCISE_MODE) {
-    if (text->text_cmp > para->text_buffer) {
-      text->input_ptr = g_utf8_prev_char (text->input_ptr);
-      unicode = g_utf8_get_char (text->input_ptr);
-      text->text_cmp = g_utf8_prev_char (text->text_cmp);
-      text_unicode = g_utf8_get_char (text->text_cmp);
+    if (para->text_cmp > para->text_buffer) {
+      para->input_ptr = g_utf8_prev_char (para->input_ptr);
+      unicode = g_utf8_get_char (para->input_ptr);
+      para->text_cmp = g_utf8_prev_char (para->text_cmp);
+      text_unicode = g_utf8_get_char (para->text_cmp);
       utt_class_record_type_dec (priv->record);
       if (unicode == text_unicode) {
 	utt_class_record_correct_dec (priv->record);
       }
-      *text->input_ptr = '\0';
+      *para->input_ptr = '\0';
       utt_text_area_underscore_restart_timeout (area);
     }
     else {
@@ -313,19 +312,15 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
       if (para_list) {
 	text->current_para = para_list;
 	para = para_list->data;
-	text->text_cmp = para->text_buffer;
-	text->input_ptr = para->input_buffer;
-	for (i = 0; i < para->num - 1; i ++) { /* FIXME */
-	  text->text_cmp = g_utf8_next_char (text->text_cmp);
-	  text->input_ptr = g_utf8_next_char (text->input_ptr);
-	}
-	unicode = g_utf8_get_char (text->input_ptr);
-	text_unicode = g_utf8_get_char (text->text_cmp);
+	para->text_cmp = g_utf8_prev_char (para->text_cmp);
+	para->input_ptr = g_utf8_prev_char (para->input_ptr);
+	unicode = g_utf8_get_char (para->input_ptr);
+	text_unicode = g_utf8_get_char (para->text_cmp);
 	utt_class_record_type_dec (priv->record);
 	if (unicode == text_unicode) {
 	  utt_class_record_correct_dec (priv->record);
 	}
-	*text->input_ptr = '\0';
+	*para->input_ptr = '\0';
 	utt_text_area_underscore_restart_timeout (area);
       }
     }
@@ -492,15 +487,15 @@ utt_text_area_handle_keyevent_unicode (UttTextArea *area, gunichar unicode)
 
   ret = g_unichar_to_utf8 (unicode, word);
   word[ret] = '\0';
-  if (text->input_ptr + ret <= para->input_buffer_end) {
-    g_utf8_strncpy (text->input_ptr, word, 1);
-    text->input_ptr = g_utf8_next_char (text->input_ptr);
+  if (para->input_ptr + ret <= para->input_buffer_end) {
+    g_utf8_strncpy (para->input_ptr, word, 1);
+    para->input_ptr = g_utf8_next_char (para->input_ptr);
     utt_class_record_type_inc (priv->record);
-    text_unicode = g_utf8_get_char (text->text_cmp);
+    text_unicode = g_utf8_get_char (para->text_cmp);
     if (unicode == text_unicode) {
       utt_class_record_correct_inc (priv->record);
     }
-    text->text_cmp = g_utf8_next_char (text->text_cmp);
+    para->text_cmp = g_utf8_next_char (para->text_cmp);
     utt_text_area_underscore_restart_timeout (area);
     if (g_utf8_strlen (para->input_buffer, -1) == g_utf8_strlen (para->text_buffer, -1)) {
       text->current_para = g_list_next (text->current_para);
@@ -508,9 +503,6 @@ utt_text_area_handle_keyevent_unicode (UttTextArea *area, gunichar unicode)
 	g_signal_emit (area, signals[STATISTICS], 0);
 	return TRUE;
       }
-      para = text->current_para->data;
-      text->text_cmp = para->text_buffer;
-      text->input_ptr = para->input_buffer;
     }
   }
   g_signal_emit (area, signals[STATISTICS], 0);
@@ -976,8 +968,14 @@ utt_text_area_get_compare_text (UttTextArea *area)
 {
   UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   struct utt_text *text = priv->text;
+  GList *list = text->current_para;
+  struct utt_paragraph *para;
 
-  return text->text_cmp;
+  if (list) {
+    para = list->data;
+    return para->text_cmp;
+  }
+  return NULL;
 }
 
 /* utt_text and utt_text_paragraph */
@@ -991,6 +989,8 @@ utt_paragraph_new (const gchar *base, gint num, gint size)
   g_utf8_strncpy (para->text_buffer, base, num);
   para->input_buffer = g_malloc0 (3 * size + 1); /* FIXME */
   para->input_buffer_end = para->input_buffer + 3 * size;
+  para->text_cmp = para->text_buffer;
+  para->input_ptr = para->input_buffer;
   para->num = num;
   return para;
 }
@@ -1073,8 +1073,6 @@ utt_text_new (const gchar *orig_text)
   para = text->para_base->data;
   text->text_base = para->text_buffer;
   text->input_base = para->input_buffer;
-  text->text_cmp = para->text_buffer;
-  text->input_ptr = para->input_buffer;
   return text;
 }
 
