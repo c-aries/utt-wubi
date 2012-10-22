@@ -1,3 +1,17 @@
+ANNOUNCEMENT
+============
+
+If you want to hack on the Utt Project, you'll need to have
+the following packages installed:
+
+    - GNU autoconf 2.67
+    - GNU automake 1.11
+    - GNU libtool 2.2.10
+    - GNU gettext 0.18
+
+These should be available by ftp from ftp.gnu.org or any of the
+fine GNU mirrors. Beta software can be found at alpha.gnu.org.
+
 URL & REPO
 ==========
 
