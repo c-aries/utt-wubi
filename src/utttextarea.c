@@ -275,6 +275,47 @@ utt_text_area_unrealize (GtkWidget *widget)
   GTK_WIDGET_CLASS (utt_text_area_parent_class)->unrealize (widget);
 }
 
+static void
+calc_backspace_page_base (GtkWidget *widget)
+{
+  PangoContext *context;
+  PangoLayout *layout;
+  PangoFontDescription *desc;
+/*   gint temp_width, temp_height; */
+/*   gdouble width, height; */
+/*   gchar word[4]; */
+
+  context = gtk_widget_get_pango_context (widget);
+  layout = pango_layout_new (context);
+  desc = pango_font_description_from_string ("Monospace 10");
+  pango_font_description_set_absolute_size (desc, 16 * PANGO_SCALE);
+  pango_layout_set_font_description (layout, desc);
+
+/*   g_utf8_strncpy (word, "我", -1); */
+/*   pango_layout_set_text (layout, word, -1); */
+/*   pango_layout_get_size (layout, &temp_width, &temp_height); */
+/*   width = (gdouble)temp_width / PANGO_SCALE; */
+/*   height = (gdouble)temp_height / PANGO_SCALE; */
+/*   g_print ("%lf %lf\n", width, height); */
+
+/*   g_utf8_strncpy (word, "永", -1); */
+/*   pango_layout_set_text (layout, word, -1); */
+/*   pango_layout_get_size (layout, &temp_width, &temp_height); */
+/*   width = (gdouble)temp_width / PANGO_SCALE; */
+/*   height = (gdouble)temp_height / PANGO_SCALE; */
+/*   g_print ("%lf %lf\n", width, height); */
+
+/*   g_utf8_strncpy (word, "睡觉", -1); */
+/*   pango_layout_set_text (layout, word, -1); */
+/*   pango_layout_get_size (layout, &temp_width, &temp_height); */
+/*   width = (gdouble)temp_width / PANGO_SCALE; */
+/*   height = (gdouble)temp_height / PANGO_SCALE; */
+/*   g_print ("%lf %lf\n", width, height); */
+
+  g_object_unref (layout);
+  pango_font_description_free (desc);
+}
+
 static gboolean
 utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 {
@@ -300,6 +341,7 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
     if (text->current_para == text->para_base &&
 	para->text_cmp <= para->text_buffer) {
       /* for stable branch */
+      calc_backspace_page_base (widget);
     }
     else {
       if (para->text_cmp > para->text_buffer) {
