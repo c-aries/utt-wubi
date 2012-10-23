@@ -282,16 +282,18 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   PangoContext *context;
   PangoLayout *layout;
   PangoFontDescription *desc;
-  GList *para_list = text->current_para;
-  struct utt_paragraph *para = para_list->data;
+  GList *orig_para_list = text->current_para;
+  struct utt_paragraph *orig_para = orig_para_list->data;
+  struct utt_paragraph *para;
   gint temp_width, temp_height;
   gint total_width = 0;
   gint total_height = 0;
   gdouble width, height;
   gchar word[4];
-  GList *right_para_list;
+  GList *para_list, *right_para_list;
   gboolean got_right_para;
-  gchar *ch;
+  gchar *ch, *right_ch;
+  gchar *input_ch, *right_input_ch;
 
   context = gtk_widget_get_pango_context (widget);
   layout = pango_layout_new (context);
@@ -299,26 +301,35 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   pango_font_description_set_absolute_size (desc, 16 * PANGO_SCALE);
   pango_layout_set_font_description (layout, desc);
 
-  right_para_list = para_list;
+  right_para_list = para_list = orig_para_list;
+  para = orig_para;
   got_right_para = FALSE;
-  ch = para->text_cmp;
+  right_ch = ch = para->text_cmp;
+  right_input_ch = input_ch = para->input_ptr;
+
   for (;;) {
     /* get next character */
     if (ch <= para->text_buffer) {
       para_list = g_list_previous (para_list);
       if (para_list == NULL) {
-	g_print ("ho\n");
-	goto exit;
+	if (ch == orig_para->text_buffer) {
+	  goto exit;
+	}
+	else {
+	  break;
+	}
       }
       else {
 	para = para_list->data;
 	ch = g_utf8_prev_char (para->text_cmp);
+	input_ch = g_utf8_prev_char (para->input_ptr);
 	total_width = 0;
 	total_height += 2 * height;
       }
     }
     else {
       ch = g_utf8_prev_char (ch);
+      input_ch = g_utf8_prev_char (input_ch);
     }
 
     /* get character width and height */
@@ -341,6 +352,8 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
       else {
 	total_width += width;
 	right_para_list = para_list;
+	right_ch = ch;
+	right_input_ch = input_ch;
 	/* get next character */
 	break;
       }
@@ -352,6 +365,12 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
 
   /* already get the right para_list */
   g_print ("%p\n", right_para_list);
+  if (right_para_list == orig_para_list) {
+    text->text_base = right_ch;
+    text->input_base = right_input_ch;
+  }
+
+  gtk_widget_queue_draw (widget);
 
 /*   g_utf8_strncpy (word, "我", -1); */
 /*   pango_layout_set_text (layout, word, -1); */
