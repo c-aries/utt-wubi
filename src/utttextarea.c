@@ -294,6 +294,7 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   gboolean got_right_para;
   gchar *ch, *right_ch;
   gchar *input_ch, *right_input_ch;
+  gchar *back_ch, *back_input_ch;
 
   context = gtk_widget_get_pango_context (widget);
   layout = pango_layout_new (context);
@@ -306,7 +307,7 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   got_right_para = FALSE;
   right_ch = ch = para->text_cmp;
   right_input_ch = input_ch = para->input_ptr;
-
+  back_ch = back_input_ch = NULL;
   for (;;) {
     /* get next character */
     if (ch <= para->text_buffer) {
@@ -325,11 +326,19 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
 	input_ch = g_utf8_prev_char (para->input_ptr);
 	total_width = 0;
 	total_height += 2 * height;
+	if (back_ch == NULL || back_input_ch == NULL) {
+	  back_ch = ch;
+	  back_input_ch = input_ch;
+	}
       }
     }
     else {
       ch = g_utf8_prev_char (ch);
       input_ch = g_utf8_prev_char (input_ch);
+      if (back_ch == NULL || back_input_ch == NULL) {
+	back_ch = ch;
+	back_input_ch = input_ch;
+      }
     }
 
     /* get character width and height */
@@ -368,9 +377,14 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   if (right_para_list == orig_para_list) {
     text->text_base = right_ch;
     text->input_base = right_input_ch;
+    if (back_ch && back_input_ch) {
+      orig_para->text_cmp = back_ch;
+      orig_para->input_ptr = back_input_ch;
+      *back_input_ch = '\0';
+    }
   }
 
-  gtk_widget_queue_draw (widget);
+  /* gtk_widget_queue_draw (widget); */
 
 /*   g_utf8_strncpy (word, "我", -1); */
 /*   pango_layout_set_text (layout, word, -1); */
