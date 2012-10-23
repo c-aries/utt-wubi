@@ -276,20 +276,82 @@ utt_text_area_unrealize (GtkWidget *widget)
 }
 
 static void
-calc_backspace_page_base (GtkWidget *widget)
+calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
+			  gint expose_width, gint expose_height)
 {
   PangoContext *context;
   PangoLayout *layout;
   PangoFontDescription *desc;
-/*   gint temp_width, temp_height; */
-/*   gdouble width, height; */
-/*   gchar word[4]; */
+  GList *para_list = text->current_para;
+  struct utt_paragraph *para = para_list->data;
+  gint temp_width, temp_height;
+  gint total_width = 0;
+  gint total_height = 0;
+  gdouble width, height;
+  gchar word[4];
+  GList *right_para_list;
+  gboolean got_right_para;
+  gchar *ch;
 
   context = gtk_widget_get_pango_context (widget);
   layout = pango_layout_new (context);
   desc = pango_font_description_from_string ("Monospace 10");
   pango_font_description_set_absolute_size (desc, 16 * PANGO_SCALE);
   pango_layout_set_font_description (layout, desc);
+
+  right_para_list = para_list;
+  got_right_para = FALSE;
+  ch = para->text_cmp;
+  for (;;) {
+    /* get next character */
+    if (ch <= para->text_buffer) {
+      para_list = g_list_previous (para_list);
+      if (para_list == NULL) {
+	g_print ("ho\n");
+	goto exit;
+      }
+      else {
+	para = para_list->data;
+	ch = g_utf8_prev_char (para->text_cmp);
+	total_width = 0;
+	total_height += 2 * height;
+      }
+    }
+    else {
+      ch = g_utf8_prev_char (ch);
+    }
+
+    /* get character width and height */
+    g_utf8_strncpy (word, ch, -1);
+    pango_layout_set_text (layout, word, -1);
+    pango_layout_get_size (layout, &temp_width, &temp_height);
+    width = (gdouble)temp_width / PANGO_SCALE;
+    height = (gdouble)temp_height / PANGO_SCALE; /* FIXME: fix font height? */
+
+    for (;;) {
+      if (total_height + height * 2 > expose_height) {
+	got_right_para = TRUE;
+	break;
+      }
+      if (total_width + width > expose_width) {
+	total_width = 0;
+	total_height += 2 * height;
+	/* still this character */
+      }
+      else {
+	total_width += width;
+	right_para_list = para_list;
+	/* get next character */
+	break;
+      }
+    }
+    if (got_right_para) {
+      break;
+    }
+  }
+
+  /* already get the right para_list */
+  g_print ("%p\n", right_para_list);
 
 /*   g_utf8_strncpy (word, "我", -1); */
 /*   pango_layout_set_text (layout, word, -1); */
@@ -312,6 +374,7 @@ calc_backspace_page_base (GtkWidget *widget)
 /*   height = (gdouble)temp_height / PANGO_SCALE; */
 /*   g_print ("%lf %lf\n", width, height); */
 
+ exit:
   g_object_unref (layout);
   pango_font_description_free (desc);
 }
@@ -339,9 +402,10 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
   if (event->keyval == GDK_BackSpace &&
       utt_text_area_get_class_mode (area) == UTT_CLASS_EXERCISE_MODE) {
     if (text->current_para == text->para_base &&
-	para->text_cmp <= para->text_buffer) {
+	para->text_cmp <= text->text_base) {
       /* for stable branch */
-      calc_backspace_page_base (widget);
+      calc_backspace_page_base (widget, text,
+				priv->expose_width, priv->expose_height);
     }
     else {
       if (para->text_cmp > para->text_buffer) {
