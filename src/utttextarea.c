@@ -276,20 +276,115 @@ utt_text_area_unrealize (GtkWidget *widget)
 }
 
 static void
-calc_backspace_page_base (GtkWidget *widget)
+calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
+			  gint expose_width, gint expose_height)
 {
   PangoContext *context;
   PangoLayout *layout;
   PangoFontDescription *desc;
-/*   gint temp_width, temp_height; */
-/*   gdouble width, height; */
-/*   gchar word[4]; */
+  GList *orig_para_list = text->current_para;
+  struct utt_paragraph *orig_para = orig_para_list->data;
+  struct utt_paragraph *para;
+  gint temp_width, temp_height;
+  gint total_width = 0;
+  gint total_height = 0;
+  gdouble width, height;
+  gchar word[4];
+  GList *para_list, *right_para_list;
+  gboolean got_right_para;
+  gchar *ch, *right_ch;
+  gchar *input_ch, *right_input_ch;
+  gchar *back_ch, *back_input_ch;
 
   context = gtk_widget_get_pango_context (widget);
   layout = pango_layout_new (context);
   desc = pango_font_description_from_string ("Monospace 10");
   pango_font_description_set_absolute_size (desc, 16 * PANGO_SCALE);
   pango_layout_set_font_description (layout, desc);
+
+  right_para_list = para_list = orig_para_list;
+  para = orig_para;
+  got_right_para = FALSE;
+  right_ch = ch = para->text_cmp;
+  right_input_ch = input_ch = para->input_ptr;
+  back_ch = back_input_ch = NULL;
+  for (;;) {
+    /* get next character */
+    if (ch <= para->text_buffer) {
+      para_list = g_list_previous (para_list);
+      if (para_list == NULL) {
+	if (ch == orig_para->text_buffer) {
+	  goto exit;
+	}
+	else {
+	  break;
+	}
+      }
+      else {
+	para = para_list->data;
+	ch = g_utf8_prev_char (para->text_cmp);
+	input_ch = g_utf8_prev_char (para->input_ptr);
+	total_width = 0;
+	total_height += 2 * height;
+	if (back_ch == NULL || back_input_ch == NULL) {
+	  back_ch = ch;
+	  back_input_ch = input_ch;
+	}
+      }
+    }
+    else {
+      ch = g_utf8_prev_char (ch);
+      input_ch = g_utf8_prev_char (input_ch);
+      if (back_ch == NULL || back_input_ch == NULL) {
+	back_ch = ch;
+	back_input_ch = input_ch;
+      }
+    }
+
+    /* get character width and height */
+    g_utf8_strncpy (word, ch, -1);
+    pango_layout_set_text (layout, word, -1);
+    pango_layout_get_size (layout, &temp_width, &temp_height);
+    width = (gdouble)temp_width / PANGO_SCALE;
+    height = (gdouble)temp_height / PANGO_SCALE; /* FIXME: fix font height? */
+
+    for (;;) {
+      if (total_height + height * 2 > expose_height) {
+	got_right_para = TRUE;
+	break;
+      }
+      if (total_width + width > expose_width) {
+	total_width = 0;
+	total_height += 2 * height;
+	/* still this character */
+      }
+      else {
+	total_width += width;
+	right_para_list = para_list;
+	right_ch = ch;
+	right_input_ch = input_ch;
+	/* get next character */
+	break;
+      }
+    }
+    if (got_right_para) {
+      break;
+    }
+  }
+
+  /* already get the right para_list */
+  g_print ("%p\n", right_para_list);
+  if (right_para_list == orig_para_list) {
+    text->text_base = right_ch;
+    text->input_base = right_input_ch;
+    if (back_ch && back_input_ch) {
+      orig_para->text_cmp = back_ch;
+      orig_para->input_ptr = back_input_ch;
+      *back_input_ch = '\0';
+    }
+  }
+
+  /* gtk_widget_queue_draw (widget); */
 
 /*   g_utf8_strncpy (word, "我", -1); */
 /*   pango_layout_set_text (layout, word, -1); */
@@ -312,6 +407,7 @@ calc_backspace_page_base (GtkWidget *widget)
 /*   height = (gdouble)temp_height / PANGO_SCALE; */
 /*   g_print ("%lf %lf\n", width, height); */
 
+ exit:
   g_object_unref (layout);
   pango_font_description_free (desc);
 }
@@ -339,9 +435,10 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
   if (event->keyval == GDK_BackSpace &&
       utt_text_area_get_class_mode (area) == UTT_CLASS_EXERCISE_MODE) {
     if (text->current_para == text->para_base &&
-	para->text_cmp <= para->text_buffer) {
+	para->text_cmp <= text->text_base) {
       /* for stable branch */
-      calc_backspace_page_base (widget);
+      calc_backspace_page_base (widget, text,
+				priv->expose_width, priv->expose_height);
     }
     else {
       if (para->text_cmp > para->text_buffer) {
