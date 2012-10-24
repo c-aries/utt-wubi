@@ -279,6 +279,17 @@ static void
 calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
 			  gint expose_width, gint expose_height)
 {
+#if 0
+  GList *para_list = text->current_para;
+  struct utt_paragraph *para = para_list->data;
+
+  para->text_cmp = g_utf8_prev_char (para->text_cmp);
+  para->input_ptr = g_utf8_prev_char (para->input_ptr);
+  *para->input_ptr = '\0';
+  text->text_base = para->text_cmp;
+  text->input_base = para->input_ptr;
+  gtk_widget_queue_draw (widget);
+#else
   PangoContext *context;
   PangoLayout *layout;
   PangoFontDescription *desc;
@@ -373,8 +384,10 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   }
 
   /* already get the right para_list */
-  g_print ("%p\n", right_para_list);
+  /* g_print ("%p\n", right_para_list); */
+  g_print ("how");
   if (right_para_list == orig_para_list) {
+#if 0
     text->text_base = right_ch;
     text->input_base = right_input_ch;
     if (back_ch && back_input_ch) {
@@ -382,34 +395,23 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
       orig_para->input_ptr = back_input_ch;
       *back_input_ch = '\0';
     }
+#else
+/*     para = right_para_list->data; */
+    
+/*     para->text_cmp = para->text_buffer; */
+/*     para->input_ptr = para->input_buffer; */
+/*     text->text_base = para->text_cmp; */
+/*     text->input_base = para->input_ptr; */
+/*     *para->input_ptr = '\0'; */
+#endif
   }
 
   /* gtk_widget_queue_draw (widget); */
 
-/*   g_utf8_strncpy (word, "我", -1); */
-/*   pango_layout_set_text (layout, word, -1); */
-/*   pango_layout_get_size (layout, &temp_width, &temp_height); */
-/*   width = (gdouble)temp_width / PANGO_SCALE; */
-/*   height = (gdouble)temp_height / PANGO_SCALE; */
-/*   g_print ("%lf %lf\n", width, height); */
-
-/*   g_utf8_strncpy (word, "永", -1); */
-/*   pango_layout_set_text (layout, word, -1); */
-/*   pango_layout_get_size (layout, &temp_width, &temp_height); */
-/*   width = (gdouble)temp_width / PANGO_SCALE; */
-/*   height = (gdouble)temp_height / PANGO_SCALE; */
-/*   g_print ("%lf %lf\n", width, height); */
-
-/*   g_utf8_strncpy (word, "睡觉", -1); */
-/*   pango_layout_set_text (layout, word, -1); */
-/*   pango_layout_get_size (layout, &temp_width, &temp_height); */
-/*   width = (gdouble)temp_width / PANGO_SCALE; */
-/*   height = (gdouble)temp_height / PANGO_SCALE; */
-/*   g_print ("%lf %lf\n", width, height); */
-
  exit:
   g_object_unref (layout);
   pango_font_description_free (desc);
+#endif
 }
 
 static gboolean
