@@ -21,7 +21,7 @@ utt_wubi_SOURCES = \
 utt_wubi_CPPFLAGS = \
 	$(GTK_CFLAGS) \
 	$(UUID_CFLAGS) \
-	$(LIBXML2_CFLAGS) \
+	$(XML_CPPFLAGS) \
 	$(GCONF2_CFLAGS) \
 	-DDATAROOTDIR=\"$(datarootdir)\" \
 	-DPKGDATADIR=\"$(pkgdatadir)\"
@@ -30,4 +30,4 @@ utt_wubi_LDFLAGS = \
 	$(GTK_LIBS) \
 	$(GCONF2_LIBS) \
 	$(UUID_LIBS) \
-	$(LIBXML2_LIBS)
+	$(XML_LIBS)
