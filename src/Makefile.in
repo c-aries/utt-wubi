@@ -129,8 +129,6 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
-LIBXML2_CFLAGS = @LIBXML2_CFLAGS@
-LIBXML2_LIBS = @LIBXML2_LIBS@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
@@ -165,6 +163,9 @@ UUID_CFLAGS = @UUID_CFLAGS@
 UUID_LIBS = @UUID_LIBS@
 VERSION = @VERSION@
 XGETTEXT = @XGETTEXT@
+XML2_CONFIG = @XML2_CONFIG@
+XML_CPPFLAGS = @XML_CPPFLAGS@
+XML_LIBS = @XML_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -236,7 +237,7 @@ utt_wubi_SOURCES = \
 utt_wubi_CPPFLAGS = \
 	$(GTK_CFLAGS) \
 	$(UUID_CFLAGS) \
-	$(LIBXML2_CFLAGS) \
+	$(XML_CPPFLAGS) \
 	$(GCONF2_CFLAGS) \
 	-DDATAROOTDIR=\"$(datarootdir)\" \
 	-DPKGDATADIR=\"$(pkgdatadir)\"
@@ -245,7 +246,7 @@ utt_wubi_LDFLAGS = \
 	$(GTK_LIBS) \
 	$(GCONF2_LIBS) \
 	$(UUID_LIBS) \
-	$(LIBXML2_LIBS)
+	$(XML_LIBS)
 
 all: all-am
 
