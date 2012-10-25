@@ -1,7 +1,5 @@
-UttTextArea，段首空格，为做成通用widget，还需处理宽度缩小到三个字时的BUG
 UttTextArea, 翻页前进时，保留上一页最后几个字符的显示
 UttTextArea, 句子居中模式
-UttTextArea, 设置光标
 ToolItem需要tips
 拆字图解,让文章键码帮助功能更适合初级用户
 统计＆历史记录训练，错字统计训练

@@ -40,6 +40,7 @@ void utt_text_area_reset (UttTextArea *area);
 void utt_text_area_set_class_recorder (UttTextArea *area, UttClassRecord *record);
 gboolean utt_text_area_set_text (UttTextArea *area, const gchar *text);
 gboolean utt_text_area_set_leading_space (UttTextArea *area, const gchar *leading_space);
+gboolean utt_text_area_set_mark (UttTextArea *area, const gchar *mark);
 void utt_text_area_underscore_stop_timeout (UttTextArea *area);
 void utt_text_area_underscore_start_timeout (UttTextArea *area);
 void utt_text_area_underscore_restart_timeout (UttTextArea *area);

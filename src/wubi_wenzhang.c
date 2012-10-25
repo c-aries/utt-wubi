@@ -570,6 +570,7 @@ create_main_page ()
   gtk_container_add (GTK_CONTAINER (frame), hbox);
   g_signal_connect (priv->area, "key-press-event", G_CALLBACK (on_key_press), utt);
   utt_text_area_set_leading_space (UTT_TEXT_AREA (priv->area), "空格");
+  utt_text_area_set_mark (UTT_TEXT_AREA (priv->area), "＿");
 
   priv->dash = utt_dashboard_new (priv->utt);
   gtk_box_pack_start (GTK_BOX (vbox), priv->dash->align, FALSE, FALSE, 0);

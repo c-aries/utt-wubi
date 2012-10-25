@@ -40,6 +40,7 @@ struct _UttTextAreaPrivate
   /* utt_text */
   struct utt_text *text;
   /* mark */
+  gchar *mark;
   gboolean mark_show;
   gint timeout_id;
   gdouble mark_x, mark_y;
@@ -234,6 +235,7 @@ utt_text_area_finalize (GObject *object)
   if (priv->leading_space) {
     g_free (priv->leading_space);
   }
+  g_free (priv->mark);
   g_object_unref (priv->im_context);
   utt_text_area_underscore_stop_timeout (area);
   G_OBJECT_CLASS (utt_text_area_parent_class)->finalize (object);
@@ -559,8 +561,9 @@ utt_text_area_input_expose_exceed (UttTextArea *area, PangoLayout *layout,
   gdouble mark_width, input_width, temp_width, text_compare_width;
   gboolean is_last_row = FALSE;
   gboolean input_is_end = FALSE;
+  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
 
-  g_utf8_strncpy (word, "_", 1);
+  g_utf8_strncpy (word, priv->mark, 1);
   pango_layout_set_text (layout, word, -1);
   pango_layout_get_size (layout, &width, NULL);
   mark_width = (gdouble)width / PANGO_SCALE;
@@ -888,7 +891,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   }
   else {
     if (priv->mark_show) {
-      g_utf8_strncpy (word, "_", 1);
+      g_utf8_strncpy (word, priv->mark, 1);
     }
     else {
       g_utf8_strncpy (word, " ", 1);
@@ -1041,6 +1044,7 @@ utt_text_area_init (UttTextArea *area)
   priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   priv->record = NULL;
   priv->text = NULL;
+  priv->mark = g_strdup ("_");
   priv->mark_show = TRUE;
   priv->mark_x = priv->mark_y = 0;
   priv->expose_width = priv->expose_height = 0;
@@ -1170,6 +1174,25 @@ utt_text_area_set_leading_space (UttTextArea *area, const gchar *leading_space)
   if (leading_space) {
     priv->leading_space = g_strdup (leading_space);
   }
+  return TRUE;
+}
+
+gboolean
+utt_text_area_set_mark (UttTextArea *area, const gchar *mark)
+{
+  UttTextAreaPrivate *priv;
+
+  g_return_val_if_fail (UTT_IS_TEXT_AREA (area) && mark &&
+			g_utf8_validate (mark, -1, NULL), FALSE);
+
+  if (strlen (mark) == 0 || g_utf8_strlen (mark, -1) != 1) {
+    return FALSE;
+  }
+  priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  if (priv->mark) {
+    g_free (priv->mark);
+  }
+  priv->mark = g_strdup (mark);
   return TRUE;
 }
 
