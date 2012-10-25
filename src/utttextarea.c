@@ -468,9 +468,12 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
   UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   struct utt_text *text = priv->text;
   GList *para_list = text->current_para;
+  GList *temp_para_list;
   struct utt_paragraph *para = para_list->data;
+  struct utt_paragraph *temp_para, *first_para;
   gunichar unicode, text_unicode;
   gboolean class_should_end = FALSE;
+  gchar *ch;
 
   if (!utt_class_record_has_begin (priv->record)) {
     return TRUE;
@@ -483,12 +486,32 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 
   if (event->keyval == GDK_BackSpace &&
       utt_text_area_get_class_mode (area) == UTT_CLASS_EXERCISE_MODE) {
+    if (para->text_cmp <= para->text_buffer) {
+      temp_para_list = g_list_previous (para_list);
+      if (temp_para_list == NULL) {
+	return TRUE;
+      }
+      temp_para = temp_para_list->data;
+      ch = g_utf8_prev_char (temp_para->text_cmp);
+    }
+    else {
+      temp_para_list = para_list;
+      ch = g_utf8_prev_char (para->text_cmp);
+    }
+#if 0
     if (text->current_para == text->para_base &&
 	para->text_cmp <= text->text_base) {
-      /* for stable branch */
-      calc_backspace_page_base (widget, text,
-				priv->record,
-				priv->cache_expose_width, priv->cache_expose_height,
+#else
+      first_para = text->paragraphs->data;
+      if ((temp_para_list == text->para_base &&
+	   ch <= text->text_base) &&
+	  !(temp_para_list == text->paragraphs &&
+	    ch <= first_para->text_buffer)) { /* FIXME: take care of the first char in the text */
+#endif
+	/* for stable branch */
+	calc_backspace_page_base (widget, text,
+				  priv->record,
+				  priv->cache_expose_width, priv->cache_expose_height,
 				priv->leading_space_width);
     }
     else {
