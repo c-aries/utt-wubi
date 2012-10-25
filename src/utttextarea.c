@@ -688,7 +688,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   UttTextArea *area = UTT_TEXT_AREA (widget);
   UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   struct utt_text *text = priv->text;
-  struct utt_paragraph *para;
+  struct utt_paragraph *para, *base_para;
   PangoLayout *layout;
   PangoFontDescription *desc;
   cairo_t *cr;
@@ -734,11 +734,16 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
     }
   }
 
-  text_x = priv->leading_space_width;
-  text_y = 0;
+  /* FIXME: BUG, haven't deal with first char and leading space */
+
+  text_x = text_y = 0;
   gdk_drawable_get_size (widget->window, &expose_width, &expose_height);
   priv->expose_width = expose_width;
   priv->expose_height = expose_height;
+  base_para = text->para_base->data;
+  if (base_para->text_buffer == text->text_base) {
+    text_x = priv->leading_space_width;
+  }
   draw_text = text->text_base;
   cmp_input = text->input_base;
   para_list = text->para_base;
@@ -806,8 +811,11 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   }
 
   /* draw input text below */
-  input_x = priv->leading_space_width;
+  input_x = 0;
   input_y = priv->font_height;
+  if (base_para->text_buffer == text->text_base) {
+    input_x = priv->leading_space_width;
+  }
   input_row_base = input_cur = text->input_base;
   text_cur = text->text_base;
   para_list = text->para_base;
