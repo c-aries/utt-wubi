@@ -54,7 +54,7 @@ struct _UttTextAreaPrivate
   UttClassMode class_mode;
   /* leading spaces */
   gchar *leading_space;
-  gint leading_space_width;
+  gdouble leading_space_width;
 };
 
 enum {
@@ -284,7 +284,8 @@ utt_text_area_unrealize (GtkWidget *widget)
 static void
 calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
 			  UttClassRecord *record,
-			  gint expose_width, gint expose_height)
+			  gint expose_width, gint expose_height,
+			  gdouble leading_space_width)
 {
   PangoContext *context;
   PangoLayout *layout;
@@ -293,8 +294,8 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   struct utt_paragraph *orig_para = orig_para_list->data;
   struct utt_paragraph *para, *back_para, *first_para, *right_para;
   gint temp_width, temp_height;
-  gint total_width = 0;
-  gint total_height = 0;
+  gdouble total_width = leading_space_width; /* FIXME */
+  gdouble total_height = 0;
   gdouble width, height;
   gchar word[4];
   GList *para_list, *right_para_list, *back_para_list;
@@ -333,7 +334,7 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
 	para = para_list->data;
 	ch = g_utf8_prev_char (para->text_cmp);
 	input_ch = g_utf8_prev_char (para->input_ptr);
-	total_width = 0;
+	total_width = leading_space_width;
 	total_height += 2 * height;
 	if (back_ch == NULL || back_input_ch == NULL) {
 	  back_ch = ch;
@@ -390,7 +391,7 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   right_para = right_para_list->data;
   ch = right_para->text_buffer;
   input_ch = right_para->input_buffer;
-  total_width = 0;
+  total_width = leading_space_width;
   if (ch != right_ch) {
     for (;;) {
       /* get character width and height */
@@ -463,7 +464,8 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
       /* for stable branch */
       calc_backspace_page_base (widget, text,
 				priv->record,
-				priv->expose_width, priv->expose_height);
+				priv->expose_width, priv->expose_height,
+				priv->leading_space_width);
     }
     else {
       if (para->text_cmp > para->text_buffer) {
@@ -732,7 +734,8 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
     }
   }
 
-  text_x = text_y = 0;
+  text_x = priv->leading_space_width;
+  text_y = 0;
   gdk_drawable_get_size (widget->window, &expose_width, &expose_height);
   priv->expose_width = expose_width;
   priv->expose_height = expose_height;
@@ -753,7 +756,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
       if (text_y + 4 * priv->font_height > expose_height) {
 	break;
       }
-      text_x = 0;
+      text_x = priv->leading_space_width;
       text_y += 2 *priv->font_height;
       draw_text = para->text_buffer;
       cmp_input = para->input_buffer;
@@ -803,7 +806,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   }
 
   /* draw input text below */
-  input_x = 0;
+  input_x = priv->leading_space_width;
   input_y = priv->font_height;
   input_row_base = input_cur = text->input_base;
   text_cur = text->text_base;
@@ -848,7 +851,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
 	input_row_base = input_cur = para->input_buffer;
 	input_num = 0;
 	row++;
-	input_x = 0;
+	input_x = priv->leading_space_width;
 	input_y += 2 *priv->font_height;
 	exceed_text_start = 0;
       }
