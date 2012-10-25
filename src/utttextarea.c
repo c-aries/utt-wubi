@@ -52,6 +52,9 @@ struct _UttTextAreaPrivate
   gulong pause_id, resume_id;
   /* class mode */
   UttClassMode class_mode;
+  /* leading spaces */
+  gchar *leading_space;
+  gdouble leading_space_width;
 };
 
 enum {
@@ -228,6 +231,9 @@ utt_text_area_finalize (GObject *object)
   if (priv->text) {
     utt_text_destroy (priv->text);
   }
+  if (priv->leading_space) {
+    g_free (priv->leading_space);
+  }
   g_object_unref (priv->im_context);
   utt_text_area_underscore_stop_timeout (area);
   G_OBJECT_CLASS (utt_text_area_parent_class)->finalize (object);
@@ -278,7 +284,8 @@ utt_text_area_unrealize (GtkWidget *widget)
 static void
 calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
 			  UttClassRecord *record,
-			  gint expose_width, gint expose_height)
+			  gint expose_width, gint expose_height,
+			  gdouble leading_space_width)
 {
   PangoContext *context;
   PangoLayout *layout;
@@ -287,8 +294,8 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   struct utt_paragraph *orig_para = orig_para_list->data;
   struct utt_paragraph *para, *back_para, *first_para, *right_para;
   gint temp_width, temp_height;
-  gint total_width = 0;
-  gint total_height = 0;
+  gdouble total_width = leading_space_width; /* FIXME */
+  gdouble total_height = 0;
   gdouble width, height;
   gchar word[4];
   GList *para_list, *right_para_list, *back_para_list;
@@ -327,7 +334,7 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
 	para = para_list->data;
 	ch = g_utf8_prev_char (para->text_cmp);
 	input_ch = g_utf8_prev_char (para->input_ptr);
-	total_width = 0;
+	total_width = leading_space_width;
 	total_height += 2 * height;
 	if (back_ch == NULL || back_input_ch == NULL) {
 	  back_ch = ch;
@@ -384,7 +391,7 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   right_para = right_para_list->data;
   ch = right_para->text_buffer;
   input_ch = right_para->input_buffer;
-  total_width = 0;
+  total_width = leading_space_width;
   if (ch != right_ch) {
     for (;;) {
       /* get character width and height */
@@ -457,7 +464,8 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
       /* for stable branch */
       calc_backspace_page_base (widget, text,
 				priv->record,
-				priv->expose_width, priv->expose_height);
+				priv->expose_width, priv->expose_height,
+				priv->leading_space_width);
     }
     else {
       if (para->text_cmp > para->text_buffer) {
@@ -680,7 +688,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   UttTextArea *area = UTT_TEXT_AREA (widget);
   UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   struct utt_text *text = priv->text;
-  struct utt_paragraph *para;
+  struct utt_paragraph *para, *base_para;
   PangoLayout *layout;
   PangoFontDescription *desc;
   cairo_t *cr;
@@ -714,10 +722,28 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   pango_font_description_set_absolute_size (desc, 16 * PANGO_SCALE);
   pango_layout_set_font_description (layout, desc);
 
+  if (priv->leading_space_width == -1) {
+    if (priv->leading_space) {
+      pango_layout_set_text (layout, priv->leading_space, -1);
+      pango_layout_get_size (layout, &width, NULL);
+      temp_width = (gdouble)width / PANGO_SCALE;
+      priv->leading_space_width = temp_width;
+    }
+    else {
+      priv->leading_space_width = 0;
+    }
+  }
+
+  /* FIXME: BUG, haven't deal with first char and leading space */
+
   text_x = text_y = 0;
   gdk_drawable_get_size (widget->window, &expose_width, &expose_height);
   priv->expose_width = expose_width;
   priv->expose_height = expose_height;
+  base_para = text->para_base->data;
+  if (base_para->text_buffer == text->text_base) {
+    text_x = priv->leading_space_width;
+  }
   draw_text = text->text_base;
   cmp_input = text->input_base;
   para_list = text->para_base;
@@ -735,7 +761,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
       if (text_y + 4 * priv->font_height > expose_height) {
 	break;
       }
-      text_x = 0;
+      text_x = priv->leading_space_width;
       text_y += 2 *priv->font_height;
       draw_text = para->text_buffer;
       cmp_input = para->input_buffer;
@@ -787,6 +813,9 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   /* draw input text below */
   input_x = 0;
   input_y = priv->font_height;
+  if (base_para->text_buffer == text->text_base) {
+    input_x = priv->leading_space_width;
+  }
   input_row_base = input_cur = text->input_base;
   text_cur = text->text_base;
   para_list = text->para_base;
@@ -830,7 +859,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
 	input_row_base = input_cur = para->input_buffer;
 	input_num = 0;
 	row++;
-	input_x = 0;
+	input_x = priv->leading_space_width;
 	input_y += 2 *priv->font_height;
 	exceed_text_start = 0;
       }
@@ -1017,6 +1046,8 @@ utt_text_area_init (UttTextArea *area)
   priv->expose_width = priv->expose_height = 0;
   priv->timeout_id = 0;
   priv->font_height = utt_text_area_get_font_height (GTK_WIDGET (area));
+  priv->leading_space = NULL;
+  priv->leading_space_width = -1;
 
   priv->im_context = gtk_im_multicontext_new ();
   g_signal_connect (priv->im_context, "preedit-start", G_CALLBACK (utt_text_area_preedit_cb), area);
@@ -1120,6 +1151,25 @@ utt_text_area_set_text (UttTextArea *area, const gchar *text)
   }
   priv->text = utt_text_new (text);
   utt_class_record_set_total (priv->record, priv->text->total);
+  return TRUE;
+}
+
+gboolean
+utt_text_area_set_leading_space (UttTextArea *area, const gchar *leading_space)
+{
+  UttTextAreaPrivate *priv;
+
+  g_return_val_if_fail (UTT_IS_TEXT_AREA (area), FALSE);
+
+  priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  if (priv->leading_space) {
+    g_free (priv->leading_space);
+    priv->leading_space = NULL;
+    priv->leading_space_width = -1; /* haven't calc yet */
+  }
+  if (leading_space) {
+    priv->leading_space = g_strdup (leading_space);
+  }
   return TRUE;
 }
 
