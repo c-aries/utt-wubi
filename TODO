@@ -1,5 +1,7 @@
 UttTextArea，段首空格
 UttTextArea, 翻页前进时，保留上一页最后几个字符的显示
+UttTextArea, 句子居中模式
+UttTextArea, 设置光标
 ToolItem需要tips
 拆字图解,让文章键码帮助功能更适合初级用户
 统计＆历史记录训练，错字统计训练
@@ -7,4 +9,5 @@ ToolItem需要tips
 设计LOGO，美化UI
 帮助文档，教程
 ibus, scim, fcitx的支持
+UttTextArea类似Wiki的Text Markup
 除BUG
