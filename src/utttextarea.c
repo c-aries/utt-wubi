@@ -52,6 +52,9 @@ struct _UttTextAreaPrivate
   gulong pause_id, resume_id;
   /* class mode */
   UttClassMode class_mode;
+  /* leading spaces */
+  gchar *leading_space;
+  gint leading_space_width;
 };
 
 enum {
@@ -227,6 +230,9 @@ utt_text_area_finalize (GObject *object)
 
   if (priv->text) {
     utt_text_destroy (priv->text);
+  }
+  if (priv->leading_space) {
+    g_free (priv->leading_space);
   }
   g_object_unref (priv->im_context);
   utt_text_area_underscore_stop_timeout (area);
@@ -714,6 +720,18 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   pango_font_description_set_absolute_size (desc, 16 * PANGO_SCALE);
   pango_layout_set_font_description (layout, desc);
 
+  if (priv->leading_space_width == -1) {
+    if (priv->leading_space) {
+      pango_layout_set_text (layout, priv->leading_space, -1);
+      pango_layout_get_size (layout, &width, NULL);
+      temp_width = (gdouble)width / PANGO_SCALE;
+      priv->leading_space_width = temp_width;
+    }
+    else {
+      priv->leading_space_width = 0;
+    }
+  }
+
   text_x = text_y = 0;
   gdk_drawable_get_size (widget->window, &expose_width, &expose_height);
   priv->expose_width = expose_width;
@@ -1017,6 +1035,8 @@ utt_text_area_init (UttTextArea *area)
   priv->expose_width = priv->expose_height = 0;
   priv->timeout_id = 0;
   priv->font_height = utt_text_area_get_font_height (GTK_WIDGET (area));
+  priv->leading_space = NULL;
+  priv->leading_space_width = -1;
 
   priv->im_context = gtk_im_multicontext_new ();
   g_signal_connect (priv->im_context, "preedit-start", G_CALLBACK (utt_text_area_preedit_cb), area);
@@ -1120,6 +1140,25 @@ utt_text_area_set_text (UttTextArea *area, const gchar *text)
   }
   priv->text = utt_text_new (text);
   utt_class_record_set_total (priv->record, priv->text->total);
+  return TRUE;
+}
+
+gboolean
+utt_text_area_set_leading_space (UttTextArea *area, const gchar *leading_space)
+{
+  UttTextAreaPrivate *priv;
+
+  g_return_val_if_fail (UTT_IS_TEXT_AREA (area), FALSE);
+
+  priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  if (priv->leading_space) {
+    g_free (priv->leading_space);
+    priv->leading_space = NULL;
+    priv->leading_space_width = -1; /* haven't calc yet */
+  }
+  if (leading_space) {
+    priv->leading_space = g_strdup (leading_space);
+  }
   return TRUE;
 }
 
