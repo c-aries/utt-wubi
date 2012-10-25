@@ -277,6 +277,7 @@ utt_text_area_unrealize (GtkWidget *widget)
 
 static void
 calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
+			  UttClassRecord *record,
 			  gint expose_width, gint expose_height)
 {
   PangoContext *context;
@@ -290,11 +291,12 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   gint total_height = 0;
   gdouble width, height;
   gchar word[4];
-  GList *para_list, *right_para_list;
+  GList *para_list, *right_para_list, *back_para_list;
   gboolean got_right_para;
   gchar *ch, *right_ch;
   gchar *input_ch, *right_input_ch;
   gchar *back_ch, *back_input_ch;
+  gunichar unicode, input_unicode;
 
   context = gtk_widget_get_pango_context (widget);
   layout = pango_layout_new (context);
@@ -302,7 +304,7 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   pango_font_description_set_absolute_size (desc, 16 * PANGO_SCALE);
   pango_layout_set_font_description (layout, desc);
 
-  right_para_list = para_list = orig_para_list;
+  back_para_list = right_para_list = para_list = orig_para_list;
   back_para = para = orig_para;
   first_para = text->paragraphs->data;
   got_right_para = FALSE;
@@ -331,6 +333,7 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
 	  back_ch = ch;
 	  back_input_ch = input_ch;
 	  back_para = para;
+	  back_para_list = para_list;
 	}
       }
     }
@@ -341,6 +344,7 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
 	back_ch = ch;
 	back_input_ch = input_ch;
 	back_para = para;
+	back_para_list = para_list;
       }
     }
 
@@ -376,13 +380,20 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   }
 
   /* already get the right para_list */
-  text->para_base  = text->current_para = right_para_list;
+  text->para_base = right_para_list;
+  text->current_para = back_para_list;
   text->text_base = right_ch;
   text->input_base = right_input_ch;
   g_assert (back_ch && back_input_ch);
   back_para->text_cmp = back_ch;
   back_para->input_ptr = back_input_ch;
+  unicode = g_utf8_get_char (back_ch);
+  input_unicode = g_utf8_get_char (back_input_ch);
   *back_input_ch = '\0';
+  utt_class_record_type_dec (record);
+  if (unicode == input_unicode) {
+    utt_class_record_correct_dec (record);
+  }
 
   gtk_widget_queue_draw (widget);
 
@@ -417,6 +428,7 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 	para->text_cmp <= text->text_base) {
       /* for stable branch */
       calc_backspace_page_base (widget, text,
+				priv->record,
 				priv->expose_width, priv->expose_height);
     }
     else {
