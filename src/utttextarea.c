@@ -30,8 +30,14 @@ struct utt_paragraph {
   gint num;
 };
 
+/* FIXME: dose here exist an object called utt_text_area_page? */
+
 static struct utt_text *utt_text_new (const gchar *orig_text);
 static void utt_text_destroy (struct utt_text *text);
+void utt_text_roll_back_text_base (struct utt_text *text, gint num);
+static void utt_text_roll_back_text_base_one_line (struct utt_text *text, GtkWidget *widget,
+						   gint expose_width, gint expose_height,
+						   gdouble leading_space_width);
 
 struct _UttTextAreaPrivate
 {
@@ -46,7 +52,7 @@ struct _UttTextAreaPrivate
   gdouble mark_x, mark_y;
   /* cache data */
   gdouble font_height;
-  gint expose_width, expose_height;
+  gint cache_expose_width, cache_expose_height;
   /* input method */
   GtkIMContext *im_context;
   /* signals */
@@ -56,6 +62,8 @@ struct _UttTextAreaPrivate
   /* leading spaces */
   gchar *leading_space;
   gdouble leading_space_width;
+  /* change page */
+  gint roll_back;
 };
 
 enum {
@@ -203,6 +211,7 @@ utt_text_area_preedit_cb (GtkIMContext *context, UttTextArea *area)
 static void
 utt_text_area_commit_cb (GtkIMContext *context, const gchar *input_str, UttTextArea *area)
 {
+  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   gunichar unicode;
   const gchar *input_cur;
   gboolean class_should_end = FALSE;
@@ -210,11 +219,13 @@ utt_text_area_commit_cb (GtkIMContext *context, const gchar *input_str, UttTextA
   if (input_str == NULL || *input_str == '\0') {
     return;
   }
+  priv->roll_back = 0;
   for (input_cur = input_str;
        *input_cur != '\0' && !class_should_end;
        input_cur = g_utf8_next_char (input_cur)) {
     unicode = g_utf8_get_char (input_cur);
     class_should_end = utt_text_area_handle_keyevent_unicode (area, unicode);
+    priv->roll_back++;
   }
   if (class_should_end) {
     /* FIXME: when pop a dialog, you will get warning.
@@ -281,6 +292,17 @@ utt_text_area_unrealize (GtkWidget *widget)
 
   gtk_im_context_set_client_window (priv->im_context, NULL);
   GTK_WIDGET_CLASS (utt_text_area_parent_class)->unrealize (widget);
+}
+
+void
+utt_text_area_roll_back_text_base_one_line (UttTextArea *area)
+{
+  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+
+  utt_text_roll_back_text_base_one_line (priv->text, GTK_WIDGET (area),
+					 priv->cache_expose_width,
+					 priv->cache_expose_height,
+					 priv->leading_space_width);
 }
 
 static void
@@ -466,7 +488,7 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
       /* for stable branch */
       calc_backspace_page_base (widget, text,
 				priv->record,
-				priv->expose_width, priv->expose_height,
+				priv->cache_expose_width, priv->cache_expose_height,
 				priv->leading_space_width);
     }
     else {
@@ -507,6 +529,7 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
     return TRUE;
   }
 
+  priv->roll_back++;
   unicode = gdk_keyval_to_unicode (event->keyval);
   class_should_end = utt_text_area_handle_keyevent_unicode (area, unicode);
   if (class_should_end) {
@@ -741,8 +764,8 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
 
   text_x = text_y = 0;
   gdk_drawable_get_size (widget->window, &expose_width, &expose_height);
-  priv->expose_width = expose_width;
-  priv->expose_height = expose_height;
+  priv->cache_expose_width = expose_width;
+  priv->cache_expose_height = expose_height;
   base_para = text->para_base->data;
   if (base_para->text_buffer == text->text_base) {
     text_x = priv->leading_space_width;
@@ -904,9 +927,12 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   priv->mark_y = input_y;
 
   if (row == text_array->len && text_cur != NULL && *text_cur != '\0') {
-    text->text_base = text_cur;
+    text->text_base = text_cur;	/* FIXME: roll back some characters */
     text->input_base = input_cur;
     text->para_base = text->current_para;
+    /* FIXME: if space not enough, use utt_text_roll_back_text_base () */
+    /* utt_text_roll_back_text_base (text, priv->roll_back); */
+    /* utt_text_area_roll_back_text_base_one_line (area); */
     gtk_widget_queue_draw (widget);
   }
 
@@ -1047,11 +1073,12 @@ utt_text_area_init (UttTextArea *area)
   priv->mark = g_strdup ("_");
   priv->mark_show = TRUE;
   priv->mark_x = priv->mark_y = 0;
-  priv->expose_width = priv->expose_height = 0;
+  priv->cache_expose_width = priv->cache_expose_height = 0;
   priv->timeout_id = 0;
   priv->font_height = utt_text_area_get_font_height (GTK_WIDGET (area));
   priv->leading_space = NULL;
   priv->leading_space_width = -1;
+  priv->roll_back = 0;
 
   priv->im_context = gtk_im_multicontext_new ();
   g_signal_connect (priv->im_context, "preedit-start", G_CALLBACK (utt_text_area_preedit_cb), area);
@@ -1331,4 +1358,87 @@ utt_text_destroy (struct utt_text *text)
     list = g_list_next (list);
   }
   g_list_free (text->paragraphs);
+}
+
+void
+utt_text_roll_back_text_base (struct utt_text *text, gint num)
+{
+  GList *para_list = text->para_base;
+  struct utt_paragraph *para = para_list->data;
+  gchar *text_buffer = para->text_buffer;
+  gchar *text_base, *input_base;
+
+  /* need to rebase para_base, text_base, input_base */
+  g_return_if_fail (num > 0);	/* FIXME: have to check if the rebase is too far */
+
+  text_base = text->text_base;
+  input_base = text->input_base;
+  for (;;) {
+    if (text_base <= text_buffer) { /* change to previous page */
+      para_list = g_list_previous (para_list);
+      if (para_list == NULL) {
+	break;
+      }
+      para = para_list->data;
+      text_base = g_utf8_prev_char (para->text_cmp);
+      input_base = g_utf8_prev_char (para->input_ptr);
+    }
+    else {
+      text_base = g_utf8_prev_char (text_base);
+      input_base = g_utf8_prev_char (input_base);
+    }
+    if (--num == 0) {
+      break;
+    }
+  }
+  if (para_list) {
+    text->para_base = para_list;
+    text->text_base = text_base;
+    text->input_base = input_base;
+  }
+  else {
+    text->para_base = text->paragraphs;
+    para = text->para_base->data;
+    text->text_base = para->text_buffer;
+    text->input_base = para->input_buffer;
+  }
+}
+
+static void
+utt_text_roll_back_text_base_one_line (struct utt_text *text, GtkWidget *widget,
+				       gint expose_width, gint expose_height,
+				       gdouble leading_space_width)
+{
+  PangoContext *context;
+  PangoLayout *layout;
+  PangoFontDescription *desc;
+  GList *para_list = text->para_base;
+  struct utt_paragraph *para = para_list->data;
+  gchar *text_buffer = para->text_buffer;
+  gchar *text_base, *input_base;
+  gchar word[4];
+  gint width;
+  gdouble temp_width;
+
+  context = gtk_widget_get_pango_context (widget);
+  layout = pango_layout_new (context);
+  desc = pango_font_description_from_string ("Monospace 10");
+  pango_font_description_set_absolute_size (desc, 16 * PANGO_SCALE);
+  pango_layout_set_font_description (layout, desc);
+
+  text_base = text->text_base;
+  input_base = text->input_base;
+  if (text_base <= text_buffer) { /* :( */
+  }
+  else {
+    text_base = g_utf8_prev_char (text_base);
+    input_base = g_utf8_prev_char (input_base);
+    g_utf8_strncpy (word, text_base, 1);
+    pango_layout_set_text (layout, word, -1);
+    pango_layout_get_size (layout, &width, NULL);
+    temp_width = (gdouble)width / PANGO_SCALE;
+  }
+
+  g_object_unref (layout);
+  pango_font_description_free (desc);
 }
