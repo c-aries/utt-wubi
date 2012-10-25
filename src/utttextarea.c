@@ -285,7 +285,7 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   PangoFontDescription *desc;
   GList *orig_para_list = text->current_para;
   struct utt_paragraph *orig_para = orig_para_list->data;
-  struct utt_paragraph *para, *back_para, *first_para;
+  struct utt_paragraph *para, *back_para, *first_para, *right_para;
   gint temp_width, temp_height;
   gint total_width = 0;
   gint total_height = 0;
@@ -380,6 +380,34 @@ calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
   }
 
   /* already get the right para_list */
+  /* get right character below */
+  right_para = right_para_list->data;
+  ch = right_para->text_buffer;
+  input_ch = right_para->input_buffer;
+  total_width = 0;
+  if (ch != right_ch) {
+    for (;;) {
+      /* get character width and height */
+      g_utf8_strncpy (word, ch, 1);
+      pango_layout_set_text (layout, word, -1);
+      pango_layout_get_size (layout, &temp_width, &temp_height);
+      width = (gdouble)temp_width / PANGO_SCALE;
+      height = (gdouble)temp_height / PANGO_SCALE; /* FIXME: fix font height? */
+
+      if (total_width + width > expose_width) {
+	if (ch >= right_ch) {
+	  right_ch = ch;
+	  right_input_ch = input_ch;
+	  break;
+	}
+	total_width = 0;
+      }
+      ch = g_utf8_next_char (ch);
+      input_ch = g_utf8_next_char (input_ch);
+      total_width += width;
+    }
+  }
+
   text->para_base = right_para_list;
   text->current_para = back_para_list;
   text->text_base = right_ch;
