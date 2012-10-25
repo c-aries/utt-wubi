@@ -718,12 +718,13 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   PangoLayout *layout;
   PangoFontDescription *desc;
   cairo_t *cr;
-  GList *para_list;
+  GList *para_list, *last_line_para_list;
   gint expose_width, expose_height, width, len;
   gint input_num, row;
   gdouble text_x, text_y, input_x, input_y, temp_width, text_width;
   gchar *draw_text, *cmp_input;
   gchar *input_cur, *text_cur, *input_row_base, *text_row_base;
+  gchar *last_line_text_base, *last_line_input_base;
   gchar word[4];
   gunichar text_ch, input_ch;
   gint text_num = 0;
@@ -770,9 +771,9 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   if (base_para->text_buffer == text->text_base) {
     text_x = priv->leading_space_width;
   }
-  draw_text = text->text_base;
-  cmp_input = text->input_base;
-  para_list = text->para_base;
+  last_line_text_base = draw_text = text->text_base;
+  last_line_input_base = cmp_input = text->input_base;
+  last_line_para_list = para_list = text->para_base;
   text_array = g_array_new (FALSE, TRUE, sizeof (struct text_record));
   memset (&text_record, 0, sizeof (struct text_record));
 
@@ -791,6 +792,9 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
       text_y += 2 *priv->font_height;
       draw_text = para->text_buffer;
       cmp_input = para->input_buffer;
+      last_line_para_list = para_list;
+      last_line_text_base = draw_text;
+      last_line_input_base = cmp_input;
     }
     text_ch = g_utf8_get_char (draw_text);
     if (*cmp_input == '\0') {
@@ -831,6 +835,8 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
       if (text_y + 4 * priv->font_height > expose_height) {
 	break;
       }
+      last_line_text_base = draw_text;
+      last_line_input_base = cmp_input;
       text_x = 0;
       text_y += 2 *priv->font_height;
     }
@@ -927,12 +933,20 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   priv->mark_y = input_y;
 
   if (row == text_array->len && text_cur != NULL && *text_cur != '\0') {
-    text->text_base = text_cur;	/* FIXME: roll back some characters */
-    text->input_base = input_cur;
-    text->para_base = text->current_para;
-    /* FIXME: if space not enough, use utt_text_roll_back_text_base () */
-    /* utt_text_roll_back_text_base (text, priv->roll_back); */
-    /* utt_text_area_roll_back_text_base_one_line (area); */
+    para = text->current_para->data;
+    if (text_cur == para->text_buffer) {
+      text->text_base = last_line_text_base;
+      text->input_base = last_line_input_base;
+      text->para_base = last_line_para_list;
+    }
+    else {
+      text->text_base = text_cur;	/* FIXME: roll back some characters */
+      text->input_base = input_cur;
+      text->para_base = text->current_para;
+      /* FIXME: if space not enough, use utt_text_roll_back_text_base () */
+      utt_text_roll_back_text_base (text, priv->roll_back);
+      /* utt_text_area_roll_back_text_base_one_line (area); */
+    }
     gtk_widget_queue_draw (widget);
   }
 
