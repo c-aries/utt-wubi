@@ -14,11 +14,18 @@ G_BEGIN_DECLS
 #define UTT_TEXT_AREA_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), UTT_TYPE_TEXT_AREA, UttTextAreaClass))
 
 #define UTT_TYPE_CLASS_MODE (utt_class_mode_get_type ())
+#define UTT_TYPE_ARRANGE (utt_arrange_get_type ())
 
 typedef enum {
   UTT_CLASS_EXERCISE_MODE,
   UTT_CLASS_EXAM_MODE,
 } UttClassMode;
+
+typedef enum {
+  UTT_LEADING_SPACE_ARRANGE,
+  UTT_NO_ARRANGE,
+  UTT_MIDDLE_ARRANGE,
+} UttArrange;
 
 typedef struct _UttTextArea UttTextArea;
 typedef struct _UttTextAreaClass UttTextAreaClass;
@@ -52,6 +59,10 @@ gchar *utt_text_area_dup_strip_text (const gchar *orig_text);
 GType utt_class_mode_get_type (void) G_GNUC_CONST;
 UttClassMode utt_text_area_get_class_mode (UttTextArea *area);
 void utt_text_area_set_class_mode (UttTextArea *area, UttClassMode mode);
+
+GType utt_arrange_get_type (void) G_GNUC_CONST;
+UttArrange utt_text_area_get_arrange (UttTextArea *area);
+void utt_text_area_set_arrange (UttTextArea *area, UttArrange arrange);
 
 G_END_DECLS
 

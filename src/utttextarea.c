@@ -7,6 +7,7 @@
 enum {
   PROP_0,
   PROP_CLASS_MODE,
+  PROP_ARRANGE,
 };
 
 #define UTT_TEXT_AREA_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE ((obj), UTT_TYPE_TEXT_AREA, UttTextAreaPrivate))
@@ -59,6 +60,8 @@ struct _UttTextAreaPrivate
   gulong pause_id, resume_id;
   /* class mode */
   UttClassMode class_mode;
+  /* arrangement */
+  UttArrange arrange;
   /* leading spaces */
   gchar *leading_space;
   gdouble leading_space_width;
@@ -87,6 +90,22 @@ utt_class_mode_get_type (void)
 	  { 0, NULL, NULL }
         };
         etype = g_enum_register_static (g_intern_static_string ("UttClassMode"), values);
+  }
+  return etype;
+}
+
+GType
+utt_arrange_get_type (void)
+{
+  static GType etype = 0;
+  if (G_UNLIKELY (etype == 0)) {
+        static const GEnumValue values[] = {
+	  { UTT_LEADING_SPACE_ARRANGE, "UTT_LEADING_SPACE_ARRANGE", "leading-space-arrange" },
+	  { UTT_NO_ARRANGE, "UTT_NO_ARRANGE", "no-arrange" },
+	  { UTT_MIDDLE_ARRANGE, "UTT_MIDDLE_ARRANGE", "middle-arrange" },
+	  { 0, NULL, NULL }
+        };
+        etype = g_enum_register_static (g_intern_static_string ("UttArrange"), values);
   }
   return etype;
 }
@@ -1006,6 +1025,32 @@ utt_text_area_set_class_mode (UttTextArea *area, UttClassMode mode)
   g_object_notify (G_OBJECT (area), "class-mode");
 }
 
+UttArrange
+utt_text_area_get_arrange (UttTextArea *area)
+{
+  UttTextAreaPrivate *priv;
+
+  g_return_val_if_fail (UTT_IS_TEXT_AREA (area), 0);
+
+  priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  return priv->arrange;
+}
+
+void
+utt_text_area_set_arrange (UttTextArea *area, UttArrange arrange)
+{
+  UttTextAreaPrivate *priv;
+
+  g_return_if_fail (UTT_IS_TEXT_AREA (area));
+
+  priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  if (priv->arrange == arrange) {
+    return;
+  }
+  priv->arrange = arrange;
+  g_object_notify (G_OBJECT (area), "arrange");
+}
+
 static void
 utt_text_area_get_property (GObject *object,
 			    guint prop_id,
@@ -1018,6 +1063,10 @@ utt_text_area_get_property (GObject *object,
   case PROP_CLASS_MODE:
     g_value_set_enum (value,
 		      utt_text_area_get_class_mode (area));
+    break;
+  case PROP_ARRANGE:
+    g_value_set_enum (value,
+		      utt_text_area_get_arrange (area));
     break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -1036,6 +1085,9 @@ utt_text_area_set_property (GObject *object,
   switch (prop_id) {
   case PROP_CLASS_MODE:
     utt_text_area_set_class_mode (area, g_value_get_enum (value));
+    break;
+  case PROP_ARRANGE:
+    utt_text_area_set_arrange (area, g_value_get_enum (value));
     break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -1060,6 +1112,14 @@ utt_text_area_class_init (UttTextAreaClass *class)
 						      "class mode, exercise or exam",
 						      UTT_TYPE_CLASS_MODE,
 						      UTT_CLASS_EXERCISE_MODE,
+						      GTK_PARAM_READWRITE));
+  g_object_class_install_property (gobject_class,
+				   PROP_ARRANGE,
+				   g_param_spec_enum ("arrange",
+						      "Arrange",
+						      "arrangement of text display",
+						      UTT_TYPE_ARRANGE,
+						      UTT_LEADING_SPACE_ARRANGE,
 						      GTK_PARAM_READWRITE));
 
   widget_class->realize = utt_text_area_realize;

@@ -14,8 +14,16 @@ enum mode {
   N_MODE,
 };
 
+enum arrange {
+  LEADING_SPACE_ARRANGE,
+  NO_ARRANGE,
+  MIDDLE_ARRANGE,
+  N_ARRANGE,
+};
+
 #define MODE_CONF "/apps/utt/wubi/jianma/mode"
 #define CLASS_INDEX_CONF "/apps/utt/wubi/wenzhang/class_index"
+#define ARRANGEMENT_CONF "/apps/utt/wubi/wenzhang/arrangement"
 
 static struct priv {
   struct utt_wubi *utt;
@@ -196,11 +204,53 @@ set_class_index (gint index)
   return FALSE;
 }
 
+/* FIXME: common function */
+static gint
+get_arrangement ()
+{
+  GConfClient *config;
+  GConfValue *value;
+  gint default_index = 0;
+
+  config = gconf_client_get_default ();
+  value = gconf_client_get (config, ARRANGEMENT_CONF, NULL);
+  if (value && value->type == GCONF_VALUE_INT) {
+    default_index = gconf_value_get_int (value);
+  }
+  g_object_unref (config);
+  if (default_index >= N_ARRANGE) {
+    default_index = 0;		/* FIXME, lazy */
+  }
+  return default_index;
+}
+
+static gboolean
+set_arrangement (gint arrange)
+{
+  GConfClient *config;
+
+  if (arrange >= 0 && arrange < N_ARRANGE) {
+    config = gconf_client_get_default ();
+    gconf_client_set_int (config, ARRANGEMENT_CONF, arrange, NULL);
+    g_object_unref (config);
+    return TRUE;
+  }
+  return FALSE;
+}
+
 static void
 on_radio_toggle (GtkToggleButton *button, enum mode mode)
 {
   if (gtk_toggle_button_get_active (button)) {
     set_mode (mode);
+  }
+}
+
+static void
+on_arrange_radio_toggle (GtkToggleButton *button, enum arrange arrange)
+{
+  if (gtk_toggle_button_get_active (button)) {
+    set_arrangement (arrange);
   }
 }
 
@@ -525,7 +575,8 @@ static GtkWidget *
 create_config_page (GtkWidget *dialog)
 {
   GtkWidget *vbox, *hbox, *label, *button;
-  GtkWidget *radio[N_MODE];
+  GtkWidget *radio[N_MODE], *arrange_radio[N_ARRANGE];
+  gint i;
 
   vbox = gtk_vbox_new (TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 6);
@@ -544,6 +595,21 @@ create_config_page (GtkWidget *dialog)
   g_signal_connect (radio[TEST_MODE], "toggled", G_CALLBACK (on_radio_toggle), GINT_TO_POINTER (TEST_MODE));
   gtk_box_pack_end (GTK_BOX (hbox), radio[TEST_MODE], FALSE, TRUE, 0);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio[get_mode ()]), TRUE);
+
+  hbox = gtk_hbox_new (FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
+  label = gtk_label_new ("排版:");
+  gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, TRUE, 0);
+  arrange_radio[LEADING_SPACE_ARRANGE] = gtk_radio_button_new_with_label (NULL, "段首空格");
+  arrange_radio[MIDDLE_ARRANGE] = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (arrange_radio[LEADING_SPACE_ARRANGE]), "居中");
+  arrange_radio[NO_ARRANGE] = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (arrange_radio[LEADING_SPACE_ARRANGE]), "不排版");
+  gtk_box_pack_end (GTK_BOX (hbox), arrange_radio[NO_ARRANGE], FALSE, TRUE, 0);
+  gtk_box_pack_end (GTK_BOX (hbox), arrange_radio[MIDDLE_ARRANGE], FALSE, TRUE, 0);
+  gtk_box_pack_end (GTK_BOX (hbox), arrange_radio[LEADING_SPACE_ARRANGE], FALSE, TRUE, 0);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (arrange_radio[get_arrangement ()]), TRUE);
+  for (i = 0; i < N_ARRANGE; i++) {
+    g_signal_connect (arrange_radio[i], "toggled", G_CALLBACK (on_arrange_radio_toggle), GINT_TO_POINTER (i));
+  }
   return vbox;
 }
 
@@ -595,7 +661,9 @@ static void
 class_begin ()
 {
   UttClassMode class_mode = UTT_CLASS_EXERCISE_MODE;
+  UttArrange choose_arrange = UTT_LEADING_SPACE_ARRANGE;
   enum mode mode;
+  enum arrange arrange;
 
   wubi_wenzhang_genchars ();
   utt_text_area_set_text (UTT_TEXT_AREA (priv->area), priv->gen_chars);
@@ -608,6 +676,18 @@ class_begin ()
     class_mode = UTT_CLASS_EXAM_MODE;
   }
   utt_text_area_set_class_mode (UTT_TEXT_AREA (priv->area), class_mode);
+
+  arrange = get_arrangement ();
+  if (arrange == LEADING_SPACE_ARRANGE) {
+    choose_arrange = UTT_LEADING_SPACE_ARRANGE;
+  }
+  if (arrange == NO_ARRANGE) {
+    choose_arrange = UTT_NO_ARRANGE;
+  }
+  if (arrange == MIDDLE_ARRANGE) {
+    choose_arrange = UTT_MIDDLE_ARRANGE;
+  }
+  utt_text_area_set_arrange (UTT_TEXT_AREA (priv->area), choose_arrange);	/* FIXME */
 
   gtk_widget_grab_focus (priv->area);
   utt_text_area_class_begin (UTT_TEXT_AREA (priv->area));
