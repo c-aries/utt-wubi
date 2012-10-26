@@ -174,3 +174,11 @@ Password:
   If you have the upsterm account, you can push yourself
 $ git push upstream
 >> https://help.github.com/articles/using-pull-requests
+
+TIPS
+====
+
+0. reading source code
+run "make tags" at the topmost directory will generate a "TAGS" file.
+It offers you the ability to read source code with GNU Emacs.
+If you use vim, just run "make ctags".

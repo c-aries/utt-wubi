@@ -7,5 +7,4 @@ ToolItem需要tips
 帮助文档，教程
 ibus, scim, fcitx的支持
 UttTextArea类似Wiki的Text Markup
-autotools添加make TAGS选项
 除BUG
