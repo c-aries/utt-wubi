@@ -36,9 +36,6 @@ struct utt_paragraph {
 static struct utt_text *utt_text_new (const gchar *orig_text);
 static void utt_text_destroy (struct utt_text *text);
 void utt_text_roll_back_text_base (struct utt_text *text, gint num);
-static void utt_text_roll_back_text_base_one_line (struct utt_text *text, GtkWidget *widget,
-						   gint expose_width, gint expose_height,
-						   gdouble leading_space_width);
 
 struct _UttTextAreaPrivate
 {
@@ -78,7 +75,7 @@ enum {
 static guint signals[LAST_SIGNAL] = { 0 };
 
 static gboolean utt_text_area_handle_keyevent_unicode (UttTextArea *area, gunichar unicode);
-static gdouble utt_text_area_get_leading_space_width (UttTextArea *area);
+static gdouble utt_text_area_get_leading_space_width (UttTextArea *area, struct utt_paragraph *para);
 
 GType
 utt_class_mode_get_type (void)
@@ -314,7 +311,8 @@ utt_text_area_unrealize (GtkWidget *widget)
   GTK_WIDGET_CLASS (utt_text_area_parent_class)->unrealize (widget);
 }
 
-void
+#if 0
+static void
 utt_text_area_roll_back_text_base_one_line (UttTextArea *area)
 {
   UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
@@ -324,6 +322,7 @@ utt_text_area_roll_back_text_base_one_line (UttTextArea *area)
 					 priv->cache_expose_height,
 					 utt_text_area_get_leading_space_width (area));
 }
+#endif
 
 static void
 calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
@@ -516,6 +515,7 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
     }
     else {
       temp_para_list = para_list;
+      temp_para = para_list->data;
       ch = g_utf8_prev_char (para->text_cmp);
     }
 /* #if 0 */
@@ -532,7 +532,7 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 	calc_backspace_page_base (widget, text,
 				  priv->record,
 				  priv->cache_expose_width, priv->cache_expose_height,
-				  utt_text_area_get_leading_space_width (area));
+				  utt_text_area_get_leading_space_width (area, temp_para));
     }
     else {
       if (para->text_cmp > para->text_buffer) {
@@ -810,7 +810,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   priv->cache_expose_height = expose_height;
   base_para = text->para_base->data;
   if (base_para->text_buffer == text->text_base) {
-    text_x = utt_text_area_get_leading_space_width (area);
+    text_x = utt_text_area_get_leading_space_width (area, base_para);
   }
   last_line_text_base = draw_text = text->text_base;
   last_line_input_base = cmp_input = text->input_base;
@@ -829,7 +829,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
       if (text_y + 4 * priv->font_height > expose_height) {
 	break;
       }
-      text_x = utt_text_area_get_leading_space_width (area);
+      text_x = utt_text_area_get_leading_space_width (area, para);
       text_y += 2 *priv->font_height;
       draw_text = para->text_buffer;
       cmp_input = para->input_buffer;
@@ -887,7 +887,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   input_x = 0;
   input_y = priv->font_height;
   if (base_para->text_buffer == text->text_base) {
-    input_x = utt_text_area_get_leading_space_width (area);
+    input_x = utt_text_area_get_leading_space_width (area, base_para);
   }
   input_row_base = input_cur = text->input_base;
   text_cur = text->text_base;
@@ -932,7 +932,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
 	input_row_base = input_cur = para->input_buffer;
 	input_num = 0;
 	row++;
-	input_x = utt_text_area_get_leading_space_width (area); /* FIXME: should cache */
+	input_x = utt_text_area_get_leading_space_width (area, para); /* FIXME: should cache */
 	input_y += 2 *priv->font_height;
 	exceed_text_start = 0;
       }
@@ -1301,7 +1301,44 @@ utt_text_area_set_leading_space (UttTextArea *area, const gchar *leading_space)
 }
 
 static gdouble
-utt_text_area_get_leading_space_width (UttTextArea *area)
+middle_arrange_calc_leading_space_width (UttTextArea *area, struct utt_paragraph *para)
+{
+  UttTextAreaPrivate *priv;
+  PangoContext *context;
+  PangoLayout *layout;
+  PangoFontDescription *desc;
+  gint width, expose_width;
+  gdouble temp_width;
+
+  g_return_val_if_fail (UTT_IS_TEXT_AREA (area), 0);
+
+  priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  if (priv->leading_space_width < 0) {
+    g_warning ("leading space width < 0");
+  }
+  expose_width = priv->cache_expose_width;
+
+  context = gtk_widget_get_pango_context (GTK_WIDGET (area));
+  layout = pango_layout_new (context);
+  desc = pango_font_description_from_string ("Monospace 10");
+  pango_font_description_set_absolute_size (desc, 16 * PANGO_SCALE);
+  pango_layout_set_font_description (layout, desc);
+
+  pango_layout_set_text (layout, para->text_buffer, -1);
+  pango_layout_get_size (layout, &width, NULL);
+  temp_width = (gdouble)width / PANGO_SCALE;
+
+  g_object_unref (layout);
+  pango_font_description_free (desc);
+
+  if (temp_width < expose_width) {
+    return (expose_width - temp_width) / 2;
+  }
+  return priv->leading_space_width;
+}
+
+static gdouble
+utt_text_area_get_leading_space_width (UttTextArea *area, struct utt_paragraph *para)
 {
   UttTextAreaPrivate *priv;
   UttArrange arrange;
@@ -1312,6 +1349,10 @@ utt_text_area_get_leading_space_width (UttTextArea *area)
   arrange = utt_text_area_get_arrange (area);
   if (arrange == UTT_NO_ARRANGE) {
     return 0;
+  }
+  /* FIXME: so complex = = */
+  if (arrange == UTT_MIDDLE_ARRANGE) {
+    return middle_arrange_calc_leading_space_width (area, para);
   }
   if (priv->leading_space_width < 0) {
     g_warning ("leading space width < 0");
@@ -1519,6 +1560,7 @@ utt_text_roll_back_text_base (struct utt_text *text, gint num)
   }
 }
 
+#if 0
 static void
 utt_text_roll_back_text_base_one_line (struct utt_text *text, GtkWidget *widget,
 				       gint expose_width, gint expose_height,
@@ -1557,3 +1599,4 @@ utt_text_roll_back_text_base_one_line (struct utt_text *text, GtkWidget *widget,
   g_object_unref (layout);
   pango_font_description_free (desc);
 }
+#endif
