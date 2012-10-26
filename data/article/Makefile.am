@@ -1,6 +1,7 @@
 articledir = $(pkgdatadir)/article
 article_DATA = \
-	4988cd8f-edd5-4dbd-9ff7-b5759390f40d
+	4566ec00-57fb-485f-8866-62396efbc213 \
+	e1312442-9fa1-4a21-bf7d-c88208046ba6
 
 EXTRA_DIST = \
 	$(article_DATA)
