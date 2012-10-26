@@ -1,4 +1,3 @@
-是否继续文章？回答是时，出错
 ToolItem需要tips
 拆字图解,让文章键码帮助功能更适合初级用户
 统计＆历史记录训练，错字统计训练
@@ -8,4 +7,4 @@ ToolItem需要tips
 change all language to english, then translate them to locale
 ibus, scim, fcitx的支持
 UttTextArea类似Wiki的Text Markup
-除BUG
+FIX BUG

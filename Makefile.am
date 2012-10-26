@@ -9,6 +9,6 @@ EXTRA_DIST = \
 	HACKING BUG README TODO
 
 distclean-local:
-	find -name "*~" -print0 | xargs -0 rm
+	find -name "*~" -print0 | xargs -0 rm -f
 
 .PHONY: distclean-local

@@ -35,7 +35,8 @@ struct utt_paragraph {
 
 static struct utt_text *utt_text_new (const gchar *orig_text);
 static void utt_text_destroy (struct utt_text *text);
-void utt_text_roll_back_text_base (struct utt_text *text, gint num);
+static void utt_text_roll_back_text_base (struct utt_text *text, gint num);
+static void utt_text_reset (struct utt_text *text);
 
 struct _UttTextAreaPrivate
 {
@@ -310,19 +311,6 @@ utt_text_area_unrealize (GtkWidget *widget)
   gtk_im_context_set_client_window (priv->im_context, NULL);
   GTK_WIDGET_CLASS (utt_text_area_parent_class)->unrealize (widget);
 }
-
-#if 0
-static void
-utt_text_area_roll_back_text_base_one_line (UttTextArea *area)
-{
-  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
-
-  utt_text_roll_back_text_base_one_line (priv->text, GTK_WIDGET (area),
-					 priv->cache_expose_width,
-					 priv->cache_expose_height,
-					 utt_text_area_get_leading_space_width (area));
-}
-#endif
 
 static void
 calc_backspace_page_base (GtkWidget *widget, struct utt_text *text,
@@ -1386,6 +1374,8 @@ utt_text_area_reset (UttTextArea *area)
 
   priv->mark_show = TRUE;
   priv->mark_x = priv->mark_y = 0;
+  utt_text_reset (priv->text);
+  /* CLASS_ADVANCE_WITHOUT_CHECK mark can advance if user type wrong */
   utt_class_record_set_mode (priv->record, CLASS_ADVANCE_WITHOUT_CHECK);
 }
 
@@ -1560,43 +1550,28 @@ utt_text_roll_back_text_base (struct utt_text *text, gint num)
   }
 }
 
-#if 0
 static void
-utt_text_roll_back_text_base_one_line (struct utt_text *text, GtkWidget *widget,
-				       gint expose_width, gint expose_height,
-				       gdouble leading_space_width)
+utt_text_reset (struct utt_text *text)
 {
-  PangoContext *context;
-  PangoLayout *layout;
-  PangoFontDescription *desc;
-  GList *para_list = text->para_base;
-  struct utt_paragraph *para = para_list->data;
-  gchar *text_buffer = para->text_buffer;
-  gchar *text_base, *input_base;
-  gchar word[4];
-  gint width;
-  gdouble temp_width;
+  GList *list = text->paragraphs;
+  struct utt_paragraph *para;
 
-  context = gtk_widget_get_pango_context (widget);
-  layout = pango_layout_new (context);
-  desc = pango_font_description_from_string ("Monospace 10");
-  pango_font_description_set_absolute_size (desc, 16 * PANGO_SCALE);
-  pango_layout_set_font_description (layout, desc);
-
-  text_base = text->text_base;
-  input_base = text->input_base;
-  if (text_base <= text_buffer) { /* :( */
+  while (list != text->current_para) {
+    para = list->data;
+    para->text_cmp = para->text_buffer;
+    para->input_ptr = para->input_buffer;
+    *para->input_ptr = '\0';
+    list = g_list_next (list);
   }
-  else {
-    text_base = g_utf8_prev_char (text_base);
-    input_base = g_utf8_prev_char (input_base);
-    g_utf8_strncpy (word, text_base, 1);
-    pango_layout_set_text (layout, word, -1);
-    pango_layout_get_size (layout, &width, NULL);
-    temp_width = (gdouble)width / PANGO_SCALE;
+  if (list) {
+    para = list->data;
+    para->text_cmp = para->text_buffer;
+    para->input_ptr = para->input_buffer;
+    *para->input_ptr = '\0';
   }
-
-  g_object_unref (layout);
-  pango_font_description_free (desc);
+  text->para_base = text->paragraphs;
+  para = text->paragraphs->data;
+  text->text_base = para->text_buffer;
+  text->input_base = para->input_buffer;
+  text->current_para = text->paragraphs;
 }
-#endif
