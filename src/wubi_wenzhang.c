@@ -598,7 +598,7 @@ create_config_page (GtkWidget *dialog)
 
   hbox = gtk_hbox_new (FALSE, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
-  label = gtk_label_new ("排版:");
+  label = gtk_label_new ("排版(下次生效):");
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, TRUE, 0);
   arrange_radio[LEADING_SPACE_ARRANGE] = gtk_radio_button_new_with_label (NULL, "段首空格");
   arrange_radio[MIDDLE_ARRANGE] = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (arrange_radio[LEADING_SPACE_ARRANGE]), "居中");

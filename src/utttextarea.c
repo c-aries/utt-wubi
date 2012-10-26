@@ -78,6 +78,7 @@ enum {
 static guint signals[LAST_SIGNAL] = { 0 };
 
 static gboolean utt_text_area_handle_keyevent_unicode (UttTextArea *area, gunichar unicode);
+static gdouble utt_text_area_get_leading_space_width (UttTextArea *area);
 
 GType
 utt_class_mode_get_type (void)
@@ -321,7 +322,7 @@ utt_text_area_roll_back_text_base_one_line (UttTextArea *area)
   utt_text_roll_back_text_base_one_line (priv->text, GTK_WIDGET (area),
 					 priv->cache_expose_width,
 					 priv->cache_expose_height,
-					 priv->leading_space_width);
+					 utt_text_area_get_leading_space_width (area));
 }
 
 static void
@@ -531,7 +532,7 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
 	calc_backspace_page_base (widget, text,
 				  priv->record,
 				  priv->cache_expose_width, priv->cache_expose_height,
-				priv->leading_space_width);
+				  utt_text_area_get_leading_space_width (area));
     }
     else {
       if (para->text_cmp > para->text_buffer) {
@@ -803,15 +804,13 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
     }
   }
 
-  /* FIXME: BUG, haven't deal with first char and leading space */
-
   text_x = text_y = 0;
   gdk_drawable_get_size (widget->window, &expose_width, &expose_height);
   priv->cache_expose_width = expose_width;
   priv->cache_expose_height = expose_height;
   base_para = text->para_base->data;
   if (base_para->text_buffer == text->text_base) {
-    text_x = priv->leading_space_width;
+    text_x = utt_text_area_get_leading_space_width (area);
   }
   last_line_text_base = draw_text = text->text_base;
   last_line_input_base = cmp_input = text->input_base;
@@ -830,7 +829,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
       if (text_y + 4 * priv->font_height > expose_height) {
 	break;
       }
-      text_x = priv->leading_space_width;
+      text_x = utt_text_area_get_leading_space_width (area);
       text_y += 2 *priv->font_height;
       draw_text = para->text_buffer;
       cmp_input = para->input_buffer;
@@ -888,7 +887,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
   input_x = 0;
   input_y = priv->font_height;
   if (base_para->text_buffer == text->text_base) {
-    input_x = priv->leading_space_width;
+    input_x = utt_text_area_get_leading_space_width (area);
   }
   input_row_base = input_cur = text->input_base;
   text_cur = text->text_base;
@@ -933,7 +932,7 @@ utt_text_area_expose (GtkWidget *widget, GdkEventExpose *event)
 	input_row_base = input_cur = para->input_buffer;
 	input_num = 0;
 	row++;
-	input_x = priv->leading_space_width;
+	input_x = utt_text_area_get_leading_space_width (area); /* FIXME: should cache */
 	input_y += 2 *priv->font_height;
 	exceed_text_start = 0;
       }
@@ -1299,6 +1298,25 @@ utt_text_area_set_leading_space (UttTextArea *area, const gchar *leading_space)
     priv->leading_space = g_strdup (leading_space);
   }
   return TRUE;
+}
+
+static gdouble
+utt_text_area_get_leading_space_width (UttTextArea *area)
+{
+  UttTextAreaPrivate *priv;
+  UttArrange arrange;
+
+  g_return_val_if_fail (UTT_IS_TEXT_AREA (area), FALSE);
+
+  priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+  arrange = utt_text_area_get_arrange (area);
+  if (arrange == UTT_NO_ARRANGE) {
+    return 0;
+  }
+  if (priv->leading_space_width < 0) {
+    g_warning ("leading space width < 0");
+  }
+  return priv->leading_space_width;
 }
 
 gboolean
