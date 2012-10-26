@@ -131,6 +131,11 @@ $ cd po; msgmerge -s -U zh_CN.po utt.pot; cd ..
 = =b> edit zh_CN.po
 $ make -C po update-po
 = =b> you can install gettext po-mode.el in the gettext tar ball
+step 0. edit po/POTFILES.in
+step 1. rm po/utt-wubi.pot
+step 2. make -C po utt-wubi.pot
+step 3. cd po; msgmerge -s -U zh_CN.po utt-wubi.pot;
+step 4. edit zh_CN.po
 
 GitHub SSH
 ==========

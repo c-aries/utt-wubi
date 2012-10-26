@@ -1,10 +1,13 @@
 #include <stdlib.h>
 #include <stdarg.h>
+#include <locale.h>
 #include <gtk/gtk.h>
 #include <glib/gprintf.h>
 #include <gdk/gdkkeysyms.h>
 #include <gconf/gconf-client.h>
+#include "config.h"
 #include "utt_wubi.h"
+#include "common.h"
 
 #define PAGE_CONF "/apps/utt/wubi/page"
 
@@ -138,7 +141,7 @@ utt_continue_dialog_run (struct utt_wubi *utt)
 					GTK_RESPONSE_NO,
 					NULL);
   content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-  label = gtk_label_new ("继续训练吗?");
+  label = gtk_label_new (_("class continue?"));
   gtk_container_add (GTK_CONTAINER (content), label);
   gtk_widget_show_all (dialog);
   ret = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -406,6 +409,20 @@ on_index_click (GtkToolButton *button, struct utt_wubi *utt)
   gtk_widget_destroy (dialog);
 }
 
+static void
+locale_setup ()
+{
+  gchar *locale;
+
+  locale = getenv ("LANG");
+  if (!locale) {
+    locale = "C";
+  }
+  setlocale (LC_ALL, locale);
+  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+  textdomain (GETTEXT_PACKAGE);
+}
+
 int main (int argc, char *argv[])
 {
   struct utt_wubi *utt;
@@ -420,6 +437,7 @@ int main (int argc, char *argv[])
   gtk_init (&argc, &argv);
 
   logo_setup ();
+  locale_setup ();
   utt = utt_wubi_new ();
   ui = &utt->ui;
 
