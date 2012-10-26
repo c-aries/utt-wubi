@@ -518,16 +518,16 @@ utt_text_area_key_press (GtkWidget *widget, GdkEventKey *event)
       temp_para_list = para_list;
       ch = g_utf8_prev_char (para->text_cmp);
     }
-#if 0
-    if (text->current_para == text->para_base &&
-	para->text_cmp <= text->text_base) {
-#else
+/* #if 0 */
+/*     if (text->current_para == text->para_base && */
+/* 	para->text_cmp <= text->text_base) { */
+/* #else */
       first_para = text->paragraphs->data;
       if ((temp_para_list == text->para_base &&
 	   ch <= text->text_base) &&
 	  !(temp_para_list == text->paragraphs &&
 	    ch <= first_para->text_buffer)) { /* FIXME: take care of the first char in the text */
-#endif
+/* #endif */
 	/* for stable branch */
 	calc_backspace_page_base (widget, text,
 				  priv->record,
