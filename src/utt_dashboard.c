@@ -22,7 +22,7 @@ on_dashboard_draw_expose (GtkWidget *widget, GdkEventExpose *event, struct utt_d
   struct utt_dashboard_priv *priv = dash->priv;
   cairo_t *cr;
   gchar timestamp[9];		/* "00:00:00" */
-  gchar speedstamp[9];		/* "000.00/m" */
+  gchar speedstamp[10];		/* "00000.0/m" */
   gchar correctstamp[5];	/* "100%" */
   gchar finishstamp[5];		/* "100%" */
   gint hour, min, sec;
@@ -40,7 +40,7 @@ on_dashboard_draw_expose (GtkWidget *widget, GdkEventExpose *event, struct utt_d
   utt_class_record_format_elapse_time (priv->utt->record, &hour, &min, &sec);
   g_sprintf (timestamp, "%02d:%02d:%02d", hour, min, sec);
   g_sprintf (correctstamp, "%d%%", utt_class_record_stat_correct (priv->utt->record));
-  g_sprintf (speedstamp, "%.2lf/m", utt_class_record_stat_speed (priv->utt->record));
+  g_sprintf (speedstamp, "%.1lf/m", utt_class_record_stat_speed (priv->utt->record));
   finish = utt_class_record_stat_finish (priv->utt->record);
   g_sprintf (finishstamp, "%d%%", (gint)(100 * finish));
   gtk_progress_bar_set_text (GTK_PROGRESS_BAR (dash->progress), finishstamp);
