@@ -5,6 +5,9 @@ ToolItem需要tips
 设计LOGO，美化UI
 帮助文档，教程
 change all language to english, then translate them to locale
-ibus, scim, fcitx的支持
+does Xorg provides any way for us to know what input method and input method program is using?
+make developer only need to write plugins, easily implement their own country's local typing training program
+the utt main window, display all types typing training program provide by plugins.
+support ibus, scim, fcitx
 UttTextArea类似Wiki的Text Markup
 FIX BUG
