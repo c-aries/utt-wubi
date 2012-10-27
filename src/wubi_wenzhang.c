@@ -536,9 +536,12 @@ on_modify_button_click (GtkButton *button, struct article_dialog_data *user_data
 static void
 on_button_click (GtkButton *button, GtkWindow *parent)
 {
-  GtkWidget *dialog, *content;
+  GtkWidget *dialog, *content, *scroll;
   GtkWidget *vbox, *hbox, *button2, *view;
   struct article_dialog_data user_data;
+  GtkAdjustment *adjustment;
+  gdouble upper, lower;
+  gint val;
 
   dialog = gtk_dialog_new_with_buttons ("管理文章",
 					parent,
@@ -546,11 +549,19 @@ on_button_click (GtkButton *button, GtkWindow *parent)
 					NULL);
   gtk_widget_set_size_request (dialog, 320, 240);
   content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  gtk_widget_set_size_request (content, -1, 240);
+
+  scroll = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
+				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_container_set_border_width (GTK_CONTAINER (scroll), 2);
+
   vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
   gtk_container_add (GTK_CONTAINER (content), vbox);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 2);
   view = create_article_view ();
-  gtk_box_pack_start (GTK_BOX (vbox), view, TRUE, TRUE, 0);
+  gtk_container_add (GTK_CONTAINER (scroll), view);
+  gtk_box_pack_start (GTK_BOX (vbox), scroll, TRUE, TRUE, 0);
   hbox = gtk_hbox_new (TRUE, 2);
   gtk_box_pack_end (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
 
@@ -565,8 +576,15 @@ on_button_click (GtkButton *button, GtkWindow *parent)
   button2 = gtk_button_new_with_label ("删除");
   g_signal_connect (button2, "clicked", G_CALLBACK (on_delete_button_click), &user_data);
   gtk_box_pack_start (GTK_BOX (hbox), button2, TRUE, TRUE, 0);
-
   gtk_widget_show_all (dialog);
+
+  adjustment = gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW (scroll));
+  upper = gtk_adjustment_get_upper (adjustment);
+  lower = gtk_adjustment_get_lower (adjustment);
+  val = get_class_index () * (gint)(upper - lower + 1) / class_num ();
+  gtk_adjustment_set_value (adjustment, val);
+  gtk_adjustment_value_changed (adjustment);
+  
   gtk_dialog_run (GTK_DIALOG (dialog));
   gtk_widget_destroy (dialog);
 }

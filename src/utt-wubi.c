@@ -312,7 +312,7 @@ logo_setup ()
 }
 
 static GtkWidget *
-fill_content_area (GtkWidget *content_area, struct utt_plugin *plugin)
+fill_content_area (GtkWidget *scroll, struct utt_plugin *plugin)
 {
   GtkWidget *view;
   GtkCellRenderer *renderer;
@@ -343,7 +343,8 @@ fill_content_area (GtkWidget *content_area, struct utt_plugin *plugin)
   gtk_tree_view_append_column (GTK_TREE_VIEW (view), column);
   sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (view));
   gtk_tree_selection_select_path (sel, path);
-  gtk_container_add (GTK_CONTAINER (content_area), view);
+
+  gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_tree_path_free (path);
   return view;
 }
@@ -360,12 +361,14 @@ on_index_key_press (GtkWidget *widget, GdkEventKey *event, GtkDialog *dialog)
 static void
 on_index_click (GtkToolButton *button, struct utt_wubi *utt)
 {
-  GtkWidget *dialog, *content_area, *view;
+  GtkWidget *dialog, *content_area, *view, *scroll;
   GtkTreeSelection *sel;
   GtkTreePath *path;
   GtkTreeIter iter;
-  gint ret, id;
+  gint ret, id, val;
   struct utt_plugin *plugin, *pre_plugin;
+  GtkAdjustment *adjustment;
+  gdouble upper, lower;
 
   plugin = utt_nth_plugin (utt->plugin, utt_current_page (utt));
 
@@ -376,9 +379,25 @@ on_index_click (GtkToolButton *button, struct utt_wubi *utt)
 					GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 					NULL);
   content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-  view = fill_content_area (content_area, plugin);
+  gtk_widget_set_size_request (content_area, -1, 240);
+
+  scroll = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
+				  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_container_add (GTK_CONTAINER (content_area), scroll);
+  gtk_container_set_border_width (GTK_CONTAINER (scroll), 2);
+
+  view = fill_content_area (scroll, plugin);
   g_signal_connect (view, "key-press-event", G_CALLBACK (on_index_key_press), dialog);
   gtk_widget_show_all (dialog);
+
+  adjustment = gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW (scroll));
+  upper = gtk_adjustment_get_upper (adjustment);
+  lower = gtk_adjustment_get_lower (adjustment);
+  val = (plugin->get_class_index ()) * (gint)(upper - lower + 1) / plugin->class_num ();
+  gtk_adjustment_set_value (adjustment, val);
+  gtk_adjustment_value_changed (adjustment);
+
   ret = gtk_dialog_run (GTK_DIALOG (dialog));
   if (ret == GTK_RESPONSE_OK) {
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (view));
