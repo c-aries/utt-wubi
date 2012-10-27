@@ -407,14 +407,3 @@ utt_class_record_set_timer_func (UttClassRecord *record, GFunc timer_func, gpoin
   priv->stat.timer_func = timer_func;
   priv->stat.timer_func_data = data;
 }
-
-void
-utt_class_record_handlers_disconnect (UttClassRecord *record)
-{
-  gint i;
-
-  for (i = CLASS_BEGIN; i < LAST_SIGNAL; i++) {
-    g_signal_handlers_disconnect_matched (NULL, G_SIGNAL_MATCH_ID,
-					  signals[i], 0, NULL, NULL, NULL);
-  }
-}

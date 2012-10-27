@@ -60,7 +60,6 @@ gboolean utt_class_record_can_pause (UttClassRecord *record);
 gboolean utt_class_record_pause_with_check (UttClassRecord *record);
 gboolean utt_class_record_resume_with_check (UttClassRecord *record);
 void utt_class_record_set_timer_func (UttClassRecord *record, GFunc timer_func, gpointer data);
-void utt_class_record_handlers_disconnect (UttClassRecord *record);
 
 G_END_DECLS
 

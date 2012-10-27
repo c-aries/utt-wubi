@@ -109,6 +109,8 @@ utt_arrange_get_type (void)
   return etype;
 }
 
+static void check_and_clean_record_signal_handlers (UttTextArea *area);
+
 static gdouble
 utt_text_area_get_font_height (GtkWidget *widget)
 {
@@ -177,6 +179,23 @@ utt_text_area_underscore_restart_timeout (UttTextArea *area)
   utt_text_area_underscore_start_timeout (area);
 }
 
+static void
+check_and_clean_record_signal_handlers (UttTextArea *area)
+{
+  UttTextAreaPrivate *priv = UTT_TEXT_AREA_GET_PRIVATE (area);
+
+  if (priv->record) {
+    if (priv->pause_id != -1) {
+      g_signal_handler_disconnect (priv->record, priv->pause_id);
+      priv->pause_id = -1;
+    }
+    if (priv->resume_id != -1) {
+      g_signal_handler_disconnect (priv->record, priv->resume_id);
+      priv->resume_id = -1;
+    }
+  }
+}
+
 void
 utt_text_area_class_begin (UttTextArea *area)
 {
@@ -186,10 +205,11 @@ utt_text_area_class_begin (UttTextArea *area)
   utt_text_area_underscore_start_timeout (area);
   utt_class_record_begin (priv->record);
   g_signal_emit (area, signals[CLASS_BEGIN], 0);
-  g_signal_connect_swapped (priv->record, "class-pause",
-			    G_CALLBACK (utt_text_area_underscore_stop_timeout), area);
-  g_signal_connect_swapped (priv->record, "class-resume",
-			    G_CALLBACK (utt_text_area_underscore_restart_timeout), area);
+  check_and_clean_record_signal_handlers (area);
+  priv->pause_id = g_signal_connect_swapped (priv->record, "class-pause",
+					     G_CALLBACK (utt_text_area_underscore_stop_timeout), area);
+  priv->resume_id = g_signal_connect_swapped (priv->record, "class-resume",
+					      G_CALLBACK (utt_text_area_underscore_restart_timeout), area);
 }
 
 void
@@ -203,7 +223,7 @@ utt_text_area_class_end (UttTextArea *area)
     utt_text_area_underscore_stop_timeout (area);
     g_signal_emit (area, signals[STATISTICS], 0);
     g_signal_emit (area, signals[CLASS_END], 0);
-    utt_class_record_handlers_disconnect (priv->record);
+    check_and_clean_record_signal_handlers (area);
   }
 }
 
@@ -1163,6 +1183,7 @@ utt_text_area_init (UttTextArea *area)
   priv->leading_space = NULL;
   priv->leading_space_width = -1;
   priv->roll_back = 0;
+  priv->pause_id = priv->resume_id = -1;
 
   priv->im_context = gtk_im_multicontext_new ();
   g_signal_connect (priv->im_context, "preedit-start", G_CALLBACK (utt_text_area_preedit_cb), area);
@@ -1185,6 +1206,7 @@ utt_text_area_set_class_recorder (UttTextArea *area, UttClassRecord *record)
   priv = UTT_TEXT_AREA_GET_PRIVATE (area);
   priv->record = record;
   utt_class_record_set_mode (priv->record, CLASS_ADVANCE_WITHOUT_CHECK);
+  check_and_clean_record_signal_handlers (area);
   priv->pause_id = g_signal_connect_swapped (priv->record, "class-pause",
 					     G_CALLBACK (utt_text_area_underscore_stop_timeout), area);
   priv->resume_id = g_signal_connect_swapped (priv->record, "class-resume",
