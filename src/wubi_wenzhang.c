@@ -422,15 +422,15 @@ on_delete_button_click (GtkButton *button, struct article_dialog_data *user_data
   }
 }
 
-static void
-show_modify_dialog (GtkWindow *parent, struct utt_xml *xml)
+static gboolean
+show_modify_dialog (GtkWindow *parent, struct utt_xml *xml, GtkTreeModel *store, GtkTreeIter *iter)
 {
   GtkWidget *dialog, *content_area, *scroll;
   GtkWidget *vbox, *entry, *view, *label;
   GtkWidget *title_frame, *content_frame;
   GtkTextBuffer *view_buffer;
   GtkTextIter start_iter, end_iter;
-  gchar *title, *content, *filepath;
+  gchar *title, *temp_title, *content, *filepath;
   const gchar *const_title;
   gint ret;
   enum article_result result = ARTICLE_MODIFY_SUCCESS;
@@ -486,6 +486,15 @@ show_modify_dialog (GtkWindow *parent, struct utt_xml *xml)
 					  FALSE);
       filepath = utt_xml_get_filepath (xml);
       result = utt_modify_article (filepath, const_title, content);
+      if (result == ARTICLE_MODIFY_SUCCESS) {
+	gtk_tree_model_get (GTK_TREE_MODEL (store), iter,
+			    0, &temp_title,
+			    -1);
+	g_free (temp_title);
+	gtk_list_store_set (GTK_LIST_STORE (store), iter,
+			    0, const_title,
+			    -1);
+      }
     }
     if (result == ARTICLE_MODIFY_SUCCESS ||
 	result & ARTICLE_PERMISSION_DENY ||
@@ -508,6 +517,10 @@ show_modify_dialog (GtkWindow *parent, struct utt_xml *xml)
     }
   }
   gtk_widget_destroy (dialog);
+  if (result == ARTICLE_MODIFY_SUCCESS) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 static void
@@ -528,7 +541,7 @@ on_modify_button_click (GtkButton *button, struct article_dialog_data *user_data
 			-1);
     xml = utt_xml_new ();
     utt_parse_xml (xml, filepath);
-    show_modify_dialog (user_data->parent, xml);
+    show_modify_dialog (user_data->parent, xml, store, &iter);
     utt_xml_destroy (xml);
   }
 }
