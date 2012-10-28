@@ -182,8 +182,10 @@ $ git push upstream
 * tags
 $ git tag -d v0.1 #delete locally
 $ git push origin :v0.4 #delete at github
-$ git tag -a v0.1 -m "release version 0.1" #tag locallly
+$ git tag -a -m "release version 0.1" v0.1 #tag locallly
 $ git push --tags #push to github
+$ git log --oneline --decorate --graph
+>> http://gitref.org/branching/#tag
 
 TIPS
 ====
