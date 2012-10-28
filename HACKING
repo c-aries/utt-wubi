@@ -180,8 +180,10 @@ Password:
 $ git push upstream
 >> https://help.github.com/articles/using-pull-requests
 * tags
-$ git tag -a v0.1
-$ git push --tags origin
+$ git tag -d v0.1 #delete locally
+$ git push origin :v0.4 #delete at github
+$ git tag -a v0.1 -m "release version 0.1" #tag locallly
+$ git push --tags #push to github
 
 TIPS
 ====
