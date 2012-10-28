@@ -39,11 +39,19 @@ locale_setup ()
 {
   gchar *locale;
 
-  locale = getenv ("LANG");
-  if (!locale) {
-    locale = "C";
+  locale = getenv ("LC_ALL");
+  if (locale) {
+    setlocale (LC_ALL, locale);
   }
-  setlocale (LC_ALL, locale);
+  else {
+    locale = getenv ("LANG");
+    if (locale) {
+      setlocale (LC_ALL, locale);
+    }
+    else {
+      setlocale (LC_ALL, "C");
+    }
+  }
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
   textdomain (GETTEXT_PACKAGE);
 }
