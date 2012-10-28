@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([utt-wubi], [0.1], [babyaries2@gmail.com])
+AC_INIT([utt-wubi], [0.2], [babyaries2@gmail.com])
 AC_CONFIG_SRCDIR([src/utt_article.h])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR([build-aux])

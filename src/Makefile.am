@@ -1,6 +1,6 @@
 AM_CFLAGS = -Werror -Wall
 
-bin_PROGRAMS = utt-wubi
+bin_PROGRAMS = utt-wubi utt
 
 utt_wubi_SOURCES = \
 	keyboard.c keyboard.h \
@@ -32,3 +32,14 @@ utt_wubi_LDFLAGS = \
 	$(GCONF2_LIBS) \
 	$(UUID_LIBS) \
 	$(XML_LIBS)
+
+utt_SOURCES = \
+	utt.c
+
+utt_CPPFLAGS = \
+	$(GTK_CFLAGS) \
+	-DDATAROOTDIR=\"$(datarootdir)\" \
+	-DLOCALEDIR=\"$(localedir)\"
+
+utt_LDFLAGS = \
+	$(GTK_LIBS)

@@ -3,3 +3,4 @@
 data/utt-wubi.desktop.in
 data/utt-wubi.desktop.in.in
 src/utt-wubi.c
+src/utt.c

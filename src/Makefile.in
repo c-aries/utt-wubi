@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = utt-wubi$(EXEEXT)
+bin_PROGRAMS = utt-wubi$(EXEEXT) utt$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -50,6 +50,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
+am_utt_OBJECTS = utt-utt.$(OBJEXT)
+utt_OBJECTS = $(am_utt_OBJECTS)
+utt_LDADD = $(LDADD)
+utt_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(utt_LDFLAGS) \
+	$(LDFLAGS) -o $@
 am_utt_wubi_OBJECTS = utt_wubi-keyboard.$(OBJEXT) \
 	utt_wubi-utt_article.$(OBJEXT) \
 	utt_wubi-uttclassrecord.$(OBJEXT) \
@@ -78,8 +84,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(utt_wubi_SOURCES)
-DIST_SOURCES = $(utt_wubi_SOURCES)
+SOURCES = $(utt_SOURCES) $(utt_wubi_SOURCES)
+DIST_SOURCES = $(utt_SOURCES) $(utt_wubi_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -254,6 +260,17 @@ utt_wubi_LDFLAGS = \
 	$(UUID_LIBS) \
 	$(XML_LIBS)
 
+utt_SOURCES = \
+	utt.c
+
+utt_CPPFLAGS = \
+	$(GTK_CFLAGS) \
+	-DDATAROOTDIR=\"$(datarootdir)\" \
+	-DLOCALEDIR=\"$(localedir)\"
+
+utt_LDFLAGS = \
+	$(GTK_LIBS)
+
 all: all-am
 
 .SUFFIXES:
@@ -331,6 +348,9 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+utt$(EXEEXT): $(utt_OBJECTS) $(utt_DEPENDENCIES) 
+	@rm -f utt$(EXEEXT)
+	$(utt_LINK) $(utt_OBJECTS) $(utt_LDADD) $(LIBS)
 utt-wubi$(EXEEXT): $(utt_wubi_OBJECTS) $(utt_wubi_DEPENDENCIES) 
 	@rm -f utt-wubi$(EXEEXT)
 	$(utt_wubi_LINK) $(utt_wubi_OBJECTS) $(utt_wubi_LDADD) $(LIBS)
@@ -341,6 +361,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt-utt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt_wubi-keyboard.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt_wubi-utt-wubi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt_wubi-utt_article.Po@am__quote@
@@ -377,6 +398,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+utt-utt.o: utt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utt-utt.o -MD -MP -MF $(DEPDIR)/utt-utt.Tpo -c -o utt-utt.o `test -f 'utt.c' || echo '$(srcdir)/'`utt.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utt-utt.Tpo $(DEPDIR)/utt-utt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utt.c' object='utt-utt.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utt-utt.o `test -f 'utt.c' || echo '$(srcdir)/'`utt.c
+
+utt-utt.obj: utt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utt-utt.obj -MD -MP -MF $(DEPDIR)/utt-utt.Tpo -c -o utt-utt.obj `if test -f 'utt.c'; then $(CYGPATH_W) 'utt.c'; else $(CYGPATH_W) '$(srcdir)/utt.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utt-utt.Tpo $(DEPDIR)/utt-utt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utt.c' object='utt-utt.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utt-utt.obj `if test -f 'utt.c'; then $(CYGPATH_W) 'utt.c'; else $(CYGPATH_W) '$(srcdir)/utt.c'; fi`
 
 utt_wubi-keyboard.o: keyboard.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_wubi_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utt_wubi-keyboard.o -MD -MP -MF $(DEPDIR)/utt_wubi-keyboard.Tpo -c -o utt_wubi-keyboard.o `test -f 'keyboard.c' || echo '$(srcdir)/'`keyboard.c

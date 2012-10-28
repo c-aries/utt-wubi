@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: utt-wubi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-26 23:58+0800\n"
-"PO-Revision-Date: 2012-10-26 23:57+0800\n"
+"POT-Creation-Date: 2012-10-28 14:08+0800\n"
+"PO-Revision-Date: 2012-10-28 14:13+0800\n"
 "Last-Translator: c-aries <babyaries2@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
 "Language: zh_CN\n"
@@ -17,10 +17,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: ../src/utt.c:59
+msgid "Universal Typing Training"
+msgstr "国际化打字训练"
+
 #: ../data/utt-wubi.desktop.in.h:1 ../data/utt-wubi.desktop.in.in.h:1
 msgid "Universal Typing Traning (Wubi)"
 msgstr "国际化打字训练(五笔)"
 
-#: ../src/utt-wubi.c:142
+#: ../src/utt-wubi.c:144
 msgid "class continue?"
 msgstr "继续训练吗？"
