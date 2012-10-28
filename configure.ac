@@ -57,6 +57,7 @@ AC_CONFIG_FILES([Makefile
 		src/Makefile
 		po/Makefile.in
 		data/Makefile
+		data/utt.desktop.in
 		data/utt-wubi.desktop.in
 		data/zigen/Makefile
 		data/zigen/png/Makefile

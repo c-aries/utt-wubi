@@ -12445,7 +12445,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile po/Makefile.in data/Makefile data/utt-wubi.desktop.in data/zigen/Makefile data/zigen/png/Makefile data/icons/Makefile data/icons/48x48/Makefile data/icons/48x48/apps/Makefile data/article/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile po/Makefile.in data/Makefile data/utt.desktop.in data/utt-wubi.desktop.in data/zigen/Makefile data/zigen/png/Makefile data/icons/Makefile data/icons/48x48/Makefile data/icons/48x48/apps/Makefile data/article/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13435,6 +13435,7 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "po/Makefile.in") CONFIG_FILES="$CONFIG_FILES po/Makefile.in" ;;
     "data/Makefile") CONFIG_FILES="$CONFIG_FILES data/Makefile" ;;
+    "data/utt.desktop.in") CONFIG_FILES="$CONFIG_FILES data/utt.desktop.in" ;;
     "data/utt-wubi.desktop.in") CONFIG_FILES="$CONFIG_FILES data/utt-wubi.desktop.in" ;;
     "data/zigen/Makefile") CONFIG_FILES="$CONFIG_FILES data/zigen/Makefile" ;;
     "data/zigen/png/Makefile") CONFIG_FILES="$CONFIG_FILES data/zigen/png/Makefile" ;;

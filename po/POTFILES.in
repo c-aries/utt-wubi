@@ -1,5 +1,7 @@
 # learn from ~/source/gedit/gedit-2.31.6/po/POTFILES.in
 [encoding: UTF-8]
+data/utt.desktop.in
+data/utt.desktop.in.in
 data/utt-wubi.desktop.in
 data/utt-wubi.desktop.in.in
 src/utt-wubi.c

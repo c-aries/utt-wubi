@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: utt-wubi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-28 14:08+0800\n"
-"PO-Revision-Date: 2012-10-28 14:13+0800\n"
+"POT-Creation-Date: 2012-10-28 14:33+0800\n"
+"PO-Revision-Date: 2012-10-28 14:33+0800\n"
 "Last-Translator: c-aries <babyaries2@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
 "Language: zh_CN\n"
@@ -19,6 +19,10 @@ msgstr ""
 
 #: ../src/utt.c:59
 msgid "Universal Typing Training"
+msgstr "国际化打字训练"
+
+#: ../data/utt.desktop.in.h:1 ../data/utt.desktop.in.in.h:1
+msgid "Universal Typing Traning"
 msgstr "国际化打字训练"
 
 #: ../data/utt-wubi.desktop.in.h:1 ../data/utt-wubi.desktop.in.in.h:1

@@ -36,7 +36,7 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = data
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/utt-wubi.desktop.in.in
+	$(srcdir)/utt-wubi.desktop.in.in $(srcdir)/utt.desktop.in.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/intltool.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
@@ -46,7 +46,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = utt-wubi.desktop.in
+CONFIG_CLEAN_FILES = utt.desktop.in utt-wubi.desktop.in
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -256,7 +256,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = zigen icons article
 desktopdir = $(datadir)/applications
-desktop_in_files = utt-wubi.desktop.in
+desktop_in_files = utt-wubi.desktop.in utt.desktop.in
 desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 imagesdir = $(pkgdatadir)
 images_DATA = \
@@ -313,6 +313,8 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+utt.desktop.in: $(top_builddir)/config.status $(srcdir)/utt.desktop.in.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 utt-wubi.desktop.in: $(top_builddir)/config.status $(srcdir)/utt-wubi.desktop.in.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
