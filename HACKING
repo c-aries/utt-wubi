@@ -181,6 +181,7 @@ $ git push upstream
 >> https://help.github.com/articles/using-pull-requests
 * tags
 $ git tag -a v0.1
+$ git push --tags origin
 
 TIPS
 ====
