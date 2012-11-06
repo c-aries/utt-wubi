@@ -177,6 +177,7 @@ Password:
 = =b> This is your github account password
 = =b> If you don't use github, you can use email, send him patch, ask the upstreamer to "remote add", "fetch", "merge"
   If you have the upsterm account, you can push yourself
+$ git remote set-url origin git@github.com:c-aries/utt-wubi.git
 $ git push upstream
 >> https://help.github.com/articles/using-pull-requests
 * tags
