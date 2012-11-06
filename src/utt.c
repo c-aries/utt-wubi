@@ -28,6 +28,7 @@ logo_setup ()
   }
   if (pixbuf) {
     list = g_list_append (list, pixbuf);
+    /* LAZY: not beautifual code, learn scim_setup_ui.cpp:create_main_ui() please */
     gtk_window_set_default_icon_list (list);
     g_list_free (list);
     g_object_unref (pixbuf);
@@ -64,12 +65,11 @@ add_class_list (GtkPaned *pane)
   GtkTreeIter iter;
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
-  GtkTreePath *path;
   GtkTreeSelection *sel;
 
   frame = gtk_frame_new (NULL);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
-  gtk_paned_add1 (pane, frame);
+  gtk_paned_pack1 (pane, frame, FALSE, FALSE);
 
   store = gtk_list_store_new (1, G_TYPE_STRING);
   gtk_list_store_append (store, &iter);
@@ -85,16 +85,16 @@ add_class_list (GtkPaned *pane)
   gtk_container_set_border_width (GTK_CONTAINER (view), 4);
   gtk_container_add (GTK_CONTAINER (frame), view);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), FALSE);
-  renderer = gtk_cell_renderer_text_new (); /* FIXME: memory leak? */
-  column = gtk_tree_view_column_new_with_attributes ("", renderer,
+  renderer = gtk_cell_renderer_text_new (); /* DISCUSS: memory leak? maybe not, scim_setup_ui.cpp talk us */
+  column = gtk_tree_view_column_new_with_attributes (NULL, renderer,
 						     "text", 0,
 						     NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (view), column);
 
   sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (view));
-  path = gtk_tree_path_new_from_indices (0, -1);
-  gtk_tree_selection_select_path (sel, path);
-  gtk_tree_path_free (path);
+  /* learn from scim_setup_ui.cpp:create_main_ui(), select one item by default */
+  /* create_splash_view() is a beautiful code also */
+  gtk_tree_selection_set_mode (sel, GTK_SELECTION_BROWSE);
 }
 
 static void
@@ -104,7 +104,7 @@ add_class_intro (GtkPaned *pane)
   GtkWidget *custom_label, *button;
 
   vbox = gtk_vbox_new (FALSE, 0);
-  gtk_paned_add2 (GTK_PANED (pane), vbox);
+  gtk_paned_pack2 (GTK_PANED (pane), vbox, FALSE, FALSE);
 
   frame = gtk_frame_new (NULL);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
