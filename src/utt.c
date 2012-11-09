@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 #include "config.h"
 #include "common.h"
+#include "utt_debug.h"
 
 static void
 logo_setup ()
@@ -132,6 +133,7 @@ int main (int argc, char *argv[])
   logo_setup ();
   locale_setup ();
   g_set_prgname (_("Universal Typing Training"));
+  utt_debug ();
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   g_signal_connect (window, "destroy", gtk_main_quit, NULL);

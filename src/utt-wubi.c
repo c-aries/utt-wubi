@@ -465,6 +465,7 @@ int main (int argc, char *argv[])
 
   logo_setup ();
   locale_setup ();
+  g_set_prgname (_("Universal Typing Training (Wubi)"));
   utt = utt_wubi_new ();
   ui = &utt->ui;
 

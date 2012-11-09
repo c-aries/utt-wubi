@@ -34,7 +34,9 @@ utt_wubi_LDFLAGS = \
 	$(XML_LIBS)
 
 utt_SOURCES = \
-	utt.c
+	utt.c \
+	utt_debug.c utt_debug.h \
+	util.c util.h
 
 utt_CPPFLAGS = \
 	$(GTK_CFLAGS) \

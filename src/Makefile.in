@@ -50,7 +50,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_utt_OBJECTS = utt-utt.$(OBJEXT)
+am_utt_OBJECTS = utt-utt.$(OBJEXT) utt-utt_debug.$(OBJEXT) \
+	utt-util.$(OBJEXT)
 utt_OBJECTS = $(am_utt_OBJECTS)
 utt_LDADD = $(LDADD)
 utt_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -261,7 +262,9 @@ utt_wubi_LDFLAGS = \
 	$(XML_LIBS)
 
 utt_SOURCES = \
-	utt.c
+	utt.c \
+	utt_debug.c utt_debug.h \
+	util.c util.h
 
 utt_CPPFLAGS = \
 	$(GTK_CFLAGS) \
@@ -361,7 +364,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt-util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt-utt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt-utt_debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt_wubi-keyboard.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt_wubi-utt-wubi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt_wubi-utt_article.Po@am__quote@
@@ -412,6 +417,34 @@ utt-utt.obj: utt.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utt.c' object='utt-utt.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utt-utt.obj `if test -f 'utt.c'; then $(CYGPATH_W) 'utt.c'; else $(CYGPATH_W) '$(srcdir)/utt.c'; fi`
+
+utt-utt_debug.o: utt_debug.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utt-utt_debug.o -MD -MP -MF $(DEPDIR)/utt-utt_debug.Tpo -c -o utt-utt_debug.o `test -f 'utt_debug.c' || echo '$(srcdir)/'`utt_debug.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utt-utt_debug.Tpo $(DEPDIR)/utt-utt_debug.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utt_debug.c' object='utt-utt_debug.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utt-utt_debug.o `test -f 'utt_debug.c' || echo '$(srcdir)/'`utt_debug.c
+
+utt-utt_debug.obj: utt_debug.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utt-utt_debug.obj -MD -MP -MF $(DEPDIR)/utt-utt_debug.Tpo -c -o utt-utt_debug.obj `if test -f 'utt_debug.c'; then $(CYGPATH_W) 'utt_debug.c'; else $(CYGPATH_W) '$(srcdir)/utt_debug.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utt-utt_debug.Tpo $(DEPDIR)/utt-utt_debug.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utt_debug.c' object='utt-utt_debug.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utt-utt_debug.obj `if test -f 'utt_debug.c'; then $(CYGPATH_W) 'utt_debug.c'; else $(CYGPATH_W) '$(srcdir)/utt_debug.c'; fi`
+
+utt-util.o: util.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utt-util.o -MD -MP -MF $(DEPDIR)/utt-util.Tpo -c -o utt-util.o `test -f 'util.c' || echo '$(srcdir)/'`util.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utt-util.Tpo $(DEPDIR)/utt-util.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='util.c' object='utt-util.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utt-util.o `test -f 'util.c' || echo '$(srcdir)/'`util.c
+
+utt-util.obj: util.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utt-util.obj -MD -MP -MF $(DEPDIR)/utt-util.Tpo -c -o utt-util.obj `if test -f 'util.c'; then $(CYGPATH_W) 'util.c'; else $(CYGPATH_W) '$(srcdir)/util.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utt-util.Tpo $(DEPDIR)/utt-util.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='util.c' object='utt-util.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utt-util.obj `if test -f 'util.c'; then $(CYGPATH_W) 'util.c'; else $(CYGPATH_W) '$(srcdir)/util.c'; fi`
 
 utt_wubi-keyboard.o: keyboard.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_wubi_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utt_wubi-keyboard.o -MD -MP -MF $(DEPDIR)/utt_wubi-keyboard.Tpo -c -o utt_wubi-keyboard.o `test -f 'keyboard.c' || echo '$(srcdir)/'`keyboard.c
