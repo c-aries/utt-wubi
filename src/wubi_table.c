@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <sys/mman.h>
 #include <glib/gstdio.h>
 #include "wubi_table.h"
 
@@ -409,5 +410,91 @@ wubi_table_parse_file (struct wubi_table *table, gchar *path)
     sscanf (buf, "%s %s %lu", code, word, &count);
     wubi_table_insert (table, g_strdup (word), g_strdup (code));
   }
+  fclose (fp);
+}
+
+static inline guint
+scim_bytestouint32 (const guchar *bytes)
+{
+  return ((guint)bytes[0] |
+	  ((guint)bytes[1]) << 8 |
+	  ((guint)bytes[2]) << 16 |
+	  ((guint)bytes[3]) << 24) ;
+}
+
+static void
+scim_load_binary (FILE *fp)
+{
+  unsigned char buff[4];
+  guint content_size, key_length, phrase_length;
+  glong cur_pos, end_pos;
+  void *m_mmapped_ptr;
+  guchar *m_content, *p;
+
+  if (fread (buff, 4, 1, fp) != 1) {
+    g_warning ("read 4 bytes fail");
+    return;
+  }
+  content_size = scim_bytestouint32 (buff);
+  if (!content_size || content_size >= 0x7FFFFFFF) {
+    g_warning ("content_size error");
+    return;
+  }
+  cur_pos = ftell (fp);
+  fseek (fp, 0, SEEK_END);
+  end_pos = ftell (fp);
+  fseek (fp, cur_pos, SEEK_SET);
+  /* FIXME: check content_size with end_pos */
+  m_mmapped_ptr = mmap (NULL, end_pos, PROT_READ | PROT_WRITE, MAP_PRIVATE, fileno (fp), 0);
+  if (m_mmapped_ptr == MAP_FAILED) {
+    g_warning ("mmap fail");
+    return;
+  }
+  p = m_content = (guchar *)m_mmapped_ptr + cur_pos;
+  while (p - m_content < content_size) {
+    key_length = ((*p) & 0x3F);
+    phrase_length = *(p + 1);
+    /* FIXME: check key & phrase length */
+    if ((*p) & 0x80) {
+      /* g_print ("%d %d\n", key_length, phrase_length); */
+    }
+    else {
+      g_error ("fail");
+    }
+    p += (4 + key_length + phrase_length);
+  }
+  munmap (m_mmapped_ptr, end_pos);
+}
+
+void
+wubi_table_parse_binary_file (struct wubi_table *table, gchar *path)
+{
+  FILE *fp;
+  gchar buf[4096];
+  gint index;
+  gboolean begin = FALSE;
+
+  fp = g_fopen (path, "rb");
+  while (fgets (buf, sizeof (buf), fp)) {
+    index = strlen (buf) - 1;
+    index = (index > 0) ? index : 0;
+    if (buf[index] != '\n' || buf[0] == ' ') {
+      g_error ("index fault");
+    }
+    buf[index] = '\0';
+    if (g_strcmp0 (buf, "BEGIN_TABLE") == 0) {
+      begin = TRUE;
+      break;
+    }
+    if (!begin) {
+      continue;
+    }
+  }
+  if (!begin) {
+    g_error ("%s hasn't contain BEGIN_TABLE", path);
+  }
+
+  scim_load_binary (fp);
+
   fclose (fp);
 }

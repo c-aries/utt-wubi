@@ -23,5 +23,6 @@ gboolean wubi_table_insert (struct wubi_table *table, gchar *utf8str, gchar *cod
 GPtrArray *wubi_table_query (struct wubi_table *table, gchar *utf8str);
 struct query_record *wubi_article_query (struct wubi_table *table, gchar *utf8str);
 void wubi_table_parse_file (struct wubi_table *table, gchar *path);
+void wubi_table_parse_binary_file (struct wubi_table *table, gchar *path);
 
 #endif
