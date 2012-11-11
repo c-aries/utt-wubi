@@ -3,7 +3,20 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <dlfcn.h>
 #include <utt/module.h>
+
+static void
+utt_load_module (char *path)
+{
+  void *handle;
+  struct utt_module *module;
+
+  handle = dlopen (path, RTLD_LAZY);
+  module = dlsym (handle, "utt_module");
+  printf ("loading module \"%s\"\n", module->module_name);
+  dlclose (handle);
+}
 
 static void
 normalize_dirname (char *path, int array_size)
@@ -51,7 +64,7 @@ scan_dir (char *path, int array_size)
 	  dirp->d_name[dname_len - 3] == '.' &&
 	  dirp->d_name[dname_len - 2] == 's' &&
 	  dirp->d_name[dname_len - 1] == 'o') {
-	puts (path);		/* load module now */
+	utt_load_module (path);	/* load module now */
       }
       path[len] = '\0';
     }
