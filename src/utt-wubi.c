@@ -71,6 +71,7 @@ utt_wubi_new ()
     g_error (G_STRLOC ": %s doesn't exists.", path);
   }
   wubi_table_parse_file (utt->table, path);
+  /* wubi_table_parse_binary_file (utt->table, "/usr/share/scim/tables/Wubi.bin"); */
   g_free (path);
   return utt;
 }

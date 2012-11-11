@@ -423,13 +423,15 @@ scim_bytestouint32 (const guchar *bytes)
 }
 
 static void
-scim_load_binary (FILE *fp)
+scim_load_binary (struct wubi_table *table, FILE *fp)
 {
   unsigned char buff[4];
   guint content_size, key_length, phrase_length;
   glong cur_pos, end_pos;
   void *m_mmapped_ptr;
   guchar *m_content, *p;
+  gchar code[128];
+  gchar word[4096];
 
   if (fread (buff, 4, 1, fp) != 1) {
     g_warning ("read 4 bytes fail");
@@ -457,6 +459,11 @@ scim_load_binary (FILE *fp)
     /* FIXME: check key & phrase length */
     if ((*p) & 0x80) {
       /* g_print ("%d %d\n", key_length, phrase_length); */
+      strncpy (code, (const char *)p + 4, key_length);
+      code[key_length] = '\0';
+      strncpy (word, (const char *)p + 4 + key_length, phrase_length);
+      word[phrase_length] = '\0';
+      wubi_table_insert (table, g_strdup (word), g_strdup (code));
     }
     else {
       g_error ("fail");
@@ -494,7 +501,7 @@ wubi_table_parse_binary_file (struct wubi_table *table, gchar *path)
     g_error ("%s hasn't contain BEGIN_TABLE", path);
   }
 
-  scim_load_binary (fp);
+  scim_load_binary (table, fp);
 
   fclose (fp);
 }
