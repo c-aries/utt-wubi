@@ -8,3 +8,4 @@ src/utt-wubi.c
 src/utt.c
 module/wubi/jianma.c
 module/wubi/wubi.c
+module/wubi/zigen.c

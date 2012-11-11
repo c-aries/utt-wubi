@@ -8,14 +8,34 @@ msgid ""
 msgstr ""
 "Project-Id-Version: utt-wubi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-11 22:10+0800\n"
-"PO-Revision-Date: 2012-11-11 22:11+0800\n"
+"POT-Creation-Date: 2012-11-12 01:41+0800\n"
+"PO-Revision-Date: 2012-11-12 01:43+0800\n"
 "Last-Translator: c-aries <babyaries2@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: ../module/wubi/zigen.c:48
+msgid "ALL"
+msgstr "综合"
+
+#: ../module/wubi/zigen.c:33
+msgid "HENG(ASDFG)"
+msgstr "横区(ASDFG)"
+
+#: ../module/wubi/zigen.c:42
+msgid "NA(YUIOP)"
+msgstr "捺区(YUIOP)"
+
+#: ../module/wubi/zigen.c:39
+msgid "PIE(QWERT)"
+msgstr "撇区(QWERT)"
+
+#: ../module/wubi/zigen.c:36
+msgid "SHU(HJKLM)"
+msgstr "竖区(HJKLM)"
 
 #: ../src/utt.c:135
 msgid "Universal Typing Training"
@@ -37,6 +57,10 @@ msgstr "国际化打字训练(五笔)"
 msgid "YiJi JianMa"
 msgstr "一级简码"
 
+#: ../module/wubi/zigen.c:45
+msgid "ZHE(XCVBN)"
+msgstr "折区(XCVBN)"
+
 #: ../src/utt-wubi.c:145
 msgid "class continue?"
 msgstr "继续训练吗？"
@@ -48,3 +72,7 @@ msgstr "简码"
 #: ../module/wubi/wubi.c:7
 msgid "wubi"
 msgstr "五笔"
+
+#: ../module/wubi/zigen.c:18
+msgid "zigen"
+msgstr "字根"

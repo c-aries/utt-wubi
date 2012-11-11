@@ -82,6 +82,12 @@ wubi_la_OBJECTS = $(am_wubi_la_OBJECTS)
 wubi_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(wubi_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
+zigen_la_LIBADD =
+am_zigen_la_OBJECTS = zigen_la-zigen.lo
+zigen_la_OBJECTS = $(am_zigen_la_OBJECTS)
+zigen_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(zigen_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -95,8 +101,9 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(jianma_la_SOURCES) $(wubi_la_SOURCES)
-DIST_SOURCES = $(jianma_la_SOURCES) $(wubi_la_SOURCES)
+SOURCES = $(jianma_la_SOURCES) $(wubi_la_SOURCES) $(zigen_la_SOURCES)
+DIST_SOURCES = $(jianma_la_SOURCES) $(wubi_la_SOURCES) \
+	$(zigen_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -244,7 +251,7 @@ AM_CFLAGS = -Werror -Wall
 AM_CPPFLAGS = -I$(top_srcdir)/include
 moduledir = $(libdir)/utt/module/wubi
 module_LTLIBRARIES = \
-	jianma.la wubi.la
+	jianma.la wubi.la zigen.la
 
 
 # learn from pidgin, FIXME: how to export .so only?
@@ -261,6 +268,16 @@ jianma_la_SOURCES = \
 wubi_la_LDFLAGS = -module -avoid-version
 wubi_la_SOURCES = \
 	wubi.c
+
+zigen_la_LDFLAGS = \
+	-module -avoid-version \
+	$(GLIB_LDFLAGS)
+
+zigen_la_CPPFLAGS = \
+	$(GLIB_CFLAGS)
+
+zigen_la_SOURCES = \
+	zigen.c
 
 all: all-am
 
@@ -331,6 +348,8 @@ jianma.la: $(jianma_la_OBJECTS) $(jianma_la_DEPENDENCIES)
 	$(jianma_la_LINK) -rpath $(moduledir) $(jianma_la_OBJECTS) $(jianma_la_LIBADD) $(LIBS)
 wubi.la: $(wubi_la_OBJECTS) $(wubi_la_DEPENDENCIES) 
 	$(wubi_la_LINK) -rpath $(moduledir) $(wubi_la_OBJECTS) $(wubi_la_LIBADD) $(LIBS)
+zigen.la: $(zigen_la_OBJECTS) $(zigen_la_DEPENDENCIES) 
+	$(zigen_la_LINK) -rpath $(moduledir) $(zigen_la_OBJECTS) $(zigen_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -340,6 +359,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jianma_la-jianma.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wubi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/zigen_la-zigen.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -368,6 +388,13 @@ jianma_la-jianma.lo: jianma.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jianma.c' object='jianma_la-jianma.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(jianma_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o jianma_la-jianma.lo `test -f 'jianma.c' || echo '$(srcdir)/'`jianma.c
+
+zigen_la-zigen.lo: zigen.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(zigen_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT zigen_la-zigen.lo -MD -MP -MF $(DEPDIR)/zigen_la-zigen.Tpo -c -o zigen_la-zigen.lo `test -f 'zigen.c' || echo '$(srcdir)/'`zigen.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/zigen_la-zigen.Tpo $(DEPDIR)/zigen_la-zigen.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='zigen.c' object='zigen_la-zigen.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(zigen_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o zigen_la-zigen.lo `test -f 'zigen.c' || echo '$(srcdir)/'`zigen.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
