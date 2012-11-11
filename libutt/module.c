@@ -22,29 +22,48 @@ normalize_dirname (char *path, int array_size)
 }
 
 static void
-test_dir ()
+scan_dir (char *path, int array_size)
 {
+  DIR *dir;
+  struct dirent *dirp;
+  int len, dname_len;
+  /* FIXME: assert path is directory */
+
+  normalize_dirname (path, array_size);
+  dir = opendir (path);
+  while ((dirp = readdir (dir))) {
+    if (strncmp (dirp->d_name, ".", 1) == 0 ||
+	strncmp (dirp->d_name, "..", 2) == 0) {
+      continue;
+    }
+    if (dirp->d_type == DT_DIR) {
+      len = strlen (path);
+      strncat (path, dirp->d_name, array_size);
+      normalize_dirname (path, array_size);
+      scan_dir (path, array_size);
+      path[len] = '\0';
+    }
+    else if (dirp->d_type == DT_REG) {
+      len = strlen (path);
+      strncat (path, dirp->d_name, array_size);
+      dname_len = strlen (dirp->d_name);
+      if (dname_len > 3 &&
+	  dirp->d_name[dname_len - 3] == '.' &&
+	  dirp->d_name[dname_len - 2] == 's' &&
+	  dirp->d_name[dname_len - 1] == 'o') {
+	puts (path);		/* load module now */
+      }
+      path[len] = '\0';
+    }
+  }
+  closedir (dir);
 }
 
 void
 utt_module_test ()
 {
-  DIR *dir;
-  struct dirent *dirp;
   char path[4096];
-  int len;
 
-  dir = opendir (UTT_MODULE_PATH);
   strncpy (path, UTT_MODULE_PATH, 4096);
-  normalize_dirname (path, 4096);
-  if ((dirp = readdir (dir))) {
-    if (dirp->d_type == DT_DIR) {
-      len = strlen (path);
-      strncat (path, dirp->d_name, 4096);
-      normalize_dirname (path, 4096);
-      test_dir ();
-      path[len] = '\0';
-    }
-  }
-  closedir (dir);
+  scan_dir (path, 4096);
 }
