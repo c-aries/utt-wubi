@@ -221,7 +221,7 @@ top_srcdir = @top_srcdir@
 
 # release headers directory
 pkginclude_HEADERS = \
-	module.h
+	module.h intl.h
 
 all: all-am
 

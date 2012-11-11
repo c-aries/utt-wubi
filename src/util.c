@@ -14,7 +14,7 @@ process_exist (gchar *name)
   gint status = -1;
   gchar *cmd;
 
-  cmd = g_strdup_printf ("pgrep ^%s$ >/dev/null", name);	/* depends on pgrep, is it great? */
+  cmd = g_strdup_printf ("pgrep ^%s$ >/dev/null", name);	/* FIXME: depends on pgrep, is it great? */
   ret = system (cmd);
   if (WIFEXITED (ret)) {
     status = WEXITSTATUS (ret);

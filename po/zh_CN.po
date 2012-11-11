@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: utt-wubi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-10 00:32+0800\n"
-"PO-Revision-Date: 2012-11-10 00:34+0800\n"
+"POT-Creation-Date: 2012-11-11 22:10+0800\n"
+"PO-Revision-Date: 2012-11-11 22:11+0800\n"
 "Last-Translator: c-aries <babyaries2@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
 "Language: zh_CN\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Universal Typing Training"
 msgstr "国际化打字训练"
 
-#: ../src/utt-wubi.c:468
+#: ../src/utt-wubi.c:469
 msgid "Universal Typing Training (Wubi)"
 msgstr "国际化打字训练(五笔)"
 
@@ -33,6 +33,18 @@ msgstr "国际化打字训练"
 msgid "Universal Typing Traning (Wubi)"
 msgstr "国际化打字训练(五笔)"
 
-#: ../src/utt-wubi.c:144
+#: ../module/wubi/jianma.c:21
+msgid "YiJi JianMa"
+msgstr "一级简码"
+
+#: ../src/utt-wubi.c:145
 msgid "class continue?"
 msgstr "继续训练吗？"
+
+#: ../module/wubi/jianma.c:8
+msgid "jianma"
+msgstr "简码"
+
+#: ../module/wubi/wubi.c:7
+msgid "wubi"
+msgstr "五笔"

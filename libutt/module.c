@@ -9,12 +9,22 @@
 static void
 utt_load_module (char *path)
 {
-  void *handle;
   struct utt_module *module;
+  struct utt_class_module *class_module;
+  void *handle;
+  int i;
 
   handle = dlopen (path, RTLD_LAZY);
   module = dlsym (handle, "utt_module");
-  printf ("loading module \"%s\"\n", module->module_name);
+  printf ("loading module \"%s\" (%s)\n",
+	  module->module_name, module->locale_name ());
+  if (module->module_type == UTT_MODULE_CLASS_TYPE) {
+    class_module = module->priv_data;
+    puts ("class list:");
+    for (i = 0; i < class_module->class_num (); i++) {
+      puts (class_module->nth_class_name (i));
+    }
+  }
   dlclose (handle);
 }
 
