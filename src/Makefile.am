@@ -17,7 +17,6 @@ utt_wubi_SOURCES = \
 	wubi_article.c \
 	zigen_images.c zigen_images.h \
 	utt_compat.h common.h
-
 utt_wubi_CPPFLAGS = \
 	$(GTK_CFLAGS) \
 	$(UUID_CFLAGS) \
@@ -26,7 +25,6 @@ utt_wubi_CPPFLAGS = \
 	-DDATAROOTDIR=\"$(datarootdir)\" \
 	-DPKGDATADIR=\"$(pkgdatadir)\" \
 	-DLOCALEDIR=\"$(localedir)\"
-
 utt_wubi_LDFLAGS = \
 	$(GTK_LIBS) \
 	$(GCONF2_LIBS) \
@@ -38,11 +36,12 @@ utt_SOURCES = \
 	utt_debug.c utt_debug.h \
 	util.c util.h \
 	wubi_table.c wubi_table.h
-
 utt_CPPFLAGS = \
 	$(GTK_CFLAGS) \
+	-I$(top_srcdir)/include \
 	-DDATAROOTDIR=\"$(datarootdir)\" \
 	-DLOCALEDIR=\"$(localedir)\"
-
 utt_LDFLAGS = \
 	$(GTK_LIBS)
+utt_LDADD = \
+	$(top_srcdir)/libutt/libutt.la

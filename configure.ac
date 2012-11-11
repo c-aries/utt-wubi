@@ -44,6 +44,10 @@ PKG_CHECK_MODULES(GCONF2,$GCONF2_MODULES)
 AC_SUBST(GCONF2_CFLAGS)
 AC_SUBST(GCONF2_LIBS)
 
+# custom utt parameter
+UTT_MODULE_PATH=${libdir}/utt/module
+AC_SUBST(UTT_MODULE_PATH)
+
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h stdlib.h string.h])
 
@@ -54,7 +58,6 @@ AC_C_INLINE
 AC_CHECK_FUNCS([memset])
 
 AC_CONFIG_FILES([Makefile
-		src/Makefile
 		po/Makefile.in
 		data/Makefile
 		data/utt.desktop.in
@@ -64,5 +67,11 @@ AC_CONFIG_FILES([Makefile
 		data/icons/Makefile
 		data/icons/48x48/Makefile
 		data/icons/48x48/apps/Makefile
-		data/article/Makefile])
+		data/article/Makefile
+		module/Makefile
+		module/wubi/Makefile
+		libutt/Makefile
+		include/Makefile
+		include/utt/Makefile
+		src/Makefile])
 AC_OUTPUT

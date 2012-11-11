@@ -1,6 +1,7 @@
 /* experiment code */
 #include <iconv.h>
 #include <glib.h>
+#include <utt/module.h>
 #include "util.h"
 #include "wubi_table.h"
 
@@ -26,9 +27,16 @@ test_parse_scim_binary_table ()
   iconv_close (conv);
 }
 
+static void
+test_module ()
+{
+  utt_module_test ();
+}
+
 void
 utt_debug ()
 {
   test_input_method ();
   test_parse_scim_binary_table ();
+  test_module ();
 }

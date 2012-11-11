@@ -53,7 +53,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_utt_OBJECTS = utt-utt.$(OBJEXT) utt-utt_debug.$(OBJEXT) \
 	utt-util.$(OBJEXT) utt-wubi_table.$(OBJEXT)
 utt_OBJECTS = $(am_utt_OBJECTS)
-utt_LDADD = $(LDADD)
+utt_DEPENDENCIES = $(top_srcdir)/libutt/libutt.la
 utt_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(utt_LDFLAGS) \
 	$(LDFLAGS) -o $@
@@ -171,6 +171,7 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 USE_NLS = @USE_NLS@
+UTT_MODULE_PATH = @UTT_MODULE_PATH@
 UUID_CFLAGS = @UUID_CFLAGS@
 UUID_LIBS = @UUID_LIBS@
 VERSION = @VERSION@
@@ -269,11 +270,15 @@ utt_SOURCES = \
 
 utt_CPPFLAGS = \
 	$(GTK_CFLAGS) \
+	-I$(top_srcdir)/include \
 	-DDATAROOTDIR=\"$(datarootdir)\" \
 	-DLOCALEDIR=\"$(localedir)\"
 
 utt_LDFLAGS = \
 	$(GTK_LIBS)
+
+utt_LDADD = \
+	$(top_srcdir)/libutt/libutt.la
 
 all: all-am
 

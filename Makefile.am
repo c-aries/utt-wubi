@@ -1,4 +1,4 @@
-SUBDIRS = src data po
+SUBDIRS = data po module libutt include src
 
 ACLOCAL_AMFLAGS = -I m4
 
