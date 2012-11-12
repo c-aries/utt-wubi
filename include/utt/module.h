@@ -18,7 +18,14 @@ struct utt_module {
   void *priv_data;
 };
 
-struct utt_modules {
+struct utt_module_tree_node {
+  char *node_name;
+  struct utt_module *module;
+  struct utt_module_tree_node *children;
+  struct utt_module_tree_node *sibling;
+};
+struct utt_modules {	/* FIXME: APUE2 has introduce how to hide the structure internal */
+  struct utt_module_tree_node *first_node;
   void *data;
 };
 

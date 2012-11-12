@@ -24,7 +24,7 @@ normalize_dirname (char *path, int array_size)
 }
 
 static gboolean
-validate_module_name (char *module_name)
+validate_module_name (gchar *module_name, gint *depth, gchar ***node_name)
 {
   gchar **name;
   gint i, j, len;
@@ -44,25 +44,58 @@ validate_module_name (char *module_name)
       break;
     }
   }
-  g_strfreev (name);
+  if (i <= 0) {
+    validate = FALSE;
+  }
+  if (validate) {
+    if (depth) {
+      *depth = i;
+    }
+    if (node_name) {
+      *node_name = name;
+    }
+  }
+  else {
+    g_strfreev (name);
+  }
   return validate;
 }
 
-void
-utt_module_test ()
+static void
+utt_modules_insert_node_recursively (struct utt_modules *modules, gchar **node_name, gint i_depth, gint depth)
 {
+  struct utt_module_tree_node *new_node;
+  struct utt_module_tree_node *node = modules->first_node;
+  gboolean match = FALSE;
+
+  while (node) {
+    if (g_strcmp0 (node->node_name, *(node_name + i_depth)) == 0) {
+      match = TRUE;
+      break;
+    }
+    node = node->sibling;
+  }
+  if (!match) {
+    new_node = g_new0 (struct utt_module_tree_node, 1);
+    new_node->node_name = g_strdup (*(node_name + i_depth));
+    modules->first_node = new_node;
+  }
 }
 
-struct utt_modules *
-utt_modules_new ()
+static gboolean
+utt_modules_add_module (struct utt_modules *modules, struct utt_module *module)
 {
-  return g_new0 (struct utt_modules, 1);
-}
+  gint depth = 0;
+  gchar **node_name = NULL;
 
-void
-utt_modules_destroy (struct utt_modules *modules)
-{
-  g_free (modules);
+  if (!validate_module_name (module->module_name, &depth, &node_name)) {
+    return FALSE;
+  }
+  utt_modules_insert_node_recursively (modules, node_name, 0, depth);
+  if (node_name) {
+    g_strfreev (node_name);
+  }
+  return TRUE;
 }
 
 static void
@@ -77,7 +110,7 @@ utt_load_module (struct utt_modules *modules, char *path)
   module = dlsym (handle, "utt_module");
 /*   printf ("loading module \"%s\" (%s)\n", */
 /* 	  module->module_name, module->locale_name ()); */
-  validate_module_name (module->module_name);
+  utt_modules_add_module (modules, module);
   if (module->module_type == UTT_MODULE_CLASS_TYPE) {
     class_module = module->priv_data;
     /* puts ("class list:"); */
@@ -133,4 +166,21 @@ utt_modules_scan (struct utt_modules *modules)
 
   strncpy (path, UTT_MODULE_PATH, 4096);
   utt_modules_scan_dir (modules, path, 4096);
+}
+
+struct utt_modules *
+utt_modules_new ()
+{
+  return g_new0 (struct utt_modules, 1);
+}
+
+void
+utt_modules_destroy (struct utt_modules *modules)
+{
+  g_free (modules);
+}
+
+void
+utt_module_test ()
+{
 }
