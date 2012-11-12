@@ -6,5 +6,8 @@ libutt_la_SOURCES = \
 	module.c
 libutt_la_CPPFLAGS = \
 	-I$(top_srcdir)/include \
-	-DUTT_MODULE_PATH=\"$(UTT_MODULE_PATH)\"
-libutt_la_LDFLAGS = --expot-dynamic
+	-DUTT_MODULE_PATH=\"$(UTT_MODULE_PATH)\" \
+	$(GLIB_CFLAGS)
+libutt_la_LDFLAGS = \
+	--expot-dynamic \
+	$(GLIB_LIBS)

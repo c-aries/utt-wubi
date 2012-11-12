@@ -18,6 +18,13 @@ struct utt_module {
   void *priv_data;
 };
 
+struct utt_modules {
+  void *data;
+};
+
 void utt_module_test ();
+struct utt_modules *utt_modules_new ();
+void utt_modules_destroy (struct utt_modules *modules);
+void utt_modules_scan (struct utt_modules *modules);
 
 #endif

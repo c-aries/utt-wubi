@@ -30,7 +30,7 @@ test_parse_scim_binary_table ()
 static void
 test_module ()
 {
-  utt_module_test ();
+  /* utt_module_test (); */
 }
 
 void
