@@ -19,8 +19,9 @@ struct utt_module {
 };
 
 struct utt_module_tree_node {
-  char *node_name;
+  char *node_name;		/* should be free when destroy */
   struct utt_module *module;
+  void *module_dl_handle;		/* dlclose () when destroy */
   struct utt_module_tree_node *children;
   struct utt_module_tree_node *sibling;
 };

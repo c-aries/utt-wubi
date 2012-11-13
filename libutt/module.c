@@ -65,7 +65,9 @@ validate_module_name (gchar *module_name, gint *depth, gchar ***node_name)
 }
 
 static void
-insert_node (struct utt_module_tree_node **children, gchar **node_name, struct utt_module *module)
+insert_node (struct utt_module_tree_node **children, gchar **node_name,
+	     struct utt_module *module,
+	     void *module_dl_handle)
 {
   struct utt_module_tree_node *new_node;
   struct utt_module_tree_node *last_node = NULL;
@@ -77,7 +79,7 @@ insert_node (struct utt_module_tree_node **children, gchar **node_name, struct u
   while (iter_node) {
     if (g_strcmp0 (iter_node->node_name, *node_name) == 0 &&
 	*(node_name + 1) != NULL) {
-      insert_node (&iter_node->children, node_name + 1, module);
+      insert_node (&iter_node->children, node_name + 1, module, module_dl_handle);
       return;
     }
     last_node = iter_node;
@@ -94,16 +96,17 @@ insert_node (struct utt_module_tree_node **children, gchar **node_name, struct u
     new_node->node_name = g_strdup (*node_name);
     if (*(node_name + 1) == NULL) {
       new_node->module = module;
+      new_node->module_dl_handle = module_dl_handle;
     }
     else {
-      insert_node (&new_node->children, node_name + 1, module);
+      insert_node (&new_node->children, node_name + 1, module, module_dl_handle);
     }
     return;
   }
 }
 
 static gboolean
-utt_modules_add_module (struct utt_modules *modules, struct utt_module *module)
+utt_modules_add_module (struct utt_modules *modules, struct utt_module *module, void *module_dl_handle)
 {
   gint depth = 0;
   gchar **node_name = NULL;
@@ -111,7 +114,7 @@ utt_modules_add_module (struct utt_modules *modules, struct utt_module *module)
   if (!validate_module_name (module->module_name, &depth, &node_name)) {
     return FALSE;
   }
-  insert_node (&modules->first_node, node_name, module);
+  insert_node (&modules->first_node, node_name, module, module_dl_handle);
   if (node_name) {
     g_strfreev (node_name);
   }
@@ -126,11 +129,18 @@ utt_load_module (struct utt_modules *modules, char *path)
   void *handle;
   int i;
 
-  handle = dlopen (path, RTLD_LAZY);
+  handle = dlopen (path, RTLD_GLOBAL);
   module = dlsym (handle, "utt_module");
+  if (!module) {
+    dlclose (handle);
+    return;
+  }
 /*   printf ("loading module \"%s\" (%s)\n", */
 /* 	  module->module_name, module->locale_name ()); */
-  utt_modules_add_module (modules, module);
+  if (!utt_modules_add_module (modules, module, handle)) {
+    dlclose (handle);
+    return;
+  }
   if (module->module_type == UTT_MODULE_CLASS_TYPE) {
     class_module = module->priv_data;
     /* puts ("class list:"); */
@@ -139,7 +149,7 @@ utt_load_module (struct utt_modules *modules, char *path)
     }
   }
   /* FIXME: should be resident here */
-/*   dlclose (handle); */
+  /* dlclose (handle); */
 }
 
 static void
