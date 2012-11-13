@@ -114,6 +114,7 @@ utt_modules_add_module (struct utt_modules *modules, struct utt_module *module, 
   if (!validate_module_name (module->module_name, &depth, &node_name)) {
     return FALSE;
   }
+  /* FIXME: insert_node should indicate successful or not */
   insert_node (&modules->first_node, node_name, module, module_dl_handle);
   if (node_name) {
     g_strfreev (node_name);
@@ -129,7 +130,7 @@ utt_load_module (struct utt_modules *modules, char *path)
   void *handle;
   int i;
 
-  handle = dlopen (path, RTLD_GLOBAL);
+  handle = dlopen (path, RTLD_LAZY);
   module = dlsym (handle, "utt_module");
   if (!module) {		/* FIXME: is it right? */
     dlclose (handle);
@@ -205,10 +206,36 @@ utt_modules_new ()
   return g_new0 (struct utt_modules, 1);
 }
 
+static void
+tree_node_free (struct utt_module_tree_node *node)
+{
+  struct utt_module *module;
+  struct utt_module_tree_node *save_node;
+
+  while (node) {
+    module = node->module;
+    if (node->children) {
+      tree_node_free (node->children);
+    }
+    /* g_print ("%s\n", node->node_name); */
+    save_node = node;
+    node = node->sibling;
+    if (module) {
+      /* g_print ("%s\n", module->module_name); */
+    }
+    g_free (save_node->node_name);
+    if (save_node->module_dl_handle) {
+      dlclose (save_node->module_dl_handle);
+    }
+    g_free (save_node);
+  }
+}
+
 void
 utt_modules_destroy (struct utt_modules *modules)
 {
   /* FIXME: haven't free any module yet, memory leak, lazy */
+  tree_node_free (modules->first_node);
   g_free (modules);
 }
 
