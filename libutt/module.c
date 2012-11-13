@@ -131,7 +131,7 @@ utt_load_module (struct utt_modules *modules, char *path)
 
   handle = dlopen (path, RTLD_GLOBAL);
   module = dlsym (handle, "utt_module");
-  if (!module) {
+  if (!module) {		/* FIXME: is it right? */
     dlclose (handle);
     return;
   }
