@@ -207,7 +207,7 @@ utt_modules_new ()
 }
 
 static void
-tree_node_free (struct utt_module_tree_node *node)
+tree_node_free_recursively (struct utt_module_tree_node *node)
 {
   struct utt_module *module;
   struct utt_module_tree_node *save_node;
@@ -215,7 +215,7 @@ tree_node_free (struct utt_module_tree_node *node)
   while (node) {
     module = node->module;
     if (node->children) {
-      tree_node_free (node->children);
+      tree_node_free_recursively (node->children);
     }
     /* g_print ("%s\n", node->node_name); */
     save_node = node;
@@ -234,8 +234,7 @@ tree_node_free (struct utt_module_tree_node *node)
 void
 utt_modules_destroy (struct utt_modules *modules)
 {
-  /* FIXME: haven't free any module yet, memory leak, lazy */
-  tree_node_free (modules->first_node);
+  tree_node_free_recursively (modules->first_node);
   g_free (modules);
 }
 
