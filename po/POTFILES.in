@@ -9,3 +9,6 @@ src/utt.c
 module/wubi/jianma.c
 module/wubi/wubi.c
 module/wubi/zigen.c
+module/english/keyboard.c
+module/english/english.c
+module/pinyin/pinyin.c

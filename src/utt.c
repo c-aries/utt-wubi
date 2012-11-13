@@ -60,7 +60,7 @@ locale_setup ()
 }
 
 static void
-add_class_list (GtkPaned *pane)
+add_class_list (GtkPaned *pane, struct utt_modules *modules)
 {
   GtkWidget *view, *frame;
   GtkListStore *store;
@@ -68,6 +68,8 @@ add_class_list (GtkPaned *pane)
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
   GtkTreeSelection *sel;
+  struct utt_module_tree_node *node;
+  struct utt_module *module;
 
   frame = gtk_frame_new (NULL);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
@@ -78,10 +80,18 @@ add_class_list (GtkPaned *pane)
   gtk_list_store_set (store, &iter,
 		      0, "Utt",
 		      -1);
-  gtk_list_store_append (store, &iter);
-  gtk_list_store_set (store, &iter,
-		      0, "Wubi86",
-		      -1);
+  for (node = modules->first_node;
+       node;
+       node = node->sibling) {	/* FIXME: only a hack here */
+    module = node->module;
+    if (module &&
+	module->module_type == UTT_MODULE_INPUT_METHOD_TYPE) {
+      gtk_list_store_append (store, &iter);
+      gtk_list_store_set (store, &iter,
+			  0, module->locale_name (),
+			  -1);
+    }
+  }
 
   view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (store));
   gtk_container_set_border_width (GTK_CONTAINER (view), 4);
@@ -138,7 +148,6 @@ int main (int argc, char *argv[])
   utt_debug ();
   modules = utt_modules_new ();
   utt_modules_scan (modules);
-  utt_modules_destroy (modules);
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   g_signal_connect (window, "destroy", gtk_main_quit, NULL);
@@ -151,7 +160,7 @@ int main (int argc, char *argv[])
   pane = gtk_hpaned_new ();
   gtk_box_pack_start (GTK_BOX (vbox), pane, TRUE, TRUE, 0);
 
-  add_class_list (GTK_PANED (pane));
+  add_class_list (GTK_PANED (pane), modules);
   add_class_intro (GTK_PANED (pane));
 
   info = gtk_statusbar_new ();
@@ -159,5 +168,6 @@ int main (int argc, char *argv[])
 
   gtk_widget_show_all (window);
   gtk_main ();
+  utt_modules_destroy (modules);
   exit (EXIT_SUCCESS);
 }

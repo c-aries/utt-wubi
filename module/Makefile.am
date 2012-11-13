@@ -1,1 +1,1 @@
-SUBDIRS = wubi
+SUBDIRS = wubi english pinyin

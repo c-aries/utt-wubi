@@ -70,6 +70,8 @@ AC_CONFIG_FILES([Makefile
 		data/article/Makefile
 		module/Makefile
 		module/wubi/Makefile
+		module/english/Makefile
+		module/pinyin/Makefile
 		libutt/Makefile
 		include/Makefile
 		include/utt/Makefile

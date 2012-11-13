@@ -29,12 +29,15 @@ validate_module_name (gchar *module_name, gint *depth, gchar ***node_name)
   gchar **name;
   gint i, j, len;
   gboolean validate = TRUE;
+  gchar ch;
 
   name = g_strsplit (module_name, "::", 0);
   for (i = 0; *(name + i); i++) {
     len = strlen (*(name + i));
     for (j = 0; j < len; j++) {
-      if (!g_ascii_isalnum (*(*(name + i) + j))) {
+      ch = *(*(name + i) + j);
+      if (!g_ascii_isalnum (ch) &&
+	  ch != '_' && ch != '-') {
 	validate = FALSE;
 	break;
       }
@@ -62,23 +65,40 @@ validate_module_name (gchar *module_name, gint *depth, gchar ***node_name)
 }
 
 static void
-utt_modules_insert_node_recursively (struct utt_modules *modules, gchar **node_name, gint i_depth, gint depth)
+insert_node (struct utt_module_tree_node **children, gchar **node_name, struct utt_module *module)
 {
   struct utt_module_tree_node *new_node;
-  struct utt_module_tree_node *node = modules->first_node;
-  gboolean match = FALSE;
+  struct utt_module_tree_node *last_node = NULL;
+  struct utt_module_tree_node *iter_node = *children;
 
-  while (node) {
-    if (g_strcmp0 (node->node_name, *(node_name + i_depth)) == 0) {
-      match = TRUE;
-      break;
-    }
-    node = node->sibling;
+  if (node_name == NULL || *node_name == NULL || children == NULL) {
+    return;
   }
-  if (!match) {
+  while (iter_node) {
+    if (g_strcmp0 (iter_node->node_name, *node_name) == 0 &&
+	*(node_name + 1) != NULL) {
+      insert_node (&iter_node->children, node_name + 1, module);
+      return;
+    }
+    last_node = iter_node;
+    iter_node = iter_node->sibling;
+  }
+  if (iter_node == NULL) {
     new_node = g_new0 (struct utt_module_tree_node, 1);
-    new_node->node_name = g_strdup (*(node_name + i_depth));
-    modules->first_node = new_node;
+    if (last_node) {
+      last_node->sibling = new_node;
+    }
+    else {
+      *children = new_node;
+    }
+    new_node->node_name = g_strdup (*node_name);
+    if (*(node_name + 1) == NULL) {
+      new_node->module = module;
+    }
+    else {
+      insert_node (&new_node->children, node_name + 1, module);
+    }
+    return;
   }
 }
 
@@ -91,7 +111,7 @@ utt_modules_add_module (struct utt_modules *modules, struct utt_module *module)
   if (!validate_module_name (module->module_name, &depth, &node_name)) {
     return FALSE;
   }
-  utt_modules_insert_node_recursively (modules, node_name, 0, depth);
+  insert_node (&modules->first_node, node_name, module);
   if (node_name) {
     g_strfreev (node_name);
   }
@@ -118,7 +138,8 @@ utt_load_module (struct utt_modules *modules, char *path)
       /* puts (class_module->nth_class_name (i)); */
     }
   }
-  dlclose (handle);
+  /* FIXME: should be resident here */
+/*   dlclose (handle); */
 }
 
 static void
@@ -177,6 +198,7 @@ utt_modules_new ()
 void
 utt_modules_destroy (struct utt_modules *modules)
 {
+  /* FIXME: haven't free any module yet, memory leak, lazy */
   g_free (modules);
 }
 

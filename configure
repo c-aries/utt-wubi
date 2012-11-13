@@ -12450,7 +12450,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile po/Makefile.in data/Makefile data/utt.desktop.in data/utt-wubi.desktop.in data/zigen/Makefile data/zigen/png/Makefile data/icons/Makefile data/icons/48x48/Makefile data/icons/48x48/apps/Makefile data/article/Makefile module/Makefile module/wubi/Makefile libutt/Makefile include/Makefile include/utt/Makefile src/Makefile"
+ac_config_files="$ac_config_files Makefile po/Makefile.in data/Makefile data/utt.desktop.in data/utt-wubi.desktop.in data/zigen/Makefile data/zigen/png/Makefile data/icons/Makefile data/icons/48x48/Makefile data/icons/48x48/apps/Makefile data/article/Makefile module/Makefile module/wubi/Makefile module/english/Makefile module/pinyin/Makefile libutt/Makefile include/Makefile include/utt/Makefile src/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13449,6 +13449,8 @@ do
     "data/article/Makefile") CONFIG_FILES="$CONFIG_FILES data/article/Makefile" ;;
     "module/Makefile") CONFIG_FILES="$CONFIG_FILES module/Makefile" ;;
     "module/wubi/Makefile") CONFIG_FILES="$CONFIG_FILES module/wubi/Makefile" ;;
+    "module/english/Makefile") CONFIG_FILES="$CONFIG_FILES module/english/Makefile" ;;
+    "module/pinyin/Makefile") CONFIG_FILES="$CONFIG_FILES module/pinyin/Makefile" ;;
     "libutt/Makefile") CONFIG_FILES="$CONFIG_FILES libutt/Makefile" ;;
     "include/Makefile") CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;
     "include/utt/Makefile") CONFIG_FILES="$CONFIG_FILES include/utt/Makefile" ;;
