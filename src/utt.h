@@ -11,7 +11,8 @@ struct utt {
     GtkWidget *im_view;		/* input method tree view */
     GtkWidget *class_window;
   } ui;
-  struct utt_module_tree_node *im_node; /* choosen input method, tree node */
+  struct utt_modules *modules;
+  struct utt_module_tree_node *im_node; /* current input method tree node */
 };
 
 struct utt *utt_new ();

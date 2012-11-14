@@ -10,12 +10,18 @@
 struct utt *
 utt_new ()
 {
-  return g_new0 (struct utt, 1);
+  struct utt *utt;
+
+  utt = g_new0 (struct utt, 1);
+  utt->modules = utt_modules_new ();
+  utt_modules_scan (utt->modules);
+  return utt;
 }
 
 void
 utt_destroy (struct utt *utt)
 {
+  utt_modules_destroy (utt->modules);
   g_free (utt);
 }
 
@@ -71,8 +77,8 @@ locale_setup ()
   textdomain (GETTEXT_PACKAGE);
 }
 
-static GtkWidget *
-add_class_list (GtkPaned *pane, struct utt_modules *modules)
+static void
+add_class_list (GtkPaned *pane, struct utt *utt)
 {
   GtkWidget *view, *frame;
   GtkListStore *store;
@@ -92,7 +98,7 @@ add_class_list (GtkPaned *pane, struct utt_modules *modules)
   gtk_list_store_set (store, &iter,
 		      0, "Utt",
 		      -1);
-  for (node = modules->first_node;
+  for (node = utt->modules->first_node;
        node;
        node = node->sibling) {	/* FIXME: only a hack here */
     module = node->module;
@@ -106,7 +112,7 @@ add_class_list (GtkPaned *pane, struct utt_modules *modules)
     }
   }
 
-  view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (store));
+  utt->ui.im_view = view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (store));
   gtk_container_set_border_width (GTK_CONTAINER (view), 4);
   gtk_container_add (GTK_CONTAINER (frame), view);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), FALSE);
@@ -120,7 +126,6 @@ add_class_list (GtkPaned *pane, struct utt_modules *modules)
   /* learn from scim_setup_ui.cpp:create_main_ui(), select one item by default */
   /* create_splash_view() is a beautiful code also */
   gtk_tree_selection_set_mode (sel, GTK_SELECTION_BROWSE);
-  return view;
 }
 
 static void
@@ -174,7 +179,6 @@ int main (int argc, char *argv[])
 {
   GtkWidget *window, *vbox;
   GtkWidget *info, *pane;
-  struct utt_modules *modules;
   struct utt *utt;
 
   gtk_init (&argc, &argv);
@@ -183,10 +187,7 @@ int main (int argc, char *argv[])
 
   logo_setup ();
   locale_setup ();
-  /* g_set_application_name (_("Universal Typing Training")); */
   utt_debug ();
-  modules = utt_modules_new ();
-  utt_modules_scan (modules);
 
   /* create home window */
   utt->ui.home_window = window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -197,13 +198,10 @@ int main (int argc, char *argv[])
 
   vbox = gtk_vbox_new (FALSE, 0);
   gtk_container_add (GTK_CONTAINER (window), vbox);
-
   pane = gtk_hpaned_new ();
   gtk_box_pack_start (GTK_BOX (vbox), pane, TRUE, TRUE, 0);
-
-  utt->ui.im_view = add_class_list (GTK_PANED (pane), modules);
+  add_class_list (GTK_PANED (pane), utt);
   add_class_intro (GTK_PANED (pane), utt);
-
   info = gtk_statusbar_new ();
   gtk_box_pack_end (GTK_BOX (vbox), info, FALSE, FALSE, 0);
 
@@ -212,7 +210,6 @@ int main (int argc, char *argv[])
 
   gtk_widget_show_all (window);
   gtk_main ();
-  utt_modules_destroy (modules);
   utt_destroy (utt);
   exit (EXIT_SUCCESS);
 }
