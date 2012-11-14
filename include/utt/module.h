@@ -1,6 +1,8 @@
 #ifndef __UTT_MODULE_H__
 #define __UTT_MODULE_H__
 
+#include <glib.h>
+
 enum utt_module_type {
   UTT_MODULE_INPUT_METHOD_TYPE,
   UTT_MODULE_CLASS_TYPE,
@@ -34,5 +36,6 @@ void utt_module_test ();
 struct utt_modules *utt_modules_new ();
 void utt_modules_destroy (struct utt_modules *modules);
 void utt_modules_scan (struct utt_modules *modules);
+void utt_modules_foreach_module (struct utt_modules *modules, GFunc func, gpointer data);
 
 #endif

@@ -238,6 +238,30 @@ utt_modules_destroy (struct utt_modules *modules)
   g_free (modules);
 }
 
+static void
+tree_node_foreach_module (struct utt_module_tree_node *node, GFunc func, gpointer data)
+{
+  struct utt_module *module;
+
+  while (node) {
+    module = node->module;
+    if (node->children) {
+      tree_node_foreach_module (node->children, func, data);
+    }
+    g_print ("[%p]\n", node);
+    node = node->sibling;
+    if (module) {
+      func (module, data);
+    }
+  }
+}
+
+void
+utt_modules_foreach_module (struct utt_modules *modules, GFunc func, gpointer data)
+{
+  tree_node_foreach_module (modules->first_node, func, data);
+}
+
 void
 utt_module_test ()
 {

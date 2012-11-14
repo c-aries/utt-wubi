@@ -7,6 +7,12 @@ on_home_click (GtkToolButton *button, struct utt *utt)
   gtk_widget_show_all (utt->ui.home_window);
 }
 
+/* static void */
+/* print_module_name (struct utt_module *module, gpointer data) */
+/* { */
+/*   g_print ("%s\n", module->module_name); */
+/* } */
+
 void
 launch_class_window (struct utt *utt)
 {
@@ -49,6 +55,10 @@ launch_class_window (struct utt *utt)
   notebook = gtk_notebook_new ();
   gtk_box_pack_start (GTK_BOX (vbox), notebook, TRUE, TRUE, 0);
   node = utt->im_node->children;
+/*   g_print ("%s %p %p\n", utt->im_node->node_name, */
+/* 	   utt->im_node->children, utt->im_node->sibling); */
+  /* utt_modules_foreach_module (utt->modules, (GFunc)print_module_name, NULL); */
+  /* g_print ("%p\n", node); */
   while (node) {
     module = node->module;
     if (!module || module->module_type != UTT_MODULE_CLASS_TYPE) {
