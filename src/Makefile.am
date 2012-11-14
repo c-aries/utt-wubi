@@ -35,7 +35,8 @@ utt_SOURCES = \
 	utt.c \
 	utt_debug.c utt_debug.h \
 	util.c util.h \
-	wubi_table.c wubi_table.h
+	wubi_table.c wubi_table.h \
+	utt_class_window.c utt.h
 utt_CPPFLAGS = \
 	$(GTK_CFLAGS) \
 	-I$(top_srcdir)/include \

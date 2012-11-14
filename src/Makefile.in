@@ -51,7 +51,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_utt_OBJECTS = utt-utt.$(OBJEXT) utt-utt_debug.$(OBJEXT) \
-	utt-util.$(OBJEXT) utt-wubi_table.$(OBJEXT)
+	utt-util.$(OBJEXT) utt-wubi_table.$(OBJEXT) \
+	utt-utt_class_window.$(OBJEXT)
 utt_OBJECTS = $(am_utt_OBJECTS)
 utt_DEPENDENCIES = $(top_srcdir)/libutt/libutt.la
 utt_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -266,7 +267,8 @@ utt_SOURCES = \
 	utt.c \
 	utt_debug.c utt_debug.h \
 	util.c util.h \
-	wubi_table.c wubi_table.h
+	wubi_table.c wubi_table.h \
+	utt_class_window.c utt.h
 
 utt_CPPFLAGS = \
 	$(GTK_CFLAGS) \
@@ -372,6 +374,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt-util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt-utt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt-utt_class_window.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt-utt_debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt-wubi_table.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utt_wubi-keyboard.Po@am__quote@
@@ -466,6 +469,20 @@ utt-wubi_table.obj: wubi_table.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='wubi_table.c' object='utt-wubi_table.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utt-wubi_table.obj `if test -f 'wubi_table.c'; then $(CYGPATH_W) 'wubi_table.c'; else $(CYGPATH_W) '$(srcdir)/wubi_table.c'; fi`
+
+utt-utt_class_window.o: utt_class_window.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utt-utt_class_window.o -MD -MP -MF $(DEPDIR)/utt-utt_class_window.Tpo -c -o utt-utt_class_window.o `test -f 'utt_class_window.c' || echo '$(srcdir)/'`utt_class_window.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utt-utt_class_window.Tpo $(DEPDIR)/utt-utt_class_window.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utt_class_window.c' object='utt-utt_class_window.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utt-utt_class_window.o `test -f 'utt_class_window.c' || echo '$(srcdir)/'`utt_class_window.c
+
+utt-utt_class_window.obj: utt_class_window.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utt-utt_class_window.obj -MD -MP -MF $(DEPDIR)/utt-utt_class_window.Tpo -c -o utt-utt_class_window.obj `if test -f 'utt_class_window.c'; then $(CYGPATH_W) 'utt_class_window.c'; else $(CYGPATH_W) '$(srcdir)/utt_class_window.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utt-utt_class_window.Tpo $(DEPDIR)/utt-utt_class_window.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utt_class_window.c' object='utt-utt_class_window.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utt-utt_class_window.obj `if test -f 'utt_class_window.c'; then $(CYGPATH_W) 'utt_class_window.c'; else $(CYGPATH_W) '$(srcdir)/utt_class_window.c'; fi`
 
 utt_wubi-keyboard.o: keyboard.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(utt_wubi_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utt_wubi-keyboard.o -MD -MP -MF $(DEPDIR)/utt_wubi-keyboard.Tpo -c -o utt_wubi-keyboard.o `test -f 'keyboard.c' || echo '$(srcdir)/'`keyboard.c

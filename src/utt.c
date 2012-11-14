@@ -4,13 +4,21 @@
 #include <gtk/gtk.h>
 #include <utt/module.h>
 #include "config.h"
+#include "utt.h"
 #include "common.h"
 #include "utt_debug.h"
 
-struct utt_global {
-  GtkWidget *main_window;
-  GtkWidget *im_tree_view;	/* input method tree view */
-};
+struct utt *
+utt_new ()
+{
+  return g_new0 (struct utt, 1);
+}
+
+void
+utt_destroy (struct utt *utt)
+{
+  g_free (utt);
+}
 
 static void
 logo_setup ()
@@ -117,38 +125,27 @@ add_class_list (GtkPaned *pane, struct utt_modules *modules)
 }
 
 static void
-launch_class_window ()
-{
-  GtkWidget *window;
-
-  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  g_signal_connect (window, "destroy", gtk_main_quit, NULL);
-  gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
-  gtk_widget_show_all (window);
-}
-
-static void
-on_ok_button_click (GtkButton *button, struct utt_global *global)
+on_ok_button_click (GtkButton *button, struct utt *utt)
 {
   GtkTreeSelection *sel;
   GtkTreeIter iter;
   GtkTreeModel *model = NULL;
   struct utt_module_tree_node *node = NULL;
 
-  sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (global->im_tree_view));
+  sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (utt->ui.im_view));
   if (gtk_tree_selection_get_selected (sel, &model, &iter)) {
     gtk_tree_model_get (model, &iter,
 			1, &node,
 			-1);
     if (node) {
-      gtk_widget_hide_all (global->main_window);
-      launch_class_window ();
+      gtk_widget_hide_all (utt->ui.home_window);
+      launch_class_window (utt);
     }
   }
 }
 
 static void
-add_class_intro (GtkPaned *pane, struct utt_global *global)
+add_class_intro (GtkPaned *pane, struct utt *utt)
 {
   GtkWidget *vbox, *hbox, *frame;
   GtkWidget *custom_label, *button;
@@ -168,7 +165,7 @@ add_class_intro (GtkPaned *pane, struct utt_global *global)
 
   button = gtk_button_new_from_stock (GTK_STOCK_OK);
   gtk_box_pack_end (GTK_BOX (hbox), button, FALSE, FALSE, 6);
-  g_signal_connect (button, "clicked", G_CALLBACK (on_ok_button_click), global);
+  g_signal_connect (button, "clicked", G_CALLBACK (on_ok_button_click), utt);
   button = gtk_button_new_from_stock (GTK_STOCK_QUIT);
   gtk_box_pack_end (GTK_BOX (hbox), button, FALSE, FALSE, 0);
 }
@@ -178,9 +175,11 @@ int main (int argc, char *argv[])
   GtkWidget *window, *vbox;
   GtkWidget *info, *pane;
   struct utt_modules *modules;
-  struct utt_global global;
+  struct utt *utt;
 
   gtk_init (&argc, &argv);
+
+  utt = utt_new ();
 
   logo_setup ();
   locale_setup ();
@@ -189,7 +188,8 @@ int main (int argc, char *argv[])
   modules = utt_modules_new ();
   utt_modules_scan (modules);
 
-  global.main_window = window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  /* create home window */
+  utt->ui.home_window = window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   g_signal_connect (window, "destroy", gtk_main_quit, NULL);
   gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
   gtk_widget_set_size_request (window, 480, 320);
@@ -200,14 +200,18 @@ int main (int argc, char *argv[])
   pane = gtk_hpaned_new ();
   gtk_box_pack_start (GTK_BOX (vbox), pane, TRUE, TRUE, 0);
 
-  global.im_tree_view = add_class_list (GTK_PANED (pane), modules);
-  add_class_intro (GTK_PANED (pane), &global);
+  utt->ui.im_view = add_class_list (GTK_PANED (pane), modules);
+  add_class_intro (GTK_PANED (pane), utt);
 
   info = gtk_statusbar_new ();
   gtk_box_pack_end (GTK_BOX (vbox), info, FALSE, FALSE, 0);
 
+  /* create class window */
+  create_class_window (utt);
+
   gtk_widget_show_all (window);
   gtk_main ();
   utt_modules_destroy (modules);
+  utt_destroy (utt);
   exit (EXIT_SUCCESS);
 }
