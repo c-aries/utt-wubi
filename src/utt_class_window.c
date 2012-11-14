@@ -19,6 +19,7 @@ launch_class_window (struct utt *utt)
   GtkWidget *window, *vbox;
   GtkWidget *toolbar, *notebook, *label;
   GtkToolItem *item;
+  GtkWidget *temp_label;
   struct utt_module_tree_node *node;
   struct utt_module *module;
   gchar *name;
@@ -65,8 +66,9 @@ launch_class_window (struct utt *utt)
       continue;
     }
     label = gtk_label_new (module->locale_name ());
+    temp_label = gtk_label_new ("class page");
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-			      NULL/* module->create_main_page () */,
+			      temp_label/* module->create_main_page () */,
 			      label);
     node = node->sibling;
   }
