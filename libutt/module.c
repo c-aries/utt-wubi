@@ -80,9 +80,14 @@ insert_node (struct utt_module_tree_node **children, gchar **node_name,
     if (g_strcmp0 (iter_node->node_name, *node_name) == 0) {
       if (*(node_name + 1) == NULL) {
 	/* FIXME: need to deal with old value(e.g. dlclose(), free()) */
-	iter_node->module = module;
-	iter_node->module_dl_handle = module_dl_handle;
-	break;
+	if (!iter_node->module) {
+	  iter_node->module = module;
+	  iter_node->module_dl_handle = module_dl_handle;
+	}
+	else {
+	  g_warning ("duplicate module_name \"%s\"", module->module_name);
+	}
+	return;
       }
       insert_node (&iter_node->children, node_name + 1, module, module_dl_handle);
       return;
