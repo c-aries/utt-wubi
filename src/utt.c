@@ -5,7 +5,6 @@
 #include <utt/module.h>
 #include "config.h"
 #include "utt.h"
-#include "common.h"
 #include "utt_debug.h"
 
 struct utt *
@@ -139,6 +138,7 @@ on_ok_button_click (GtkButton *button, struct utt *utt)
 			-1);
     if (node) {
       gtk_widget_hide_all (utt->ui.home_window);
+      utt->im_node = node;
       launch_class_window (utt);
     }
   }
@@ -183,13 +183,14 @@ int main (int argc, char *argv[])
 
   logo_setup ();
   locale_setup ();
-  g_set_prgname (_("Universal Typing Training"));
+  /* g_set_application_name (_("Universal Typing Training")); */
   utt_debug ();
   modules = utt_modules_new ();
   utt_modules_scan (modules);
 
   /* create home window */
   utt->ui.home_window = window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title (GTK_WINDOW (window), _("Universal Typing Training"));
   g_signal_connect (window, "destroy", gtk_main_quit, NULL);
   gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
   gtk_widget_set_size_request (window, 480, 320);

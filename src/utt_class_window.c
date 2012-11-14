@@ -3,7 +3,14 @@
 void
 launch_class_window (struct utt *utt)
 {
+  struct utt_module *module;
+  gchar *name;
+
+  module = utt->im_node->module;
   gtk_widget_hide_all (utt->ui.home_window);
+  name = g_strdup_printf ("%s(%s)", _("Universal Typing Training"), module->locale_name ());
+  gtk_window_set_title (GTK_WINDOW (utt->ui.class_window), name);
+  g_free (name);
   gtk_widget_show_all (utt->ui.class_window);
 }
 

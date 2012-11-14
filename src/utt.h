@@ -2,6 +2,8 @@
 #define __UTT_H__
 
 #include <gtk/gtk.h>
+#include <utt/module.h>
+#include <utt/intl.h>
 
 struct utt {
   struct {
@@ -9,6 +11,7 @@ struct utt {
     GtkWidget *im_view;		/* input method tree view */
     GtkWidget *class_window;
   } ui;
+  struct utt_module_tree_node *im_node; /* choosen input method, tree node */
 };
 
 struct utt *utt_new ();
