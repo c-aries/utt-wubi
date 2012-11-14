@@ -205,9 +205,6 @@ int main (int argc, char *argv[])
   info = gtk_statusbar_new ();
   gtk_box_pack_end (GTK_BOX (vbox), info, FALSE, FALSE, 0);
 
-  /* create class window */
-  create_class_window (utt);
-
   gtk_widget_show_all (window);
   gtk_main ();
   utt_destroy (utt);

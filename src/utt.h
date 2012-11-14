@@ -17,8 +17,7 @@ struct utt {
 
 struct utt *utt_new ();
 void utt_destroy (struct utt *utt);
-void create_class_window (struct utt *utt);
-void launch_class_window ();
+void launch_class_window (struct utt *utt);
 
 #endif
 
