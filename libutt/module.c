@@ -79,6 +79,7 @@ insert_node (struct utt_module_tree_node **children, gchar **node_name,
   while (iter_node) {
     if (g_strcmp0 (iter_node->node_name, *node_name) == 0) {
       if (*(node_name + 1) == NULL) {
+	/* FIXME: need to deal with old value(e.g. dlclose(), free()) */
 	iter_node->module = module;
 	iter_node->module_dl_handle = module_dl_handle;
 	break;
@@ -99,7 +100,6 @@ insert_node (struct utt_module_tree_node **children, gchar **node_name,
     }
     new_node->node_name = g_strdup (*node_name);
     if (*(node_name + 1) == NULL) {
-      /* FIXME: need to deal with old value(e.g. dlclose(), free()) */
       new_node->module = module;
       new_node->module_dl_handle = module_dl_handle;
     }
