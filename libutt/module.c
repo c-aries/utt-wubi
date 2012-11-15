@@ -272,7 +272,41 @@ utt_modules_foreach_module (struct utt_modules *modules, GFunc func, gpointer da
   tree_node_foreach_module (modules->first_node, func, data);
 }
 
-void
-utt_module_test ()
+struct utt_module *
+utt_nth_child_module (struct utt_module_tree_node *node, int nth)
 {
+  struct utt_module *module;
+
+  if (!node || !node->children || nth < 0) {
+    return NULL;
+  }
+  node = node->children;
+  for (;;) {
+    module = node->module;
+    if (nth-- == 0) {
+      return module;
+    }
+    node = node->sibling;
+    if (node == NULL) {
+      return NULL;
+    }
+  }
+}
+
+struct utt_module_tree_node *
+utt_nth_child_node (struct utt_module_tree_node *node, int nth)
+{
+  if (!node || !node->children || nth < 0) {
+    return NULL;
+  }
+  node = node->children;
+  for (;;) {
+    if (nth-- == 0) {
+      return node;
+    }
+    node = node->sibling;
+    if (node == NULL) {
+      return NULL;
+    }
+  }
 }

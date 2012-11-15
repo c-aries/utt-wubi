@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: utt-wubi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-15 00:03+0800\n"
-"PO-Revision-Date: 2012-11-14 00:35+0800\n"
+"POT-Creation-Date: 2012-11-16 00:39+0800\n"
+"PO-Revision-Date: 2012-11-16 00:39+0800\n"
 "Last-Translator: c-aries <babyaries2@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
 "Language: zh_CN\n"
@@ -37,7 +37,7 @@ msgstr "撇区(QWERT)"
 msgid "SHU(HJKLM)"
 msgstr "竖区(HJKLM)"
 
-#: ../src/utt.c:193 ../src/utt_class_window.c:11
+#: ../src/utt.c:194 ../src/utt_class_window.c:63
 msgid "Universal Typing Training"
 msgstr "国际化打字训练"
 
@@ -64,6 +64,10 @@ msgstr "折区(XCVBN)"
 #: ../module/english/keyboard.c:21
 msgid "alphabetic character"
 msgstr "字母"
+
+#: ../src/utt_class_window.c:20
+msgid "choose one class"
+msgstr "选择一个课程"
 
 #: ../src/utt-wubi.c:145
 msgid "class continue?"

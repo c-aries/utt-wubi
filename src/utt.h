@@ -13,6 +13,8 @@ struct utt {
   } ui;
   struct utt_modules *modules;
   struct utt_module_tree_node *im_node; /* current input method tree node */
+  struct utt_module_tree_node *class_node;	/* current class tree node */
+  gint class_item;
 };
 
 struct utt *utt_new ();

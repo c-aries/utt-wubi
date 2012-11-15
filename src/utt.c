@@ -100,7 +100,7 @@ add_class_list (GtkPaned *pane, struct utt *utt)
 		      -1);
   for (node = utt->modules->first_node;
        node;
-       node = node->sibling) {	/* FIXME: only a hack here */
+       node = node->sibling) {	/* FIXME: just a hack here */
     module = node->module;
     if (module &&
 	module->module_type == UTT_MODULE_INPUT_METHOD_TYPE) {

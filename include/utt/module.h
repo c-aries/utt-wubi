@@ -32,10 +32,11 @@ struct utt_modules {	/* FIXME: APUE2 has introduce how to hide the structure int
   void *data;
 };
 
-void utt_module_test ();
 struct utt_modules *utt_modules_new ();
 void utt_modules_destroy (struct utt_modules *modules);
 void utt_modules_scan (struct utt_modules *modules);
 void utt_modules_foreach_module (struct utt_modules *modules, GFunc func, gpointer data);
+struct utt_module *utt_nth_child_module (struct utt_module_tree_node *children_node, int nth);
+struct utt_module_tree_node *utt_nth_child_node (struct utt_module_tree_node *node, int nth);
 
 #endif
