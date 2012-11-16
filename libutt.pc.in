@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libutt
+URL: https://github.com/c-aries/utt-wubi
+Description: Universal Typing Training Library.
+Version: @VERSION@
+Requires: gtk+-2.0
+Libs: -L${libdir} -lutt
+Cflags: -I${includedir}

@@ -1,16 +1,17 @@
 parse scim, ibus, fcitx binary table
 plugins
 fcitx backspace problem in text mode
-ToolItem需要tips
-拆字图解,让文章键码帮助功能更适合初级用户
-统计＆历史记录训练，错字统计训练
-全局配置，如字体大小
-设计LOGO，美化UI
-帮助文档，教程
+module Makefile.am add UTT_CFLAGS UTT_LIBS
+add tips for ToolItem
+beginners need pictures to teach them how a chinese character split to strokes
+statistics, history, mistyping words, record to exercise.
+global configure, e.g. font size
+design logo, make ui beautiful
+Help Documents, Input method tutorial
 change all language to english, then translate them to locale
 does Xorg provides any way for us to know what input method and input method program is using?
 make developer only need to write plugins, easily implement their own country's local typing training program
 the utt main window, display all types typing training program provide by plugins.
 support ibus, scim, fcitx
-UttTextArea类似Wiki的Text Markup
+UttTextArea Wiki like Text Markup
 FIX BUG

@@ -58,6 +58,7 @@ AC_C_INLINE
 AC_CHECK_FUNCS([memset])
 
 AC_CONFIG_FILES([Makefile
+		libutt.pc
 		po/Makefile.in
 		data/Makefile
 		data/utt.desktop.in
