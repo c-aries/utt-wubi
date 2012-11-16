@@ -115,6 +115,26 @@ insert_node (struct utt_module_tree_node **children, gchar **node_name,
   }
 }
 
+static GtkWidget *
+default_create_class_page ()
+{
+  return gtk_label_new ("create class page here.");
+}
+
+static void
+utt_module_set_defaults (struct utt_module *module)
+{
+  struct utt_class_module *class_module;
+  enum utt_module_type type = module->module_type;
+
+  if (type == UTT_MODULE_CLASS_TYPE) {
+    class_module = module->priv_data;
+    if (!class_module->create_class_page) {
+      class_module->create_class_page = default_create_class_page;
+    }
+  }
+}
+
 static gboolean
 utt_modules_add_module (struct utt_modules *modules, struct utt_module *module, void *module_dl_handle)
 {
@@ -124,6 +144,7 @@ utt_modules_add_module (struct utt_modules *modules, struct utt_module *module, 
   if (!validate_module_name (module->module_name, &depth, &node_name)) {
     return FALSE;
   }
+  utt_module_set_defaults (module);
   /* FIXME: insert_node should indicate successful or not */
   insert_node (&modules->first_node, node_name, module, module_dl_handle);
   if (node_name) {

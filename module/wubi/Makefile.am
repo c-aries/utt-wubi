@@ -8,27 +8,27 @@ module_LTLIBRARIES = \
 # learn from pidgin, FIXME: how to export .so only?
 jianma_la_LDFLAGS = \
 	-module -avoid-version \
-	$(GLIB_LDFLAGS)
+	$(GTK_LDFLAGS)
 jianma_la_CPPFLAGS = \
-	$(GLIB_CFLAGS) \
+	$(GTK_CFLAGS) \
 	-I$(top_srcdir)/include
 jianma_la_SOURCES = \
 	jianma.c
 
 wubi_la_LDFLAGS = \
 	-module -avoid-version \
-	$(GLIB_LDFLAGS)
+	$(GTK_LDFLAGS)
 wubi_la_CPPFLAGS = \
-	$(GLIB_CFLAGS) \
+	$(GTK_CFLAGS) \
 	-I$(top_srcdir)/include
 wubi_la_SOURCES = \
 	wubi.c
 
 zigen_la_LDFLAGS = \
 	-module -avoid-version \
-	$(GLIB_LDFLAGS)
+	$(GTK_LDFLAGS)
 zigen_la_CPPFLAGS = \
-	$(GLIB_CFLAGS) \
+	$(GTK_CFLAGS) \
 	-I$(top_srcdir)/include
 zigen_la_SOURCES = \
 	zigen.c

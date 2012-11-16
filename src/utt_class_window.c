@@ -62,6 +62,9 @@ on_index_click (GtkToolButton *button, struct utt *utt)
   struct utt_class_module *class_module;
   gint ret, id;
 
+  if (!utt->class_node) {
+    return;
+  }
   module = utt->class_node->module;
   class_module = module->priv_data;
   dialog = gtk_dialog_new_with_buttons (_("choose one class"),
@@ -113,11 +116,11 @@ void
 launch_class_window (struct utt *utt)
 {
   GtkWidget *window, *vbox;
-  GtkWidget *toolbar, *notebook, *label;
+  GtkWidget *toolbar, *notebook, *label, *page;
   GtkToolItem *item;
-  GtkWidget *temp_label;
   struct utt_module_tree_node *node;
   struct utt_module *module;
+  struct utt_class_module *class_module;
   gchar *name;
 
   gtk_widget_hide_all (utt->ui.home_window);
@@ -158,11 +161,10 @@ launch_class_window (struct utt *utt)
     if (!module || module->module_type != UTT_MODULE_CLASS_TYPE) {
       continue;
     }
+    class_module = module->priv_data;
     label = gtk_label_new (module->locale_name ());
-    temp_label = gtk_label_new ("class page");
-    gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-			      temp_label/* module->create_main_page () */,
-			      label);
+    page = class_module->create_class_page ();
+    gtk_notebook_append_page (GTK_NOTEBOOK (notebook), page, label);
     node = node->sibling;
   }
   g_signal_connect (notebook, "switch-page", G_CALLBACK (on_notebook_switch), utt);

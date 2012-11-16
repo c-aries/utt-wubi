@@ -1,7 +1,7 @@
 #ifndef __UTT_MODULE_H__
 #define __UTT_MODULE_H__
 
-#include <glib.h>
+#include <gtk/gtk.h>
 
 enum utt_module_type {
   UTT_MODULE_INPUT_METHOD_TYPE,
@@ -10,8 +10,9 @@ enum utt_module_type {
 };
 
 struct utt_class_module {
-  int (*class_num) (void);
+  int (*class_num) (void);	/* how many class in this class module? */
   char *(*nth_class_name) (int nth);
+  GtkWidget *(*create_class_page) (void);
 };
 struct utt_module {
   char *module_name;

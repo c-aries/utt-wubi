@@ -8,9 +8,9 @@ module_LTLIBRARIES = \
 # learn from pidgin, FIXME: how to export .so only?
 pinyin_la_LDFLAGS = \
 	-module -avoid-version \
-	$(GLIB_LDFLAGS)
+	$(GTK_LDFLAGS)
 pinyin_la_CPPFLAGS = \
-	$(GLIB_CFLAGS) \
+	$(GTK_CFLAGS) \
 	-I$(top_srcdir)/include
 pinyin_la_SOURCES = \
 	pinyin.c

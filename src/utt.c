@@ -143,6 +143,10 @@ on_ok_button_click (GtkButton *button, struct utt *utt)
 			-1);
     if (node) {
       gtk_widget_hide_all (utt->ui.home_window);
+      if (utt->im_node != node) {
+	utt->class_node = NULL;
+	utt->class_item = 0;
+      }
       utt->im_node = node;
       launch_class_window (utt);
     }

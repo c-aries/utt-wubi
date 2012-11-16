@@ -7,18 +7,18 @@ module_LTLIBRARIES = \
 
 keyboard_la_LDFLAGS = \
 	-module -avoid-version \
-	$(GLIB_LDFLAGS)
+	$(GTK_LDFLAGS)
 keyboard_la_CPPFLAGS = \
-	$(GLIB_CFLAGS) \
+	$(GTK_CFLAGS) \
 	-I$(top_srcdir)/include
 keyboard_la_SOURCES = \
 	keyboard.c
 
 english_la_LDFLAGS = \
 	-module -avoid-version \
-	$(GLIB_LDFLAGS)
+	$(GTK_LDFLAGS)
 english_la_CPPFLAGS = \
-	$(GLIB_CFLAGS) \
+	$(GTK_CFLAGS) \
 	-I$(top_srcdir)/include
 english_la_SOURCES = \
 	english.c
