@@ -141,16 +141,21 @@ launch_class_window (struct utt *utt)
   gtk_box_pack_start (GTK_BOX (vbox), toolbar, FALSE, FALSE, 0);
   item = gtk_tool_button_new_from_stock (GTK_STOCK_INDEX);
   g_signal_connect (item, "clicked", G_CALLBACK (on_index_click), utt);
+  gtk_tool_item_set_tooltip_text (item, _("choose a new class to begin"));
   gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (item), -1);
   item = gtk_toggle_tool_button_new_from_stock (GTK_STOCK_MEDIA_PAUSE);
+  gtk_tool_item_set_tooltip_text (item, _("class pause"));
   gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (item), -1);
   gtk_widget_set_sensitive (GTK_WIDGET (item), FALSE);
   item = gtk_tool_button_new_from_stock (GTK_STOCK_PREFERENCES);
+  gtk_tool_item_set_tooltip_text (item, _("configuration"));
   gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (item), -1);
   item = gtk_tool_button_new_from_stock (GTK_STOCK_HOME);
+  gtk_tool_item_set_tooltip_text (item, _("go back homepage"));
   g_signal_connect (item, "clicked", G_CALLBACK (on_home_click), utt);
   gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (item), -1);
   item = gtk_tool_button_new_from_stock (GTK_STOCK_HELP);
+  gtk_tool_item_set_tooltip_text (item, _("help manual and tutorial"));
   gtk_toolbar_insert (GTK_TOOLBAR (toolbar), GTK_TOOL_ITEM (item), -1);
 
   notebook = gtk_notebook_new ();

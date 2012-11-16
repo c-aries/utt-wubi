@@ -9,6 +9,7 @@ struct utt {
   struct {
     GtkWidget *home_window;
     GtkWidget *im_view;		/* input method tree view */
+    GtkWidget *home_ok_button;
     GtkWidget *class_window;
   } ui;
   struct utt_modules *modules;

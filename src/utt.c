@@ -2,6 +2,7 @@
 #include <locale.h>
 #include <libintl.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 #include <utt/module.h>
 #include "config.h"
 #include "utt.h"
@@ -77,6 +78,15 @@ locale_setup ()
   textdomain (GETTEXT_PACKAGE);
 }
 
+static gboolean
+on_im_view_key_press (GtkWidget *widget, GdkEventKey *event, struct utt *utt)
+{
+  if (event->keyval == GDK_Return) {
+    g_signal_emit_by_name (utt->ui.home_ok_button, "clicked", utt);
+  }
+  return FALSE;
+}
+
 static void
 add_class_list (GtkPaned *pane, struct utt *utt)
 {
@@ -113,6 +123,7 @@ add_class_list (GtkPaned *pane, struct utt *utt)
   }
 
   utt->ui.im_view = view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (store));
+  g_signal_connect (view, "key-press-event", G_CALLBACK (on_im_view_key_press), utt);
   gtk_container_set_border_width (GTK_CONTAINER (view), 4);
   gtk_container_add (GTK_CONTAINER (frame), view);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), FALSE);
@@ -172,10 +183,11 @@ add_class_intro (GtkPaned *pane, struct utt *utt)
   gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (hbox), 4);
 
-  button = gtk_button_new_from_stock (GTK_STOCK_OK);
+  utt->ui.home_ok_button = button = gtk_button_new_from_stock (GTK_STOCK_OK);
   gtk_box_pack_end (GTK_BOX (hbox), button, FALSE, FALSE, 6);
   g_signal_connect (button, "clicked", G_CALLBACK (on_ok_button_click), utt);
   button = gtk_button_new_from_stock (GTK_STOCK_QUIT);
+  g_signal_connect (button, "clicked", gtk_main_quit, NULL);
   gtk_box_pack_end (GTK_BOX (hbox), button, FALSE, FALSE, 0);
 }
 

@@ -1,8 +1,7 @@
 parse scim, ibus, fcitx binary table
 plugins
 fcitx backspace problem in text mode
-module Makefile.am add UTT_CFLAGS UTT_LIBS
-add tips for ToolItem
+module Makefile.am add UTT_CFLAGS UTT_LIBS, write libutt.m4
 beginners need pictures to teach them how a chinese character split to strokes
 statistics, history, mistyping words, record to exercise.
 global configure, e.g. font size

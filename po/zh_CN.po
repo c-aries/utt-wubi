@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: utt-wubi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-16 00:39+0800\n"
-"PO-Revision-Date: 2012-11-16 00:39+0800\n"
+"POT-Creation-Date: 2012-11-16 22:31+0800\n"
+"PO-Revision-Date: 2012-11-16 22:31+0800\n"
 "Last-Translator: c-aries <babyaries2@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
 "Language: zh_CN\n"
@@ -37,7 +37,7 @@ msgstr "撇区(QWERT)"
 msgid "SHU(HJKLM)"
 msgstr "竖区(HJKLM)"
 
-#: ../src/utt.c:194 ../src/utt_class_window.c:63
+#: ../src/utt.c:198 ../src/utt_class_window.c:133
 msgid "Universal Typing Training"
 msgstr "国际化打字训练"
 
@@ -65,7 +65,11 @@ msgstr "折区(XCVBN)"
 msgid "alphabetic character"
 msgstr "字母"
 
-#: ../src/utt_class_window.c:20
+#: ../src/utt_class_window.c:144
+msgid "choose a new class to begin"
+msgstr "选择一个新的课程,开始训练"
+
+#: ../src/utt_class_window.c:70
 msgid "choose one class"
 msgstr "选择一个课程"
 
@@ -73,9 +77,25 @@ msgstr "选择一个课程"
 msgid "class continue?"
 msgstr "继续训练吗？"
 
+#: ../src/utt_class_window.c:147
+msgid "class pause"
+msgstr "课程暂停"
+
+#: ../src/utt_class_window.c:151
+msgid "configuration"
+msgstr "配置"
+
 #: ../module/english/english.c:7
 msgid "english"
 msgstr "英文"
+
+#: ../src/utt_class_window.c:154
+msgid "go back homepage"
+msgstr "返回主页"
+
+#: ../src/utt_class_window.c:158
+msgid "help manual and tutorial"
+msgstr "帮助信息与教程"
 
 #: ../module/wubi/jianma.c:8
 msgid "jianma"
