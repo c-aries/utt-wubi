@@ -10,6 +10,8 @@ enum utt_module_type {
 };
 
 struct utt_class_module {
+  void (*init) (void);
+  void (*destroy) (void);
   int (*class_num) (void);	/* how many class in this class module? */
   char *(*nth_class_name) (int nth);
   GtkWidget *(*create_class_page) (void);

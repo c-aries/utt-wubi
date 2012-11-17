@@ -4,7 +4,18 @@
 static void
 on_home_click (GtkToolButton *button, struct utt *utt)
 {
+  struct utt_module *module;
+  struct utt_class_module *class_module;
+
   gtk_widget_destroy (utt->ui.class_window);
+  if (utt->class_node) {
+    module = utt->class_node->module;
+    g_assert (module->module_type == UTT_MODULE_CLASS_TYPE);
+    if (module->module_type == UTT_MODULE_CLASS_TYPE) {
+      class_module = module->priv_data;
+      class_module->destroy ();
+    }
+  }
   gtk_widget_show_all (utt->ui.home_window);
 }
 
@@ -167,6 +178,7 @@ launch_class_window (struct utt *utt)
       continue;
     }
     class_module = module->priv_data;
+    class_module->init ();
     label = gtk_label_new (module->locale_name ());
     page = class_module->create_class_page ();
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook), page, label);

@@ -122,6 +122,16 @@ default_create_class_page ()
 }
 
 static void
+default_destroy ()
+{
+}
+
+static void
+default_init ()
+{
+}
+
+static void
 utt_module_set_defaults (struct utt_module *module)
 {
   struct utt_class_module *class_module;
@@ -131,6 +141,12 @@ utt_module_set_defaults (struct utt_module *module)
     class_module = module->priv_data;
     if (!class_module->create_class_page) {
       class_module->create_class_page = default_create_class_page;
+    }
+    if (!class_module->destroy) {
+      class_module->destroy = default_destroy;
+    }
+    if (!class_module->init) {
+      class_module->init = default_init;
     }
   }
 }

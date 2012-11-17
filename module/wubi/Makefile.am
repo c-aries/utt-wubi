@@ -29,6 +29,7 @@ zigen_la_LDFLAGS = \
 	$(GTK_LDFLAGS)
 zigen_la_CPPFLAGS = \
 	$(GTK_CFLAGS) \
+	-DPKGDATADIR=\"$(pkgdatadir)\" \
 	-I$(top_srcdir)/include
 zigen_la_SOURCES = \
 	zigen.c
