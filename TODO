@@ -14,3 +14,4 @@ the utt main window, display all types typing training program provide by plugin
 support ibus, scim, fcitx
 UttTextArea Wiki like Text Markup
 FIX BUG
+support make menuconfig way, "Esc Esc" operation

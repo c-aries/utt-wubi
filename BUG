@@ -4,3 +4,10 @@
 不行啊，打字好像用fcitx我打错字，backspace会把已经输入的删除而不是删除fcitx打错 
 = =b> 他用的系统是slackware
 
+* scim
+after launch scim, i press 'Tab'
+$ utt
+Failed to receive messages at scim_bridge_client_read_and_dispatch ()
+An IOException at scim_bridge_client_change_focus ()
+An IOException occurred at scim_bridge_client_imcontext_focus_out ()
+An IOException occurred at scim_bridge_client_imcontext_set_cursor_location ()

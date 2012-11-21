@@ -14,7 +14,7 @@ enum {
 };
 
 struct _zigen_priv {
-  struct utt_keyboard *kb;
+  GtkWidget *kb;
 };
 static struct _zigen_priv *priv;
 
@@ -62,6 +62,7 @@ GtkWidget *create_class_page (void)
   GtkWidget *vbox;
 
   vbox = gtk_vbox_new (FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), priv->kb, FALSE, FALSE, 0);
   return vbox;
 #else
   GtkWidget *vbox;
@@ -124,12 +125,12 @@ init (void)
 {
   priv = g_new0 (struct _zigen_priv, 1);
   priv->kb = utt_keyboard_new ();
+  /* needn't call g_object_unref, gtk_widget_destroy(class_window) free it */
 }
 
 static void
 destroy (void)
 {
-  utt_keyboard_destroy (priv->kb);
   g_free (priv);
 }
 
