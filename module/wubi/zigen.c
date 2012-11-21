@@ -124,8 +124,8 @@ static void
 init (void)
 {
   priv = g_new0 (struct _zigen_priv, 1);
-  priv->kb = utt_keyboard_new ();
   /* needn't call g_object_unref, gtk_widget_destroy(class_window) free it */
+  priv->kb = utt_keyboard_new ();
 }
 
 static void
