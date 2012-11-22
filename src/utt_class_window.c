@@ -139,7 +139,6 @@ launch_class_window (struct utt *utt)
   utt->ui.class_window = window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   g_signal_connect (window, "delete-event", gtk_main_quit, NULL);
   gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
-  gtk_widget_set_size_request (window, 640, 480);
   module = utt->im_node->module;
   name = g_strdup_printf ("%s(%s)", _("Universal Typing Training"), module->locale_name ());
   gtk_window_set_title (GTK_WINDOW (utt->ui.class_window), name);

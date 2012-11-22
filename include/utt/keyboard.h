@@ -27,6 +27,7 @@ struct _UttKeyboardClass
 
 GType utt_keyboard_get_type (void) G_GNUC_CONST;
 GtkWidget *utt_keyboard_new (void);
+gboolean utt_keyboard_set_image (UttKeyboard *kb, const gchar *filename);
 
 G_END_DECLS
 

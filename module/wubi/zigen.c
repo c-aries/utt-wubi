@@ -60,8 +60,14 @@ GtkWidget *create_class_page (void)
 {
 #if 1
   GtkWidget *vbox;
+  gchar *path;
 
   vbox = gtk_vbox_new (FALSE, 0);
+
+  priv->kb = utt_keyboard_new ();
+  path = g_build_filename (PKGDATADIR, "keyboard_wubi.png", NULL);
+  utt_keyboard_set_image (UTT_KEYBOARD (priv->kb), path);
+  g_free (path);
   gtk_box_pack_start (GTK_BOX (vbox), priv->kb, FALSE, FALSE, 0);
   return vbox;
 #else
@@ -125,7 +131,6 @@ init (void)
 {
   priv = g_new0 (struct _zigen_priv, 1);
   /* needn't call g_object_unref, gtk_widget_destroy(class_window) free it */
-  priv->kb = utt_keyboard_new ();
 }
 
 static void
