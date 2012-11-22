@@ -45,4 +45,5 @@ utt_CPPFLAGS = \
 utt_LDFLAGS = \
 	$(GTK_LIBS)
 utt_LDADD = \
-	$(top_srcdir)/libutt/libutt.la
+	$(top_builddir)/libutt/libutt.la
+# top_builddir learn from pidgin-2.7.9/pidgin/Makefile.am

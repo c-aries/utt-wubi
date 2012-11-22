@@ -54,7 +54,7 @@ am_utt_OBJECTS = utt-utt.$(OBJEXT) utt-utt_debug.$(OBJEXT) \
 	utt-util.$(OBJEXT) utt-wubi_table.$(OBJEXT) \
 	utt-utt_class_window.$(OBJEXT)
 utt_OBJECTS = $(am_utt_OBJECTS)
-utt_DEPENDENCIES = $(top_srcdir)/libutt/libutt.la
+utt_DEPENDENCIES = $(top_builddir)/libutt/libutt.la
 utt_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(utt_LDFLAGS) \
 	$(LDFLAGS) -o $@
@@ -280,7 +280,7 @@ utt_LDFLAGS = \
 	$(GTK_LIBS)
 
 utt_LDADD = \
-	$(top_srcdir)/libutt/libutt.la
+	$(top_builddir)/libutt/libutt.la
 
 all: all-am
 
@@ -900,6 +900,7 @@ uninstall-am: uninstall-binPROGRAMS
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-binPROGRAMS
 
+# top_builddir learn from pidgin-2.7.9/pidgin/Makefile.am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

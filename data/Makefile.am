@@ -1,4 +1,4 @@
-SUBDIRS = zigen icons article
+SUBDIRS = zigen icons article artwork
 
 desktopdir = $(datadir)/applications
 desktop_in_files = utt-wubi.desktop.in utt.desktop.in

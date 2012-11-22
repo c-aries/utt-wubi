@@ -69,6 +69,8 @@ AC_CONFIG_FILES([Makefile
 		data/icons/48x48/Makefile
 		data/icons/48x48/apps/Makefile
 		data/article/Makefile
+		data/artwork/Makefile
+		data/artwork/keyboard/Makefile
 		module/Makefile
 		module/wubi/Makefile
 		module/english/Makefile
