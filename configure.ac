@@ -71,6 +71,7 @@ AC_CONFIG_FILES([Makefile
 		data/article/Makefile
 		data/artwork/Makefile
 		data/artwork/keyboard/Makefile
+		data/artwork/keyboard-wubi/Makefile
 		module/Makefile
 		module/wubi/Makefile
 		module/english/Makefile

@@ -1,1 +1,1 @@
-SUBDIRS = keyboard
+SUBDIRS = keyboard keyboard-wubi
